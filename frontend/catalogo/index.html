@@ -21,7 +21,6 @@
             position: sticky; top: 0; z-index: 100;
         }
 
-        /* CAMBIO 1: Ruta relativa simple para el botón volver */
         .btn-back { 
             text-decoration: none; color: var(--primary); 
             font-weight: 700; font-size: 0.95rem;
@@ -39,7 +38,9 @@
 
         .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
         .filter-group label { font-size: 0.75rem; font-weight: 800; color: #6b7280; text-transform: uppercase; }
-        .filter-group select { 
+        
+        /* Estilo común para inputs y selects */
+        .filter-control { 
             padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; 
             font-size: 16px; background: #fafafa; width: 100%;
         }
@@ -72,6 +73,8 @@
         @media (min-width: 768px) {
             .filters { flex-direction: row; align-items: flex-end; justify-content: center; padding: 30px; flex-wrap: wrap; }
             .filter-group { min-width: 150px; max-width: 200px; }
+            /* El buscador un poco más ancho */
+            .search-group { flex: 2; min-width: 250px; } 
             .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
             .btn-apply { padding: 12px 30px; margin-top: 0; }
         }
@@ -87,9 +90,17 @@
     </header>
 
     <section class="filters">
+        <div class="filter-group search-group">
+            <label>Nombre de la carta</label>
+            <div style="position: relative;">
+                <input type="text" id="search-name" placeholder="Ej: Black Lotus..." class="filter-control">
+                <i class="fas fa-search" style="position: absolute; right: 15px; top: 15px; color: #9ca3af;"></i>
+            </div>
+        </div>
+
         <div class="filter-group">
             <label>Color</label>
-            <select id="color">
+            <select id="color" class="filter-control">
                 <option value="">Todos</option>
                 <option value="w">Blanco</option>
                 <option value="u">Azul</option>
@@ -100,7 +111,7 @@
         </div>
         <div class="filter-group">
             <label>Rareza</label>
-            <select id="rarity">
+            <select id="rarity" class="filter-control">
                 <option value="">Todas</option>
                 <option value="common">Común</option>
                 <option value="uncommon">Infrecuente</option>
@@ -110,7 +121,7 @@
         </div>
         <div class="filter-group">
             <label>Mana (CMC)</label>
-            <select id="cmc">
+            <select id="cmc" class="filter-control">
                 <option value="">Cualquiera</option>
                 <option value="0">0</option>
                 <option value="1">1</option>
@@ -124,8 +135,9 @@
         </div>
         <div class="filter-group">
             <label>Colección</label>
-            <select id="set">
+            <select id="set" class="filter-control">
                 <option value="">Todas</option>
+                <option value="lrw">Lorwyn</option>
                 <option value="dft">Aetherdrift</option>
                 <option value="fdn">Foundations</option>
                 <option value="dsk">Duskmourn</option>
@@ -145,84 +157,99 @@
     </main>
 
     <script>
-    // 1. Función para buscar cartas
-    async function fetchCards(q = 'f:standard') {
-        const grid = document.getElementById('catalog-grid');
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;">Cargando...</p>';
+        // --- 1. FUNCIÓN PRINCIPAL DE BÚSQUEDA ---
+        async function fetchCards(q = 'f:standard') {
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;">Cargando...</p>';
 
-        try {
-            // Petición a tu API
-            const res = await fetch(`/api/cartas?q=${encodeURIComponent(q)}`);
-            
-            if (!res.ok) throw new Error('Error en la red');
+            try {
+                // Petición a tu API (usando el Proxy de Nginx)
+                const res = await fetch(`/api/cartas?q=${encodeURIComponent(q)}`);
+                
+                if (!res.ok) throw new Error('Error en la red');
 
-            const data = await res.json();
-            
-            if(!data.data || data.data.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados.</p>';
-                return;
+                const data = await res.json();
+                
+                if(!data.data || data.data.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados.</p>';
+                    return;
+                }
+
+                grid.innerHTML = data.data.map(card => `
+                    <div class="card-catalog">
+                        <img src="${card.image_uris?.normal || 'https://via.placeholder.com/488x680?text=No+Image'}" loading="lazy">
+                        <div class="card-info">
+                            <h3>${card.name}</h3>
+                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : (card.prices.usd ? card.prices.usd + ' $' : '---')}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error(error);
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:red;">Error de conexión API.</p>';
+            }
+        }
+
+        // --- 2. LÓGICA DE FILTROS ---
+        function applyFilters() {
+            // Recoger valores
+            const name = document.getElementById('search-name').value;
+            const c = document.getElementById('color').value;
+            const r = document.getElementById('rarity').value;
+            const cmc = document.getElementById('cmc').value;
+            const set = document.getElementById('set').value;
+
+            let queryParts = [];
+
+            // 1. Si hay texto escrito, va primero
+            if (name) {
+                queryParts.push(name.trim());
             }
 
-            grid.innerHTML = data.data.map(card => `
-                <div class="card-catalog">
-                    <img src="${card.image_uris?.normal || 'https://via.placeholder.com/488x680?text=No+Image'}" loading="lazy">
-                    <div class="card-info">
-                        <h3>${card.name}</h3>
-                        <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : (card.prices.usd ? card.prices.usd + ' $' : '---')}</p>
-                    </div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error(error);
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:red;">Error de conexión API.</p>';
-        }
-    }
+            // 2. Si no hay Set seleccionado, buscamos en Standard por defecto
+            if (!set) {
+                queryParts.push('f:standard');
+            }
 
-    // 2. Función para leer los filtros del HTML y buscar
-    function applyFilters() {
-        const c = document.getElementById('color').value;
-        const r = document.getElementById('rarity').value;
-        const cmc = document.getElementById('cmc').value;
-        const set = document.getElementById('set').value;
+            // 3. Añadir el resto de filtros
+            if(c) queryParts.push(`c:${c}`);
+            if(r) queryParts.push(`r:${r}`);
+            if(set) queryParts.push(`s:${set}`);
+            
+            if(cmc) {
+                if(cmc === "7") queryParts.push(`cmc>=7`);
+                else queryParts.push(`cmc:${cmc}`);
+            }
 
-        // Si hay un set seleccionado, quitamos el filtro "f:standard" para que busque en todo el historial de ese set
-        let queryParts = [];
-
-        // Si NO hay set, solemos querer solo standard (opcional, según tu gusto)
-        if (!set) {
-            queryParts.push('f:standard');
+            // Unir y buscar
+            fetchCards(queryParts.join(' '));
         }
 
-        if(c) queryParts.push(`c:${c}`);
-        if(r) queryParts.push(`r:${r}`);
-        if(set) queryParts.push(`s:${set}`);
-        
-        if(cmc) {
-            if(cmc === "7") queryParts.push(`cmc>=7`);
-            else queryParts.push(`cmc:${cmc}`);
-        }
+        // --- 3. EVENTO ENTER EN BUSCADOR ---
+        document.getElementById('search-name').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
 
-        fetchCards(queryParts.join(' '));
-    }
+        // --- 4. CARGA INICIAL (Y LECTURA DE URL) ---
+        window.onload = () => {
+            // Leemos si hay parámetros en la URL (ej: ?set=lrw)
+            const params = new URLSearchParams(window.location.search);
+            const setParam = params.get('set');
 
-    // 3. ¡NUEVO! Lógica al cargar la página para leer la URL
-    window.onload = () => {
-        // Leemos los parámetros de la URL (ej: ?set=lrw)
-        const params = new URLSearchParams(window.location.search);
-        const setParam = params.get('set');
+            if (setParam) {
+                // A. Actualizamos el desplegable visualmente
+                const setSelect = document.getElementById('set');
+                if(setSelect) setSelect.value = setParam;
 
-        if (setParam) {
-            // A. Ponemos el valor en el desplegable visualmente
-            const setSelect = document.getElementById('set');
-            if(setSelect) setSelect.value = setParam;
-
-            // B. Hacemos la búsqueda directa de ese set
-            fetchCards(`s:${setParam}`);
-        } else {
-            // C. Si no hay parámetros, carga normal (Estándar)
-            fetchCards('f:standard');
-        }
-    };
-</script>
+                // B. Buscamos directamente esa colección
+                fetchCards(`s:${setParam}`);
+            } else {
+                // C. Si no hay nada, carga por defecto
+                fetchCards('f:standard');
+            }
+        };
+    </script>
 </body>
 </html>
