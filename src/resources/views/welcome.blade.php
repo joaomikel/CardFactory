@@ -200,7 +200,7 @@
                 @auth
                     <a href="{{ url('/dashboard') }}" class="btn btn-solid">Mi Panel</a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-outline">Log In</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline">Iniciar sesión</a>
 
                     @if (Route::has('register'))
                         <a href="{{ route('register') }}" class="btn btn-solid">Registrar</a>
