@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. RESET Y BASE BLINDADA --- */
         :root {
             --primary: #816EB2;
             --secondary: #958EA0;
@@ -20,14 +19,14 @@
 
         * { 
             margin: 0; padding: 0; 
-            box-sizing: border-box; /* Fundamental para que el padding no rompa el ancho */
+            box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
         }
 
         html, body {
             width: 100%;
-            max-width: 100vw; /* Asegura que nunca sea más ancho que la pantalla */
-            overflow-x: hidden; /* Oculta lo que sobre salga horizontalmente */
+            max-width: 100vw;
+            overflow-x: hidden;
             background-color: #f8f9fa; 
             color: var(--text-dark);
             font-family: 'Inter', sans-serif;
@@ -36,18 +35,17 @@
             flex-direction: column;
         }
 
-        /* --- 2. HEADER FIJO SEGURO --- */
         header {
             background: transparent;
             height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 15px; /* Padding interno seguro */
+            padding: 0 15px;
             position: absolute;
             top: 0;
             left: 0; 
-            right: 0; /* Anclado a izquierda y derecha */
+            right: 0;
             width: 100%;
             z-index: 100;
         }
@@ -66,7 +64,6 @@
         .btn-login { background: rgba(255,255,255,0.2); color: var(--white); border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); }
         .btn-register { background: var(--primary); color: var(--white); }
 
-        /* --- 3. SIDEBAR --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s;
@@ -84,7 +81,6 @@
         .close-sidebar { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; background: none; border: none; color: #666; }
         .sidebar a { display: block; padding: 15px 0; border-bottom: 1px solid #eee; color: var(--text-dark); text-decoration: none; font-size: 1.1rem; }
 
-        /* --- 4. HERO SECTION (Ajustado para no desbordar) --- */
         .hero-mini {
             position: relative;
             width: 100%;
@@ -98,14 +94,14 @@
             color: white;
             border-bottom-left-radius: 25px;
             border-bottom-right-radius: 25px;
-            overflow: hidden; /* Evita que la imagen se salga */
+            overflow: hidden;
         }
         
         .hero-mini h1 { 
             font-size: 1.8rem; 
             margin-bottom: 20px; 
             line-height: 1.2;
-            word-wrap: break-word; /* Rompe palabras largas si es necesario */
+            word-wrap: break-word;
         }
         
         .search-wrapper-mini { width: 100%; max-width: 500px; position: relative; }
@@ -119,7 +115,6 @@
             color: var(--primary);
         }
 
-        /* --- 5. CONTENEDOR FLUIDO --- */
         .container { 
             width: 100%; 
             padding: 0 15px; 
@@ -127,10 +122,9 @@
             flex: 1; 
         }
         
-        /* Grid que se comporta como Lista en Móvil */
         .sets-grid { 
             display: grid; 
-            grid-template-columns: 1fr; /* Una sola columna por defecto (móvil) */
+            grid-template-columns: 1fr;
             gap: 15px; 
             margin-bottom: 30px;
             width: 100%;
@@ -146,9 +140,11 @@
             gap: 15px;
             cursor: pointer;
             border-left: 4px solid var(--primary);
-            width: 100%; /* Asegura que ocupe el ancho disponible */
-            overflow: hidden; /* Evita desbordamiento interno */
+            width: 100%;
+            overflow: hidden;
+            transition: transform 0.2s;
         }
+        .set-item:active { transform: scale(0.98); }
 
         .set-icon {
             width: 40px; height: 40px;
@@ -156,10 +152,9 @@
             fill: var(--text-dark);
         }
         
-        /* SOLUCIÓN AL CORTE DE TEXTO: Flexbox con min-width 0 */
         .set-info { 
             flex: 1; 
-            min-width: 0; /* TRUCO DE ORO: Permite que el flex-child se encoja */
+            min-width: 0;
             display: flex; flex-direction: column; justify-content: center;
         }
 
@@ -168,17 +163,14 @@
             color: var(--text-dark); 
             margin-bottom: 4px; 
             font-weight: 700;
-            /* Puntos suspensivos si el texto es muy largo */
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
         }
 
         .set-info p { font-size: 0.85rem; color: #666; margin: 0; }
-        
         .arrow-indicator { font-size: 1.2rem; color: #ccc; margin-left: auto; }
 
-        /* Botón cargar más */
         .btn-more {
             display: block; width: 100%; max-width: 300px; margin: 20px auto;
             background: white; color: var(--primary); border: 2px solid var(--primary);
@@ -186,7 +178,6 @@
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        /* --- 6. FOOTER --- */
         footer {
             margin-top: auto;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -202,19 +193,14 @@
             padding-top: 20px; text-align: center; font-size: 0.8rem; opacity: 0.7; 
         }
 
-        /* --- 7. TABLET Y DESKTOP (Scaling Up) --- */
         @media (min-width: 768px) {
             .container { max-width: 1200px; padding: 0 40px; }
-            
-            /* El grid pasa a ser cuadrícula real */
             .sets-grid { 
                 grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
                 gap: 25px; 
             }
-            
             .hero-mini { padding: 140px 40px 80px 40px; border-radius: 0; }
             .hero-mini h1 { font-size: 3rem; }
-            
             header { padding: 0 40px; height: 80px; }
             .footer-content { grid-template-columns: repeat(3, 1fr); }
         }
@@ -226,17 +212,17 @@
     <div class="sidebar" id="sidebar">
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Menú</h3>
-        <a href="index.html">Inicio</a>
+        <a href="/">Inicio</a>
         <a href="#">Perfil</a>
-        <a href="collections.html" style="color: var(--primary); font-weight: 700;">Colecciones</a>
-        <a href="#">Catálogo</a>
+        <a href="/colecciones" style="color: var(--primary); font-weight: 700;">Colecciones</a>
+        <a href="/catalogo">Catálogo</a>
     </div>
 
     <header>
         <button class="menu-trigger" onclick="toggleMenu()">&#9776;</button>
         <div class="auth-actions">
-            <a href="{{ route('login') }}" class="btn-header btn-login">Login</a>
-            <a href="{{ route('register') }}" class="btn-header btn-register">Registro</a>
+            <a href="/login" class="btn-header btn-login">Login</a>
+            <a href="/register" class="btn-header btn-register">Registro</a>
         </div>
     </header>
 
@@ -263,8 +249,8 @@
             </div>
             <div>
                 <h3 style="margin-bottom:10px; color:white;">Links</h3>
-                <a href="index.html" style="color:white; text-decoration:none; display:block; margin-bottom:5px;">Inicio</a>
-                <a href="#" style="color:white; text-decoration:none;">Catálogo</a>
+                <a href="/" style="color:white; text-decoration:none; display:block; margin-bottom:5px;">Inicio</a>
+                <a href="/catalogo" style="color:white; text-decoration:none;">Catálogo</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -289,7 +275,6 @@
                 
                 const validTypes = ['expansion', 'core', 'masters', 'draft_innovation', 'commander', 'modern'];
                 allSets = data.data.filter(set => validTypes.includes(set.set_type));
-                // Ordenar más reciente primero
                 allSets.sort((a, b) => new Date(b.released_at) - new Date(a.released_at));
 
                 renderSets(allSets.slice(0, currentCount));
@@ -300,7 +285,6 @@
 
         function renderSets(setsList) {
             const container = document.getElementById('sets-container');
-            
             if(setsList.length === 0) {
                 container.innerHTML = '<p style="text-align:center; padding:20px;">No hay resultados.</p>';
                 return;
@@ -309,7 +293,7 @@
             container.innerHTML = setsList.map(set => {
                 const dateYear = new Date(set.released_at).getFullYear();
                 return `
-                <div class="set-item" onclick="console.log('${set.code}')">
+                <div class="set-item" onclick="window.location.href='/catalogo?set=${set.code}'">
                     <img src="${set.icon_svg_uri}" class="set-icon" alt="" loading="lazy">
                     <div class="set-info">
                         <h3>${set.name}</h3>
@@ -342,6 +326,3 @@
     </script>
 </body>
 </html>
-apps-fileview.texmex_20260108.00_p0
-colecciones.html
-Mostrando colecciones.html.
