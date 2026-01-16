@@ -32,3 +32,4 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html
 
 # El puerto 80 ya está expuesto por defecto por la imagen 'php:*-apache'
+CMD php artisan serve --host=0.0.0.0 --port=8000

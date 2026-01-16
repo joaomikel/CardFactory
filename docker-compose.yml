@@ -30,6 +30,8 @@ services:
   backend:
     build:
       context: ./backend
+    ports:
+    - "8000:8000"
     container_name: cardfactory-backend
     restart: unless-stopped
     # AGREGA ESTA LÍNEA (Esto arranca el servidor en el puerto 8000)
