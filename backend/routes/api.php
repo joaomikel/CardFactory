@@ -29,59 +29,39 @@ Route::get('/cartas', function (Request $request) {
     return $respuesta->json();
 });
 
-// ... Mantén las otras rutas (trending, lorwyn) como las tenías o haz lo mismo con ellas
-
+// 1. RUTA TRENDING (ALEATORIA)
 Route::get('/trending', function () {
-    return response()->json([
-        'data' => [
-            [
-                'name' => 'Sheoldred, the Apocalypse',
-                'prices' => ['eur' => '85.50'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/d/6/d67be074-cdd4-41d9-ac89-0a0456c4e4b2.jpg']
-            ],
-            [
-                'name' => 'The One Ring',
-                'prices' => ['eur' => '110.00'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/d/5/d5806e68-1054-458e-866d-1f2470f682b2.jpg']
-            ],
-            [
-                'name' => 'Orcish Bowmasters',
-                'prices' => ['eur' => '45.00'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/7/c/7c024bae-5631-4e20-ac69-df392ac9e109.jpg']
-            ],
-            [
-                'name' => 'Black Lotus (Proxy)',
-                'prices' => ['usd' => '99999'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/b/d/bd8fa327-dd41-4737-8f19-2cf5eb1f7cdd.jpg']
-            ]
-        ]
+    // order=random hace que cada vez que entres, salgan cartas distintas
+    $response = Http::get('https://api.scryfall.com/cards/search', [
+        'q' => 'lang:en year>=2020 frame:2015', // Cartas modernas para que se vean bonitas
+        'order' => 'random',
+        'unique' => 'art'
     ]);
+
+    $data = $response->json();
+    
+    // TRUCO: Solo devolvemos las 4 primeras para que quede bien en tu HTML
+    if (isset($data['data'])) {
+        $data['data'] = array_slice($data['data'], 0, 4);
+    }
+
+    return $data;
 });
 
-// RUTA PARA LORWYN (HOME)
+// 2. RUTA LORWYN
 Route::get('/lorwyn', function () {
-    return response()->json([
-        'data' => [
-            [
-                'name' => 'Cryptic Command',
-                'prices' => ['eur' => '12.00'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/3/0/30f6fca9-003b-4f6b-9d6e-1e88adda4155.jpg']
-            ],
-            [
-                'name' => 'Thoughtseize',
-                'prices' => ['eur' => '18.50'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/b/2/b281a308-ab6b-47b6-bec7-632c9aaecede.jpg']
-            ],
-            [
-                'name' => 'Mulldrifter',
-                'prices' => ['eur' => '0.50'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/d/9/d9fb2f2b-ed82-4461-9013-490e8bca89f2.jpg']
-            ],
-            [
-                'name' => 'Liliana Vess',
-                'prices' => ['eur' => '8.00'],
-                'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/9/6/96bb667b-7240-4072-beb7-9a803c9eabe3.jpg']
-            ]
-        ]
+    // set:lrw es el código de Magic para "Lorwyn"
+    $response = Http::get('https://api.scryfall.com/cards/search', [
+        'q' => 'set:lrw', 
+        'order' => 'rarity' // Mostramos primero las raras/míticas
     ]);
+
+    $data = $response->json();
+
+    // Solo devolvemos las 4 primeras
+    if (isset($data['data'])) {
+        $data['data'] = array_slice($data['data'], 0, 4);
+    }
+
+    return $data;
 });
