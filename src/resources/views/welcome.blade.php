@@ -2,273 +2,329 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CardFactory - Magic Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* --- CONFIGURACIÓN GENERAL --- */
+        
         :root {
-            --primary: #111827;     /* Negro casi puro */
-            --accent: #6366f1;      /* Morado Magic */
-            --accent-dark: #4338ca; 
-            --bg-body: #f3f4f6;     
+            --primary: #816EB2;     
+            --secondary: #958EA0;   
+            --text-dark: #222;
+            --text-light: #f4f4f4;
             --white: #ffffff;
-            --gray-border: #e5e7eb;
             --radius: 12px;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
+
         body { 
-            background-color: var(--bg-body); 
-            color: var(--primary);
+            background-color: #f9f9f9; 
+            color: var(--text-dark);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
-        a { text-decoration: none; color: inherit; }
-        button { cursor: pointer; border: none; outline: none; transition: 0.2s; }
-
-        /* --- HEADER --- */
         header {
-            background: var(--white);
+            background: transparent;
             height: 70px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 5%;
-            position: sticky;
+            padding: 0 20px;
+            position: absolute;
+            width: 100%;
             top: 0;
-            z-index: 50;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 100;
         }
 
-        .menu-trigger { font-size: 1.5rem; background: none; color: var(--primary); }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .menu-trigger { 
+            font-size: 1.8rem; background: none; border: none; 
+            color: var(--white); cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); padding: 10px;
+        }
 
         .auth-actions { display: flex; gap: 10px; }
-        .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; }
-        .btn-outline { border: 1px solid var(--gray-border); background: white; color: var(--primary); }
-        .btn-solid { background: var(--primary); color: white; }
+        .btn-header {
+            padding: 8px 16px; border-radius: 20px; font-weight: 600;
+            text-decoration: none; font-size: 0.85rem; transition: 0.3s; white-space: nowrap;
+        }
+        .btn-login { background: rgba(255,255,255,0.25); color: var(--white); border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(4px); }
+        .btn-register { background: var(--primary); color: var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        /* --- SIDEBAR (Menú Lateral) --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 99;
-            opacity: 0; pointer-events: none; transition: 0.3s;
+            background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px);
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: all; }
 
         .sidebar {
-            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background: white; z-index: 100; padding: 2rem;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; gap: 1rem;
+            position: fixed; top: 0; left: -100%; width: 85%; max-width: 320px; height: 100%;
+            background: var(--white); z-index: 102; padding: 2rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; gap: 1rem; box-shadow: 5px 0 15px rgba(0,0,0,0.2);
         }
         .sidebar.active { left: 0; }
-        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; background: none; }
-        .sidebar a { padding: 10px; font-weight: 500; color: #4b5563; border-bottom: 1px solid #f0f0f0; }
+        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; }
+        .sidebar a { padding: 15px 10px; font-weight: 500; color: var(--secondary); border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; }
 
-        /* --- HERO BUSCADOR (FONDO BLACK LOTUS + MORADO) --- */
         .hero-search {
             position: relative;
-            padding: 80px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* 1. Imagen de Black Lotus (Arte Vintage Masters) */
-            /* 2. Gradiente Morado (rgba) encima */
+            padding: 120px 20px 60px 20px;
+            display: flex; justify-content: center; align-items: center;
             background: 
-                linear-gradient(135deg, rgba(67, 56, 202, 0.85), rgba(124, 58, 237, 0.7)),
-                url('https://cards.scryfall.io/art_crop/front/b/d/bd8fa327-dd41-4737-8f19-2cf5eb1f7cdd.jpg?1614638838');
-            background-size: cover;
-            background-position: center;
+                linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(129, 110, 178, 0.85) 100%),
+                url('img/Black Lotus.jpg'); 
+            background-size: cover; background-position: center;
             margin-bottom: 30px;
         }
 
-        .search-wrapper {
-            width: 100%;
-            max-width: 600px;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            border-radius: 50px;
-        }
-
+        .search-wrapper { width: 100%; max-width: 600px; position: relative; }
         .search-wrapper input {
-            width: 100%;
-            padding: 18px 55px 18px 25px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 50px;
-            outline: none;
+            width: 100%; padding: 18px 55px 18px 25px; font-size: 16px;
+            border: none; border-radius: 50px; outline: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
         }
-
         .search-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--accent);
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.3s;
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+            background: var(--primary); color: white; width: 44px; height: 44px;
+            border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem;
         }
-        .search-btn:hover { background: var(--accent-dark); transform: translateY(-50%) scale(1.05); }
 
-        /* --- CONTENIDO --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; flex: 1; }
-        
+        .container { width: 100%; padding: 0 20px; margin: 0 auto; flex: 1; }
         h2 { 
-            font-size: 1.5rem; margin-bottom: 20px; 
-            border-left: 5px solid var(--accent); padding-left: 15px; 
+            font-size: 1.4rem; margin-bottom: 20px; color: var(--text-dark);
+            border-left: 5px solid var(--primary); padding-left: 15px; 
         }
 
-        /* Grid Cartas */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-        }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+
         .card-item {
-            background: var(--white);
-            padding: 10px;
-            border-radius: var(--radius);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: 0.3s;
-            text-align: center;
+            background: var(--white); padding: 10px; border-radius: var(--radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
-        .card-item:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .card-item img { width: 100%; border-radius: 8px; margin-bottom: 10px; }
-        .card-price { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
+        .card-item:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
 
-        /* Ediciones Scroll */
-        .editions-scroller {
-            display: flex; gap: 15px; overflow-x: auto; padding: 10px 0;
-            scrollbar-width: thin;
-        }
+        .card-item img { width: 100%; border-radius: 8px; margin-bottom: 10px; aspect-ratio: 2.5/3.5; object-fit: cover; }
+        .card-price { color: var(--primary); font-weight: bold; font-size: 1.1rem; transition: color 0.3s; }
+        
+        .price-updated { color: #27ae60 !important; transform: scale(1.1); }
+
+        .editions-scroller { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .editions-scroller::-webkit-scrollbar { display: none; }
+        
         .edition-badge {
-            min-width: 150px;
-            height: 80px;
-            background: var(--white);
-            border: 1px solid var(--gray-border);
-            border-radius: var(--radius);
+            min-width: 180px; height: 110px; border-radius: var(--radius);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-weight: 800; color: white; text-transform: uppercase;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8); box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            background-size: cover; background-position: center;
+            position: relative; overflow: hidden; flex-shrink: 0; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .edition-badge:hover { transform: scale(1.02); }
+        .edition-badge::before {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(129, 110, 178, 0.85) 100%); z-index: 1;
+        }
+        .edition-badge span { position: relative; z-index: 2; text-align: center; font-size: 1rem; padding: 0 10px; }
+
+        .section-footer { width: 100%; display: flex; justify-content: center; margin-top: 25px; margin-bottom: 10px; }
+        .btn-more {
+            background: transparent; color: var(--primary); border: 2px solid var(--primary);
+            padding: 10px 30px; border-radius: 30px; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-more:hover {
+            background: var(--primary); color: var(--white);
+            transform: translateY(-2px); box-shadow: 0 5px 15px rgba(129, 110, 178, 0.4);
         }
 
-        /* Reseñas */
-        .reviews-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+        .reviews-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 40px; }
         .review-card {
             background: white; padding: 20px; border-radius: var(--radius);
             display: flex; gap: 15px; align-items: start;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary);
         }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; }
+        .avatar { 
+            width: 50px; height: 50px; border-radius: 50%; 
+            background: #eee; object-fit: cover; 
+            border: 2px solid var(--primary);
+        }
 
-        /* --- FOOTER CON DEGRADADO --- */
         footer {
             margin-top: auto;
-            /* Degradado de Morado a Negro */
-            background: linear-gradient(to right, #1e1b4b, #4c1d95, #1e1b4b);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text-light);
+            padding-top: 60px;
         }
-        footer p { opacity: 0.8; font-size: 0.9rem; }
 
+        .footer-content {
+            display: grid; grid-template-columns: 1fr; gap: 40px;
+            max-width: 1200px; margin: 0 auto; padding: 0 20px 40px 20px;
+        }
+
+        .footer-section h3 { font-size: 1.2rem; margin-bottom: 20px; color: var(--white); }
+        .footer-section p { font-size: 0.9rem; line-height: 1.6; opacity: 0.9; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { text-decoration: none; color: var(--text-light); transition: 0.3s; font-size: 0.95rem; opacity: 0.8; }
+        .footer-links a:hover { color: var(--white); opacity: 1; padding-left: 5px; }
+        
+        .social-icons { display: flex; gap: 15px; margin-top: 20px; }
+        .social-icons a {
+            width: 40px; height: 40px; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--white); text-decoration: none; transition: 0.3s;
+        }
+        .social-icons a:hover { background: var(--primary); transform: translateY(-3px); }
+
+        .footer-bottom { background: rgba(0,0,0,0.2); padding: 20px; text-align: center; font-size: 0.85rem; }
+
+        @media (min-width: 768px) {
+            header { padding: 0 40px; height: 90px; }
+            .hero-search { padding: 160px 40px 80px 40px; }
+            .container { max-width: 760px; }
+            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+            .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+            .edition-badge { min-width: 240px; height: 140px; }
+            .footer-content { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .container { max-width: 1200px; padding: 0 40px; }
+            .reviews-grid { grid-template-columns: repeat(3, 1fr); }
+            .sidebar { width: 300px; }
+            .footer-content { grid-template-columns: repeat(4, 1fr); }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <button class="menu-trigger" onclick="toggleMenu()">&#9776;</button>
-        <div class="logo">CardFactory</div>
-        
-        <div class="auth-actions">
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="btn btn-solid">Mi Panel</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-outline">Iniciar sesión</a>
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
+        <a href="#">Perfil</a>
+        <a href="#">Colecciones</a>
+        <a href="{{ url('/catalogo') }}">Catálogo</a>
+        <a href="#">Carrito</a>
+    </div>
 
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn btn-solid">Registrar</a>
-                    @endif
-                @endauth
-            @endif
+    <header>
+        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">&#9776;</button>
+        <div class="auth-actions">
+            <a href="#" class="btn-header btn-login">Login</a>
+            <a href="#" class="btn-header btn-register">Registro</a>
         </div>
     </header>
 
-    <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
-        <h3 style="color: var(--accent); margin-bottom: 1rem;">Menú</h3>
-        
-        @auth
-            <a href="{{ url('/dashboard') }}">👤 Perfil</a>
-            <a href="#">📚 Mis Colecciones</a>
-        @else
-            <a href="{{ route('login') }}">🔐 Iniciar Sesión</a>
-            <a href="{{ route('register') }}">📝 Crear Cuenta</a>
-        @endauth
-        
-        <a href="#">📦 Catálogo</a>
-    </div>
-
     <section class="hero-search">
         <div class="search-wrapper">
-            <input type="text" placeholder="Busca cartas, ediciones, artistas..." id="searchInput">
-            <button class="search-btn">🔍</button>
+            <input type="text" placeholder="Search cards (e.g., Sheoldred)..." id="searchInput">
+            <button class="search-btn" aria-label="Buscar">🔍</button>
         </div>
     </section>
 
     <main class="container">
         
         <section>
-            <h2>Cartas en tendencia</h2>
+            <h2>Trending Cards (Actualización: 10s)</h2>
             <div class="cards-grid" id="trending-container">
-                <p>Cargando mercado...</p>
+                <p style="grid-column: 1/-1; text-align: center;">Conectando con Scryfall...</p>
             </div>
-            <div style="text-align: center; margin-top: 25px;">
-                <button class="btn btn-solid">Ver catálogo completo</button>
+            <div class="section-footer">
+                <button class="btn-more">Ver más...</button>
             </div>
         </section>
 
         <br><br>
 
         <section>
-            <h2>Ediciones</h2>
+            <h2>Nueva Colección: Lorwyn</h2>
+            <div class="cards-grid" id="lorwyn-container">
+                <p style="grid-column: 1/-1; text-align: center;">Cargando Lorwyn...</p>
+            </div>
+            <div class="section-footer">
+                <button class="btn-more">Ver más...</button>
+            </div>
+        </section>
+
+        <br><br>
+
+        <section>
+            <h2>Colecciones Destacadas</h2>
             <div class="editions-scroller">
-                <div class="edition-badge">Lorwyn Eclipsed</div>
-                <div class="edition-badge">Tarkir Dragonstorm</div>
-                <div class="edition-badge">Ravnica Remastered</div>
-                <div class="edition-badge">Innistrad Midnight</div>
+                <div class="edition-badge" style="background-image: url('img/lowyn.jpg');">
+                    <span>Lorwyn Eclipsed</span>
+                </div>
+                <div class="edition-badge" style="background-image: url('img/Tarkir.jpg');">
+                    <span>Tarkir Dragons</span>
+                </div>
+                <div class="edition-badge" style="background-image: url('img/inistrad.jpg');">
+                    <span>Innistrad Rem.</span>
+                </div>
+                <div class="edition-badge" style="background-image: url('img/Ravinika.jpg');">
+                    <span>Ravnica Rem.</span>
+                </div>
+            </div>
+            <div class="section-footer">
+                <button class="btn-more">Ver más...</button>
             </div>
         </section>
 
         <br><br>
 
         <section>
-            <h2>Reseñas</h2>
+            <h2>Reseñas de Usuarios</h2>
             <div class="reviews-grid" id="reviews-container"></div>
         </section>
 
     </main>
 
     <footer>
-        <h3>CardFactory</h3>
-        <p>&copy; 2026 - Tu mercado de confianza de Magic The Gathering</p>
-        <p style="font-size: 0.8rem; margin-top: 10px;">Datos proporcionados por Scryfall API</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CardFactory</h3>
+                <p>Tu mercado de confianza para comprar y vender cartas de Magic: The Gathering.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Catálogo</a></li>
+                    <li><a href="#">Vender</a></li>
+                    <li><a href="#">Nosotros</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Soporte</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Ayuda</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <div style="display: flex; margin-top: 15px;">
+                    <input type="email" placeholder="Email..." style="padding: 10px; border:none; border-radius: 8px 0 0 8px; width:100%;">
+                    <button style="padding: 10px; background: var(--primary); color:white; border:none; border-radius: 0 8px 8px 0;">Ir</button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CardFactory. Datos API Scryfall.</p>
+        </div>
     </footer>
 
     <script>
@@ -277,39 +333,60 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
+        function createCardHTML(card) {
+            const img = card.image_uris?.normal || (card.card_faces && card.card_faces[0].image_uris.normal) || '';
+            let finalPrice = 'Sin Stock';
+            if (card.prices.eur) finalPrice = `${card.prices.eur} €`;
+            else if (card.prices.usd) finalPrice = `${card.prices.usd} $`;
+
+            return `
+                <div class="card-item">
+                    <img src="${img}" alt="${card.name}" loading="lazy">
+                    <h3>${card.name}</h3>
+                    <p class="card-price">${finalPrice}</p>
+                </div>
+            `;
+        }
+
         async function loadTrendingCards() {
             const container = document.getElementById('trending-container');
             try {
-                // Cartas míticas en español populares
-                const res = await fetch('https://api.scryfall.com/cards/search?q=r:mythic+lang:es&order=edhrec');
+                const res = await fetch('https://api.scryfall.com/cards/search?q=r:mythic+lang:en+year>=2020&order=usd&unique=cards');
                 const data = await res.json();
-                const cards = data.data.slice(0, 4);
-
-                container.innerHTML = cards.map(card => `
-                    <div class="card-item" draggable="true">
-                        <img src="${card.image_uris?.normal || card.card_faces[0].image_uris.normal}" alt="${card.name}">
-                        <h3>${card.name}</h3>
-                        <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : 'Sin stock'}</p>
-                    </div>
-                `).join('');
+                
+                const shuffled = data.data.sort(() => 0.5 - Math.random());
+                container.innerHTML = shuffled.slice(0, 4).map(createCardHTML).join('');
+                console.log("Precios actualizados (Tendencias)");
             } catch (error) {
-                console.error(error);
+                console.log('Error tendencias');
+            }
+        }
+
+        async function loadLorwynCards() {
+            const container = document.getElementById('lorwyn-container');
+            try {
+                const res = await fetch('https://api.scryfall.com/cards/search?q=set:lrw+lang:en&order=usd');
+                const data = await res.json();
+                container.innerHTML = data.data.slice(0, 4).map(createCardHTML).join('');
+                console.log("Precios actualizados (Lorwyn)");
+            } catch (error) {
+                console.log('Error Lorwyn');
             }
         }
 
         function loadReviews() {
             const reviews = [
-                { name: "Adrian De la Cruz", text: "El buscador es rapidísimo y los precios son justos.", img: "https://i.pravatar.cc/150?u=1" },
-                { name: "Elena Gómez", text: "Me encanta el diseño y la facilidad para vender.", img: "https://i.pravatar.cc/150?u=5" },
-                { name: "Pablo S.", text: "La mejor web para completar mis mazos de Commander.", img: "https://i.pravatar.cc/150?u=8" }
+                { name: "Adrian DLC", text: "Me encanta ver los precios actualizados.", img: "https://i.pravatar.cc/150?u=a" },
+                { name: "Marina G.", text: "El diseño de Lorwyn me parece increíble.", img: "https://i.pravatar.cc/150?u=b" },
+                { name: "Carlos R.", text: "Muy intuitivo desde el móvil.", img: "https://i.pravatar.cc/150?u=c" }
             ];
             
-            document.getElementById('reviews-container').innerHTML = reviews.sort(() => 0.5 - Math.random()).map(r => `
+            document.getElementById('reviews-container').innerHTML = reviews.map(r => `
                 <div class="review-card">
-                    <img src="${r.img}" alt="Avatar" class="avatar">
+                    <img src="${r.img}" class="avatar" alt="User">
                     <div>
                         <strong>${r.name}</strong>
-                        <p style="font-size: 0.9rem; color: #555;">"${r.text}"</p>
+                        <p style="color:#555; font-size:0.9rem;">"${r.text}"</p>
                     </div>
                 </div>
             `).join('');
@@ -317,8 +394,13 @@
 
         window.onload = () => {
             loadTrendingCards();
+            loadLorwynCards();
             loadReviews();
-            setInterval(loadTrendingCards, 60000); // Refresco tiempo real
+
+            setInterval(() => {
+                loadTrendingCards();
+                loadLorwynCards();
+            }, 10000); 
         };
     </script>
 </body>

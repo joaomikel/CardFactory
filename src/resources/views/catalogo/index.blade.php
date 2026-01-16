@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - CardFactory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #816EB2; --dark: #111827; --white: #ffffff; --bg: #f3f4f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); padding-bottom: 50px; }
+
+        header {
+            background: var(--white);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .btn-back { 
+            text-decoration: none; color: var(--primary); 
+            font-weight: 700; font-size: 0.95rem;
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 12px; border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-back:hover { background: #f0f0ff; }
+
+        /* FILTROS ADAPTADOS */
+        .filters {
+            background: white; padding: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .filter-group label { font-size: 0.75rem; font-weight: 800; color: #6b7280; text-transform: uppercase; }
+        .filter-group select { 
+            padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; 
+            font-size: 16px; background: #fafafa; width: 100%;
+        }
+
+        .btn-apply { 
+            background: var(--primary); color: white; padding: 15px; border: none; 
+            border-radius: 10px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(129, 110, 178, 0.3);
+            margin-top: 10px;
+        }
+
+        .container { padding: 15px; max-width: 1200px; margin: 0 auto; }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+        }
+
+        .card-catalog {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .card-catalog img { width: 100%; aspect-ratio: 2.5/3.5; object-fit: cover; }
+        .card-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-info h3 { font-size: 0.85rem; color: var(--dark); margin-bottom: 8px; }
+        .card-price { color: var(--primary); font-weight: 800; font-size: 1rem; }
+
+        @media (min-width: 768px) {
+            .filters { flex-direction: row; align-items: flex-end; justify-content: center; padding: 30px; flex-wrap: wrap; }
+            .filter-group { min-width: 150px; max-width: 200px; }
+            .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+            .btn-apply { padding: 12px 30px; margin-top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-weight:800; font-size:1.2rem;">Catálogo</div>
+        <a href="{{ url('/') }}" class="btn-back">
+            <i class="fas fa-chevron-left"></i> Inicio
+        </a>
+    </header>
+
+    <section class="filters">
+        <div class="filter-group">
+            <label>Color</label>
+            <select id="color">
+                <option value="">Todos</option>
+                <option value="w">Blanco</option>
+                <option value="u">Azul</option>
+                <option value="b">Negro</option>
+                <option value="r">Rojo</option>
+                <option value="g">Verde</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Rareza</label>
+            <select id="rarity">
+                <option value="">Todas</option>
+                <option value="common">Común</option>
+                <option value="uncommon">Infrecuente</option>
+                <option value="rare">Rara</option>
+                <option value="mythic">Mítica</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Mana (CMC)</label>
+            <select id="cmc">
+                <option value="">Cualquiera</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7+</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Colección</label>
+            <select id="set">
+                <option value="">Todas</option>
+                <option value="dft">Aetherdrift</option>
+                <option value="fdn">Foundations</option>
+                <option value="dsk">Duskmourn</option>
+                <option value="blb">Bloomburrow</option>
+                <option value="otj">Outlaws of Thunder Junction</option>
+                <option value="mkm">Murders at Karlov Manor</option>
+                <option value="lci">Lost Caverns of Ixalan</option>
+            </select>
+        </div>
+        <button class="btn-apply" onclick="applyFilters()">Aplicar Filtros</button>
+    </section>
+
+    <main class="container">
+        <div class="grid" id="catalog-grid">
+            <p style="grid-column: 1/-1; text-align: center; padding: 50px;">Buscando cartas...</p>
+        </div>
+    </main>
+
+    <script>
+        async function fetchCards(q = 'f:standard') {
+            const grid = document.getElementById('catalog-grid');
+            try {
+                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                
+                if(!data.data || data.data.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados para esta búsqueda.</p>';
+                    return;
+                }
+
+                grid.innerHTML = data.data.map(card => `
+                    <div class="card-catalog">
+                        <img src="${card.image_uris?.normal || 'https://via.placeholder.com/488x680?text=No+Image'}" loading="lazy">
+                        <div class="card-info">
+                            <h3>${card.name}</h3>
+                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : (card.prices.usd ? card.prices.usd + ' $' : '---')}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Error al conectar con la API.</p>';
+            }
+        }
+
+        function applyFilters() {
+            const c = document.getElementById('color').value;
+            const r = document.getElementById('rarity').value;
+            const cmc = document.getElementById('cmc').value;
+            const set = document.getElementById('set').value;
+
+            let queryParts = ['f:standard']; // Por defecto cartas legales en Standard
+
+            if(c) queryParts.push(`c:${c}`);
+            if(r) queryParts.push(`r:${r}`);
+            if(set) queryParts.push(`s:${set}`);
+            
+            if(cmc) {
+                if(cmc === "7") {
+                    queryParts.push(`cmc>=7`);
+                } else {
+                    queryParts.push(`cmc:${cmc}`);
+                }
+            }
+
+            fetchCards(queryParts.join(' '));
+        }
+
+        // Carga inicial
+        fetchCards();
+    </script>
+</body>
+</html>
