@@ -21,6 +21,7 @@
             position: sticky; top: 0; z-index: 100;
         }
 
+        /* CAMBIO 1: Ruta relativa simple para el botón volver */
         .btn-back { 
             text-decoration: none; color: var(--primary); 
             font-weight: 700; font-size: 0.95rem;
@@ -30,7 +31,6 @@
         }
         .btn-back:hover { background: #f0f0ff; }
 
-        /* FILTROS ADAPTADOS */
         .filters {
             background: white; padding: 20px;
             display: flex; flex-direction: column; gap: 15px;
@@ -81,7 +81,7 @@
 
     <header>
         <div style="font-weight:800; font-size:1.2rem;">Catálogo</div>
-        <a href="{{ url('/') }}" class="btn-back">
+        <a href="/" class="btn-back">
             <i class="fas fa-chevron-left"></i> Inicio
         </a>
     </header>
@@ -148,11 +148,18 @@
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
             try {
-                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
+                // CAMBIO PRINCIPAL: Petición a tu propio Backend (API Local)
+                // Pasamos la query 'q' como parámetro GET
+                const res = await fetch(`/api/cartas?q=${encodeURIComponent(q)}`);
+                
+                // Si la respuesta no es OK, lanzamos error
+                if (!res.ok) throw new Error('Error en la red');
+
                 const data = await res.json();
                 
+                // Ajuste: Verificamos si existe data.data (formato Scryfall/Laravel Resource)
                 if(!data.data || data.data.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados para esta búsqueda.</p>';
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados en el servidor local.</p>';
                     return;
                 }
 
@@ -166,7 +173,8 @@
                     </div>
                 `).join('');
             } catch (error) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Error al conectar con la API.</p>';
+                console.error(error);
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Error al conectar con el Backend (API).</p>';
             }
         }
 
@@ -176,7 +184,7 @@
             const cmc = document.getElementById('cmc').value;
             const set = document.getElementById('set').value;
 
-            let queryParts = ['f:standard']; // Por defecto cartas legales en Standard
+            let queryParts = ['f:standard'];
 
             if(c) queryParts.push(`c:${c}`);
             if(r) queryParts.push(`r:${r}`);
