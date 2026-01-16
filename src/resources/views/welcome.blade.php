@@ -212,7 +212,7 @@
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="#">Perfil</a>
-        <a href="#">Colecciones</a>
+        <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
         <a href="#">Carrito</a>
     </div>
@@ -220,8 +220,8 @@
     <header>
         <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">&#9776;</button>
         <div class="auth-actions">
-            <a href="#" class="btn-header btn-login">Login</a>
-            <a href="#" class="btn-header btn-register">Registro</a>
+            <a href="{{ route('login') }}" class="btn-header btn-login">Login</a>
+            <a href="{{ route('register') }}" class="btn-header btn-register">Registro</a>
         </div>
     </header>
 

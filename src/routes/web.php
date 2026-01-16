@@ -19,6 +19,10 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/catalogo', function () {
     return view('catalogo.index');
-})->name('catalogo');
+});
+
+Route::get('/colecciones', function () {
+    return view('colecciones.index');
+});
 
 require __DIR__.'/auth.php';
