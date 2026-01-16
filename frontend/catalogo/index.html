@@ -233,7 +233,7 @@
         });
 
         // --- 4. CARGA INICIAL (Y LECTURA DE URL) ---
-        window.onload = () => {
+          window.onload = () => {
             // Leemos si hay parámetros en la URL (ej: ?set=lrw)
             const params = new URLSearchParams(window.location.search);
             const setParam = params.get('set');
@@ -243,22 +243,6 @@
                 const setSelect = document.getElementById('set');
                 if(setSelect) setSelect.value = setParam;
 
-<<<<<<< HEAD
-        if (setParam) {
-            // A. Ponemos el valor en el desplegable visualmente
-            const setSelect = document.getElementById('set');
-            if(setSelect) setSelect.value = setParam;
-
-            // B. Hacemos la búsqueda directa de ese set
-            fetchCards(`s:${setParam}`);
-        } else {
-            // C. Si no hay parámetros, carga normal (Estándar)
-            fetchCards('f:standard');
-        }
-    };
-    
-</script>
-=======
                 // B. Buscamos directamente esa colección
                 fetchCards(`s:${setParam}`);
             } else {
@@ -267,6 +251,5 @@
             }
         };
     </script>
->>>>>>> 5ffaf05d404da648efc2466ad5a9f88480f88fdc
 </body>
 </html>
