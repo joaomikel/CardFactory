@@ -30,38 +30,28 @@ Route::get('/cartas', function (Request $request) {
 });
 
 // 1. RUTA TRENDING (ALEATORIA)
-Route::get('/trending', function () {
-    // order=random hace que cada vez que entres, salgan cartas distintas
-    $response = Http::get('https://api.scryfall.com/cards/search', [
-        'q' => 'lang:en year>=2020 frame:2015', // Cartas modernas para que se vean bonitas
-        'order' => 'random',
-        'unique' => 'art'
-    ]);
-
-    $data = $response->json();
-    
-    // TRUCO: Solo devolvemos las 4 primeras para que quede bien en tu HTML
-    if (isset($data['data'])) {
-        $data['data'] = array_slice($data['data'], 0, 4);
-    }
-
-    return $data;
-});
-
-// 2. RUTA LORWYN
 Route::get('/lorwyn', function () {
-    // set:lrw es el código de Magic para "Lorwyn"
     $response = Http::get('https://api.scryfall.com/cards/search', [
-        'q' => 'set:lrw', 
-        'order' => 'rarity' // Mostramos primero las raras/míticas
+        'q'     => 'set:lrw',   // Filtra por Lorwyn
+        'order' => 'random',    // <--- ESTO ES LO QUE FALTA (Baraja todo el set)
     ]);
 
     $data = $response->json();
 
-    // Solo devolvemos las 4 primeras
+    // Opcional: limitar a 10 resultados para no saturar el JSON
     if (isset($data['data'])) {
-        $data['data'] = array_slice($data['data'], 0, 4);
+        $data['data'] = array_slice($data['data'], 0, 20);
     }
 
     return $data;
 });
+
+Route::get('/trending', function () {
+    $response = Http::get('https://api.scryfall.com/cards/search', [
+        'q'     => 'lang:en year>=2024',
+        'order' => 'random',    // <--- TAMBIÉN AQUÍ para que no salgan solo de la "A"
+    ]);
+
+    return $response->json();
+});
+

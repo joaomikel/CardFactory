@@ -436,14 +436,14 @@ footer {
             </div>
             
             <div class="section-footer">
-                <a href="/catalogo/" class="btn-more">Ver más...</a>
+                <a href="/catalogo" class="btn-more">Ver más...</a>
             </div>
         </section>
 
         <br><br>
 
         <section style="position: relative; z-index: 10;">
-            <h2>Nueva Colección: Lorwyn</h2>
+            <h2>Nueva Colección: Aetherdrift</h2>
             <div class="cards-grid" id="lorwyn-container">
             </div>
         
@@ -460,49 +460,45 @@ footer {
             <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
                 
                 <a href="/catalogo/?set=fdn" class="collection-link">
-                    <img src="https://cards.scryfall.io/large/front/a/8/a88d52a2-3837-4592-8a9d-16bd428387fd.jpg?1730554189" 
-                         alt="Foundations" 
-                         style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/a/8/a88d52a2-3837-4592-8a9d-16bd428387fd.jpg" 
+                        alt="Foundations" 
+                        style="width: 100%; height: 160px; object-fit: cover;">
                     <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px;">Foundations</h3>
-                        <p style="color: #6b7280; font-size: 0.85rem;">La base de Magic</p>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Foundations</h3>
+                        <p style="color: #6b7280; font-size: 0.85rem;">La esencia de Magic</p>
                     </div>
                 </a>
 
                 <a href="/catalogo/?set=dsk" class="collection-link">
-                    <img src="https://cards.scryfall.io/large/front/d/e/de37130c-253c-411a-8288-51846b0d5c07.jpg?1726084666" 
-                         alt="Duskmourn" 
-                         style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/d/e/de37130c-253c-411a-8288-51846b0d5c07.jpg" 
+                        alt="Duskmourn" 
+                        style="width: 100%; height: 160px; object-fit: cover;">
                     <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px;">Duskmourn</h3>
-                        <p style="color: #6b7280; font-size: 0.85rem;">Horror en la casa</p>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Duskmourn</h3>
+                        <p style="color: #6b7280; font-size: 0.85rem;">Terror en la casa</p>
                     </div>
                 </a>
 
                 <a href="/catalogo/?set=blb" class="collection-link">
-                    <img src="https://cards.scryfall.io/large/front/3/0/30349666-b529-450b-9343-855c3c08a984.jpg?1721426462" 
-                         alt="Bloomburrow" 
-                         style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/3/0/30349666-b529-450b-9343-855c3c08a984.jpg" 
+                        alt="Bloomburrow" 
+                        style="width: 100%; height: 160px; object-fit: cover;">
                     <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px;">Bloomburrow</h3>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Bloomburrow</h3>
                         <p style="color: #6b7280; font-size: 0.85rem;">Pequeños héroes</p>
                     </div>
                 </a>
 
                 <a href="/catalogo/?set=otj" class="collection-link">
-                    <img src="https://cards.scryfall.io/large/front/f/2/f2066d48-679a-4c28-941e-53906a5b06bd.jpg?1712353343" 
-                         alt="Thunder Junction" 
-                         style="width: 100%; height: 180px; object-fit: cover;">
+                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/f/2/f2066d48-679a-4c28-941e-53906a5b06bd.jpg" 
+                        alt="Thunder Junction" 
+                        style="width: 100%; height: 160px; object-fit: cover;">
                     <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px;">Thunder Junction</h3>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Thunder Junction</h3>
                         <p style="color: #6b7280; font-size: 0.85rem;">Forajidos del Oeste</p>
                     </div>
                 </a>
 
-            </div>
-            
-            <div class="section-footer">
-                <a href="/colecciones/" class="btn-more">Ver todas...</a>
             </div>
         </section>
 
@@ -529,7 +525,7 @@ footer {
             <div class="footer-section">
                 <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="/catalogo/">Catálogo</a></li>
+                    <li><a href="/catalogo">Catálogo</a></li>
                     <li><a href="#">Vender</a></li>
                     <li><a href="#">Nosotros</a></li>
                 </ul>
@@ -594,32 +590,28 @@ footer {
             const container = document.getElementById(containerId);
             
             try {
-                // Añadimos timestamp para obligar al navegador a pedir datos nuevos
-                const url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}nocache=${Date.now()}`;
+                // Generamos un número aleatorio para que la URL sea siempre distinta
+                // Ej: /api/lorwyn?v=123456789
+                const randomRef = Math.random().toString(36).substring(7);
+                const url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}v=${randomRef}`;
                 
                 const res = await fetch(url, {
-                    method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'no-cache'
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
                     }
                 });
-
-                if (!res.ok) throw new Error('Error en respuesta de red');
 
                 const data = await res.json();
                 const cards = data.data || [];
 
                 if (cards.length > 0) {
-                    // Mezclamos un poco para notar visualmente el refresco
-                    const randomCards = cards.sort(() => 0.5 - Math.random()).slice(0, 4);
-                    container.innerHTML = randomCards.map(createCardHTML).join('');
-                } else {
-                    container.innerHTML = '<p style="grid-column: 1/-1;">No hay cartas disponibles.</p>';
+                    // El backend ya debería mandarlas random, pero aquí barajamos otra vez por seguridad
+                    const displayCards = cards.sort(() => 0.5 - Math.random()).slice(0, 4);
+                    container.innerHTML = displayCards.map(createCardHTML).join('');
                 }
             } catch (error) {
-                console.error('Error cargando ' + endpoint + ':', error);
-                // No vaciamos el contenedor en caso de error para no dejar huecos blancos
+                console.error('Error:', error);
             }
         }
 
