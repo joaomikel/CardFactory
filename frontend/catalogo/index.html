@@ -39,7 +39,6 @@
         .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
         .filter-group label { font-size: 0.75rem; font-weight: 800; color: #6b7280; text-transform: uppercase; }
         
-        /* Estilo común para inputs y selects */
         .filter-control { 
             padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; 
             font-size: 16px; background: #fafafa; width: 100%;
@@ -72,9 +71,8 @@
 
         @media (min-width: 768px) {
             .filters { flex-direction: row; align-items: flex-end; justify-content: center; padding: 30px; flex-wrap: wrap; }
-            .filter-group { min-width: 150px; max-width: 200px; }
-            /* El buscador un poco más ancho */
-            .search-group { flex: 2; min-width: 250px; } 
+            .filter-group { min-width: 150px; max-width: 180px; }
+            .search-group { flex: 2; min-width: 200px; } 
             .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
             .btn-apply { padding: 12px 30px; margin-top: 0; }
         }
@@ -109,6 +107,7 @@
                 <option value="g">Verde</option>
             </select>
         </div>
+
         <div class="filter-group">
             <label>Rareza</label>
             <select id="rarity" class="filter-control">
@@ -119,6 +118,7 @@
                 <option value="mythic">Mítica</option>
             </select>
         </div>
+
         <div class="filter-group">
             <label>Mana (CMC)</label>
             <select id="cmc" class="filter-control">
@@ -133,20 +133,47 @@
                 <option value="7">7+</option>
             </select>
         </div>
+
         <div class="filter-group">
             <label>Colección</label>
             <select id="set" class="filter-control">
                 <option value="">Todas</option>
-                <option value="lrw">Lorwyn</option>
-                <option value="dft">Aetherdrift</option>
-                <option value="fdn">Foundations</option>
-                <option value="dsk">Duskmourn</option>
-                <option value="blb">Bloomburrow</option>
-                <option value="otj">Outlaws of Thunder Junction</option>
-                <option value="mkm">Murders at Karlov Manor</option>
-                <option value="lci">Lost Caverns of Ixalan</option>
+                <option value="dft">Aetherdrift (DFT)</option>
+                <option value="inr">Innistrad Remastered (INR)</option>
+                <option value="fdn">Foundations (FDN)</option>
+                <option value="dsk">Duskmourn (DSK)</option>
+                <option value="blb">Bloomburrow (BLB)</option>
+                <option value="otj">Outlaws of Thunder Junction (OTJ)</option>
+                <option value="mkm">Murders at Karlov Manor (MKM)</option>
+                <option value="lci">Lost Caverns of Ixalan (LCI)</option>
+                <option value="woe">Wilds of Eldraine (WOE)</option>
+                <option value="mom">March of the Machine (MOM)</option>
+                <option value="one">Phyrexia: All Will Be One (ONE)</option>
+                <option value="bro">The Brothers' War (BRO)</option>
+                <option value="dmu">Dominaria United (DMU)</option>
+                <option value="snc">Streets of New Capenna (SNC)</option>
+                <option value="neo">Kamigawa: Neon Dynasty (NEO)</option>
+                <option value="vow">Innistrad: Crimson Vow (VOW)</option>
+                <option value="mid">Innistrad: Midnight Hunt (MID)</option>
+                <option value="afr">Forgotten Realms (AFR)</option>
+                <option value="stx">Strixhaven (STX)</option>
+                <option value="khm">Kaldheim (KHM)</option>
+                <option value="znr">Zendikar Rising (ZNR)</option>
+                <option value="m21">Core Set 2021 (M21)</option>
+                <option value="iko">Ikoria (IKO)</option>
+                <option value="thb">Theros Beyond Death (THB)</option>
+                <option value="eld">Throne of Eldraine (ELD)</option>
+                <option value="mh3">Modern Horizons 3 (MH3)</option>
+                <option value="ltr">Lord of the Rings (LTR)</option>
+                <option value="mh2">Modern Horizons 2 (MH2)</option>
+                <option value="mh1">Modern Horizons 1 (MH1)</option>
+                <option value="dom">Dominaria (DOM)</option>
+                <option value="xln">Ixalan (XLN)</option>
+                <option value="lrw">Lorwyn (LRW)</option>
+                <option value="lea">Alpha (LEA)</option>
             </select>
         </div>
+
         <button class="btn-apply" onclick="applyFilters()">Aplicar Filtros</button>
     </section>
 
@@ -157,17 +184,13 @@
     </main>
 
     <script>
-        // --- 1. FUNCIÓN PRINCIPAL DE BÚSQUEDA ---
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
             grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;">Cargando...</p>';
 
             try {
-                // Petición a tu API (usando el Proxy de Nginx)
                 const res = await fetch(`/api/cartas?q=${encodeURIComponent(q)}`);
-                
-                if (!res.ok) throw new Error('Error en la red');
-
+                if (!res.ok) throw new Error('Error API');
                 const data = await res.json();
                 
                 if(!data.data || data.data.length === 0) {
@@ -185,68 +208,44 @@
                     </div>
                 `).join('');
             } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:red;">Error de conexión API.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:red;">Error de conexión.</p>';
             }
         }
 
-        // --- 2. LÓGICA DE FILTROS ---
         function applyFilters() {
-            // Recoger valores
             const name = document.getElementById('search-name').value;
-            const c = document.getElementById('color').value;
-            const r = document.getElementById('rarity').value;
+            const color = document.getElementById('color').value;
+            const rarity = document.getElementById('rarity').value;
             const cmc = document.getElementById('cmc').value;
             const set = document.getElementById('set').value;
 
             let queryParts = [];
 
-            // 1. Si hay texto escrito, va primero
-            if (name) {
-                queryParts.push(name.trim());
-            }
-
-            // 2. Si no hay Set seleccionado, buscamos en Standard por defecto
-            if (!set) {
-                queryParts.push('f:standard');
-            }
-
-            // 3. Añadir el resto de filtros
-            if(c) queryParts.push(`c:${c}`);
-            if(r) queryParts.push(`r:${r}`);
-            if(set) queryParts.push(`s:${set}`);
+            if (name) queryParts.push(name.trim());
+            if (!set && !name) queryParts.push('f:standard');
+            if (color) queryParts.push(`c:${color}`);
+            if (rarity) queryParts.push(`r:${rarity}`);
+            if (set) queryParts.push(`s:${set}`);
             
-            if(cmc) {
-                if(cmc === "7") queryParts.push(`cmc>=7`);
+            if (cmc) {
+                if (cmc === "7") queryParts.push(`cmc>=7`);
                 else queryParts.push(`cmc:${cmc}`);
             }
 
-            // Unir y buscar
             fetchCards(queryParts.join(' '));
         }
 
-        // --- 3. EVENTO ENTER EN BUSCADOR ---
-        document.getElementById('search-name').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                applyFilters();
-            }
+        document.getElementById('search-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyFilters();
         });
 
-        // --- 4. CARGA INICIAL (Y LECTURA DE URL) ---
-          window.onload = () => {
-            // Leemos si hay parámetros en la URL (ej: ?set=lrw)
+        window.onload = () => {
             const params = new URLSearchParams(window.location.search);
             const setParam = params.get('set');
-
             if (setParam) {
-                // A. Actualizamos el desplegable visualmente
-                const setSelect = document.getElementById('set');
-                if(setSelect) setSelect.value = setParam;
-
-                // B. Buscamos directamente esa colección
+                document.getElementById('set').value = setParam;
                 fetchCards(`s:${setParam}`);
             } else {
-                // C. Si no hay nada, carga por defecto
                 fetchCards('f:standard');
             }
         };

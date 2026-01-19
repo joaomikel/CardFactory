@@ -86,7 +86,8 @@
     <div class="sidebar" id="sidebar">
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3>Menú</h3>
-        <a href="#">Perfil</a>
+        <a href="/">Inicio</a>
+        <a href="{{ url('/dashboard') }}">Perfil</a>
         <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
         <a href="#">Carrito</a>
