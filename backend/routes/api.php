@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http; // <--- IMPORTANTE: Agrega esto arriba del todo
+use Illuminate\Support\Facades\Http; 
+use App\Http\Controllers\Api\ListingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,3 +56,4 @@ Route::get('/trending', function () {
     return $response->json();
 });
 
+Route::get('/listings/{scryfall_id}', [ListingController::class, 'getByCard']);

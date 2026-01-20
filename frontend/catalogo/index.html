@@ -293,13 +293,13 @@
                 }
 
                 grid.innerHTML = data.data.map(card => `
-                    <div class="card-catalog">
-                        <img src="${card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680?text=No+Image')}" loading="lazy">
+                    <a href="/carta.html?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
+                        <img src="${card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680')}" loading="lazy">
                         <div class="card-info">
                             <h3>${card.name}</h3>
-                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : (card.prices.usd ? card.prices.usd + ' $' : 'Sin Stock')}</p>
+                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : 'Consultar'}</p>
                         </div>
-                    </div>
+                    </a>
                 `).join('');
             } catch (error) {
                 console.error(error);

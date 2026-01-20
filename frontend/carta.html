@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle - Drag & Drop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #8C52FF; 
+            --secondary: #958EA0;
+            --dark: #111827; 
+            --bg: #f3f4f6; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--dark); padding-bottom: 100px; }
+
+        /* --- ESTILOS BÁSICOS (Header, Grid, Imagen) --- */
+        header {
+            background: var(--primary); height: 70px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        
+        .detail-grid {
+            display: grid; grid-template-columns: 1fr; gap: 40px;
+            background: white; padding: 40px; border-radius: 12px;
+        }
+        @media (min-width: 768px) { .detail-grid { grid-template-columns: 400px 1fr; } }
+
+        .card-image-large {
+            width: 100%; max-width: 380px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* --- ESTILOS DE LA LISTA DE VENDEDORES (DRAGGABLE) --- */
+        .sellers-section { margin-top: 40px; }
+        
+        .seller-row {
+            background: white; padding: 15px 20px; margin-bottom: 15px;
+            border-radius: 12px; border: 1px solid #e5e7eb;
+            display: flex; justify-content: space-between; align-items: center;
+            /* CLAVE PARA DRAG AND DROP: */
+            cursor: grab; 
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            user-select: none; /* Evita que se seleccione el texto al arrastrar */
+        }
+
+        /* Efecto cuando pasas el mouse por encima */
+        .seller-row:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        /* Efecto mientras estás arrastrando */
+        .seller-row.dragging {
+            opacity: 0.5;
+            background: #f0f0f0;
+            border: 2px dashed var(--primary);
+        }
+
+        .seller-info { display: flex; gap: 15px; align-items: center; }
+        .seller-avatar { 
+            width: 45px; height: 45px; background: #eee; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            color: #888; font-size: 1.2rem;
+        }
+        .price-tag { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        
+        /* Botón pequeño por si no quieren arrastrar */
+        .btn-add-mini {
+            background: var(--dark); color: white; border: none;
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+            margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
+        }
+
+        /* --- ZONA DE DROP (CARRITO FLOTANTE) --- */
+        .floating-cart-zone {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            width: 70px; height: 70px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            box-shadow: 0 10px 25px rgba(140, 82, 255, 0.4);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .floating-cart-zone i { font-size: 1.8rem; pointer-events: none; }
+        
+        .cart-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: #ff4757; color: white;
+            width: 25px; height: 25px; border-radius: 50%;
+            font-size: 0.8rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Efecto cuando arrastras algo ENCIMA del carrito */
+        .drag-over-active {
+            transform: scale(1.3); /* Se hace grande */
+            background: #00d2d3; /* Cambia de color */
+            box-shadow: 0 0 30px rgba(0, 210, 211, 0.6);
+        }
+
+        /* Animación de rebote al soltar */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+        .pop-anim { animation: pop 0.3s ease; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" style="color: white; font-weight: bold; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Inicio
+        </a>
+        <div style="color: white; font-weight: 800;">CardFactory</div>
+        <div style="width: 50px;"></div>
+    </header>
+
+    <main class="container">
+        <div class="detail-grid" id="main-content">
+            <div style="text-align: center; padding: 40px;">Cargando...</div>
+        </div>
+
+        <div class="sellers-section">
+            <h3 style="margin-bottom: 15px;">Arrastra un vendedor al carrito 👇</h3>
+            <div id="sellers-list"></div>
+        </div>
+    </main>
+
+    <div id="drop-zone" class="floating-cart-zone" onclick="window.location.href='carrito.html'">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cart-count">0</span>
+    </div>
+
+    <script>
+    const API_URL = 'http://localhost:8000/api'; 
+    const params = new URLSearchParams(window.location.search);
+    const cardId = params.get('id'); // ID Scryfall
+    
+    let currentCardInfo = {}; // Datos visuales de la carta
+    let sellersData = []; // Guardamos los datos de los vendedores aquí
+
+    // Inicializar
+    updateCartCount();
+    init();
+
+    async function init() {
+        if(!cardId) return;
+
+        // 1. Obtener Info Carta
+        try {
+            const res = await fetch(`https://api.scryfall.com/cards/${cardId}`);
+            const card = await res.json();
+            
+            let img = "https://via.placeholder.com/400";
+            if(card.image_uris) img = card.image_uris.large;
+            else if(card.card_faces) img = card.card_faces[0].image_uris.large;
+
+            currentCardInfo = { 
+                name: card.name, 
+                image: img, 
+                rarity: card.rarity 
+            };
+            
+            // Render HTML Carta
+            document.getElementById('main-content').innerHTML = `
+                <div style="text-align:center;">
+                    <img src="${img}" class="card-image-large">
+                </div>
+                <div>
+                    <h1 style="font-size:2rem; margin-bottom:10px;">${card.name}</h1>
+                    <p>${card.type_line}</p>
+                    <div style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:8px;">
+                        ${card.oracle_text || ''}
+                    </div>
+                </div>
+            `;
+        } catch(e) { console.error(e); }
+
+        // 2. Obtener Vendedores (Laravel)
+        try {
+            const res = await fetch(`${API_URL}/listings/${cardId}`);
+            if(res.ok) {
+                sellersData = await res.json();
+                renderSellers(sellersData);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function renderSellers(listings) {
+        const container = document.getElementById('sellers-list');
+        if(listings.length === 0) {
+            container.innerHTML = "<p>No hay vendedores.</p>";
+            return;
+        }
+
+        container.innerHTML = listings.map((venta, index) => `
+            <div 
+                class="seller-row" 
+                draggable="true" 
+                ondragstart="handleDragStart(event, ${index})"
+            >
+                <div class="seller-info">
+                    <div class="seller-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <strong>${venta.user ? venta.user.name : 'Usuario'}</strong>
+                        <div style="font-size:0.8rem; color:#666;">
+                            ${venta.condition} • ${venta.is_foil ? 'Foil' : 'Normal'}
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span class="price-tag">${parseFloat(venta.price).toFixed(2)}€</span>
+                    <button class="btn-add-mini" onclick="manualAdd(${index})">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // --- LÓGICA DRAG AND DROP ---
+
+    // 1. Cuando empiezas a arrastrar
+    function handleDragStart(e, index) {
+        const row = e.target;
+        row.classList.add('dragging'); // Efecto visual
+        
+        // Guardamos el índice del array en el paquete de datos del arrastre
+        e.dataTransfer.setData("text/plain", index);
+        e.dataTransfer.effectAllowed = "copy";
+    }
+
+    // Evento global para quitar estilo cuando dejas de arrastrar
+    document.addEventListener("dragend", (e) => {
+        if (e.target.classList.contains('seller-row')) {
+            e.target.classList.remove('dragging');
+        }
+    });
+
+    // --- LÓGICA DE LA ZONA DE SOLTAR (CARRITO) ---
+    const dropZone = document.getElementById('drop-zone');
+
+    // 2. Permitir soltar (Drag Over)
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Necesario para permitir el drop
+        dropZone.classList.add('drag-over-active'); // Hacemos el carrito grande
+    });
+
+    // 3. Si sales de la zona sin soltar
+    dropZone.addEventListener('dragleave', (e) => {
+        dropZone.classList.remove('drag-over-active');
+    });
+
+    // 4. SOLTAR (Drop)
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over-active');
+
+        // Recuperar el índice que guardamos en dragStart
+        const index = e.dataTransfer.getData("text/plain");
+        
+        // Llamar a la función de guardar
+        addToCart(index);
+    });
+
+    // --- LÓGICA DE GUARDADO ---
+
+    function manualAdd(index) {
+        addToCart(index);
+    }
+
+    function addToCart(index) {
+        const venta = sellersData[index];
+        
+        // Objeto a guardar
+        const item = {
+            id: venta.id,
+            name: currentCardInfo.name,
+            image: currentCardInfo.image,
+            rarity: currentCardInfo.rarity,
+            price: parseFloat(venta.price),
+            condition: venta.condition,
+            addedAt: new Date().getTime()
+        };
+
+        // Guardar en LocalStorage
+        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+        
+        // (Opcional) Verificar duplicados
+        if(cart.find(i => i.id === item.id)) {
+            alert("⚠️ Ya tienes esta carta exacta en el carrito.");
+            return;
+        }
+
+        cart.push(item);
+        localStorage.setItem('myCart', JSON.stringify(cart));
+
+        // Animación de éxito
+        dropZone.classList.add('pop-anim');
+        setTimeout(() => dropZone.classList.remove('pop-anim'), 300);
+        
+        // Actualizar contador visual
+        updateCartCount();
+    }
+
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('myCart')) || [];
+        document.getElementById('cart-count').innerText = cart.length;
+    }
+
+    </script>
+</body>
+</html>
