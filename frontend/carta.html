@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle - Drag & Drop</title>
+    <title>Detalle de Carta - CardFactory</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -16,7 +16,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); color: var(--dark); padding-bottom: 100px; }
 
-        /* --- ESTILOS BÁSICOS (Header, Grid, Imagen) --- */
+        /* --- HEADER --- */
         header {
             background: var(--primary); height: 70px;
             display: flex; align-items: center; justify-content: space-between;
@@ -25,76 +25,96 @@
         }
         .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
         
+        /* --- GRID PRINCIPAL (FOTO + INFO) --- */
         .detail-grid {
             display: grid; grid-template-columns: 1fr; gap: 40px;
             background: white; padding: 40px; border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        @media (min-width: 768px) { .detail-grid { grid-template-columns: 400px 1fr; } }
+        @media (min-width: 768px) { .detail-grid { grid-template-columns: 350px 1fr; } }
 
         .card-image-large {
-            width: 100%; max-width: 380px; border-radius: 15px;
+            width: 100%; border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        /* --- ESTILOS DE LA LISTA DE VENDEDORES (DRAGGABLE) --- */
-        .sellers-section { margin-top: 40px; }
+        /* --- ESTILOS DE LA TABLA (REQUISITO PROFESORA) --- */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden; /* Para que los bordes redondeados funcionen con la tabla */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: var(--dark);
+            color: white;
+        }
+
+        th { padding: 15px 20px; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; }
         
-        .seller-row {
-            background: white; padding: 15px 20px; margin-bottom: 15px;
-            border-radius: 12px; border: 1px solid #e5e7eb;
-            display: flex; justify-content: space-between; align-items: center;
-            /* CLAVE PARA DRAG AND DROP: */
-            cursor: grab; 
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-            user-select: none; /* Evita que se seleccione el texto al arrastrar */
+        td { 
+            padding: 15px 20px; 
+            border-bottom: 1px solid #e5e7eb; 
+            vertical-align: middle;
         }
 
-        /* Efecto cuando pasas el mouse por encima */
-        .seller-row:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-color: var(--primary);
+        /* Filas arrastrables */
+        tbody tr {
+            cursor: grab;
+            transition: background-color 0.2s, transform 0.2s;
         }
 
-        /* Efecto mientras estás arrastrando */
-        .seller-row.dragging {
+        tbody tr:hover {
+            background-color: #f9fafb;
+            transform: scale(1.01); /* Pequeño efecto pop */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 10; position: relative;
+        }
+
+        tbody tr.dragging {
             opacity: 0.5;
-            background: #f0f0f0;
+            background: #e0e7ff;
             border: 2px dashed var(--primary);
         }
 
-        .seller-info { display: flex; gap: 15px; align-items: center; }
-        .seller-avatar { 
-            width: 45px; height: 45px; background: #eee; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            color: #888; font-size: 1.2rem;
+        .price-tag {
+            font-weight: 800; color: var(--primary); font-size: 1.1rem;
         }
-        .price-tag { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
         
-        /* Botón pequeño por si no quieren arrastrar */
-        .btn-add-mini {
+        .badge {
+            padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;
+        }
+        .badge-foil { background: linear-gradient(135deg, #fceabb 0%,#f8b500 100%); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .badge-normal { background: #e5e7eb; color: #666; }
+
+        /* Botón de añadir pequeño */
+        .btn-add {
             background: var(--dark); color: white; border: none;
-            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-            margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
-        }
-
-        /* --- ZONA DE DROP (CARRITO FLOTANTE) --- */
-        .floating-cart-zone {
-            position: fixed;
-            bottom: 30px; right: 30px;
-            width: 70px; height: 70px;
-            background: var(--primary);
-            border-radius: 50%;
+            width: 35px; height: 35px; border-radius: 8px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            color: white;
-            box-shadow: 0 10px 25px rgba(140, 82, 255, 0.4);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
+            transition: transform 0.1s;
         }
+        .btn-add:active { transform: scale(0.9); }
 
+        /* --- CARRITO FLOTANTE --- */
+        .floating-cart-zone {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 70px; height: 70px;
+            background: var(--primary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; box-shadow: 0 10px 25px rgba(140, 82, 255, 0.4);
+            z-index: 1000; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
         .floating-cart-zone i { font-size: 1.8rem; pointer-events: none; }
-        
         .cart-badge {
             position: absolute; top: -5px; right: -5px;
             background: #ff4757; color: white;
@@ -103,20 +123,8 @@
             display: flex; align-items: center; justify-content: center;
             border: 2px solid white;
         }
-
-        /* Efecto cuando arrastras algo ENCIMA del carrito */
-        .drag-over-active {
-            transform: scale(1.3); /* Se hace grande */
-            background: #00d2d3; /* Cambia de color */
-            box-shadow: 0 0 30px rgba(0, 210, 211, 0.6);
-        }
-
-        /* Animación de rebote al soltar */
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.4); }
-            100% { transform: scale(1); }
-        }
+        .drag-over-active { transform: scale(1.3); background: #00d2d3; }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
         .pop-anim { animation: pop 0.3s ease; }
 
     </style>
@@ -125,20 +133,41 @@
 
     <header>
         <a href="/" style="color: white; font-weight: bold; text-decoration: none;">
-            <i class="fas fa-arrow-left"></i> Inicio
+            <i class="fas fa-arrow-left"></i> Volver
         </a>
-        <div style="color: white; font-weight: 800;">CardFactory</div>
+        <div style="color: white; font-weight: 800; font-size: 1.2rem;">CardFactory</div>
         <div style="width: 50px;"></div>
     </header>
 
     <main class="container">
         <div class="detail-grid" id="main-content">
-            <div style="text-align: center; padding: 40px;">Cargando...</div>
+            <div style="text-align: center; padding: 40px;">Cargando carta...</div>
         </div>
 
         <div class="sellers-section">
-            <h3 style="margin-bottom: 15px;">Arrastra un vendedor al carrito 👇</h3>
-            <div id="sellers-list"></div>
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-store"></i> Ofertas de Vendedores
+                <span style="font-size: 0.9rem; font-weight: normal; color: #666; margin-left: auto;">
+                    Arrastra una fila al carrito 🛒
+                </span>
+            </h3>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Vendedor (Usuario)</th>
+                            <th>Estado</th>
+                            <th>Edición</th>
+                            <th>Precio</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sellers-tbody">
+                        <tr><td colspan="5" style="text-align:center; color: #999;">Buscando vendedores...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -148,12 +177,15 @@
     </div>
 
     <script>
+    // URL de tu Backend (Asegúrate que el puerto es correcto, por defecto Laravel es 80 o 8000)
+    // Si usas Docker mapeado al 80, quita el :8000
     const API_URL = 'http://localhost:8000/api'; 
-    const params = new URLSearchParams(window.location.search);
-    const cardId = params.get('id'); // ID Scryfall
     
-    let currentCardInfo = {}; // Datos visuales de la carta
-    let sellersData = []; // Guardamos los datos de los vendedores aquí
+    const params = new URLSearchParams(window.location.search);
+    const cardId = params.get('id'); // ID de Scryfall
+    
+    let currentCardInfo = {}; 
+    let sellersData = []; 
 
     // Inicializar
     updateCartCount();
@@ -162,7 +194,7 @@
     async function init() {
         if(!cardId) return;
 
-        // 1. Obtener Info Carta
+        // 1. Cargar Info VISUAL desde Scryfall
         try {
             const res = await fetch(`https://api.scryfall.com/cards/${cardId}`);
             const card = await res.json();
@@ -174,112 +206,128 @@
             currentCardInfo = { 
                 name: card.name, 
                 image: img, 
-                rarity: card.rarity 
+                rarity: card.rarity,
+                set_name: card.set_name 
             };
             
-            // Render HTML Carta
             document.getElementById('main-content').innerHTML = `
                 <div style="text-align:center;">
                     <img src="${img}" class="card-image-large">
                 </div>
                 <div>
                     <h1 style="font-size:2rem; margin-bottom:10px;">${card.name}</h1>
-                    <p>${card.type_line}</p>
-                    <div style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:8px;">
-                        ${card.oracle_text || ''}
+                    <p style="color:var(--secondary); font-weight:600;">${card.type_line}</p>
+                    <div style="margin-top:20px; background:#f9f9f9; padding:20px; border-radius:8px; line-height: 1.6;">
+                        ${card.oracle_text || 'Sin descripción disponible.'}
                     </div>
                 </div>
             `;
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Error Scryfall:", e); }
 
-        // 2. Obtener Vendedores (Laravel)
+        // 2. Cargar Vendedores desde TU LARAVEL (Base de Datos)
         try {
-            const res = await fetch(`${API_URL}/listings/${cardId}`);
+            // Nota: Aquí llamamos a la ruta que busca por ID de carta
+            const res = await fetch(`${API_URL}/listings/card/${cardId}`);
+            
             if(res.ok) {
                 sellersData = await res.json();
-                renderSellers(sellersData);
+                renderSellersTable(sellersData);
+            } else {
+                console.warn("No se encontraron vendedores o error en API");
+                document.getElementById('sellers-tbody').innerHTML = 
+                    `<tr><td colspan="5" style="text-align:center;">No hay ofertas disponibles.</td></tr>`;
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { 
+            console.error("Error Backend:", e); 
+            document.getElementById('sellers-tbody').innerHTML = 
+                    `<tr><td colspan="5" style="text-align:center; color:red;">Error conectando con el servidor.</td></tr>`;
+        }
     }
 
-    function renderSellers(listings) {
-        const container = document.getElementById('sellers-list');
+    // Renderizar la TABLA (Requisito 1:N / N:M)
+    function renderSellersTable(listings) {
+        const tbody = document.getElementById('sellers-tbody');
+        
         if(listings.length === 0) {
-            container.innerHTML = "<p>No hay vendedores.</p>";
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px;">No hay vendedores para esta carta aún.</td></tr>`;
             return;
         }
 
-        container.innerHTML = listings.map((venta, index) => `
-            <div 
-                class="seller-row" 
+        tbody.innerHTML = listings.map((venta, index) => `
+            <tr 
                 draggable="true" 
                 ondragstart="handleDragStart(event, ${index})"
             >
-                <div class="seller-info">
-                    <div class="seller-avatar"><i class="fas fa-user"></i></div>
-                    <div>
-                        <strong>${venta.user ? venta.user.name : 'Usuario'}</strong>
-                        <div style="font-size:0.8rem; color:#666;">
-                            ${venta.condition} • ${venta.is_foil ? 'Foil' : 'Normal'}
+                <td>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-user-circle" style="font-size:1.5rem; color:#ccc;"></i>
+                        <div>
+                            <strong>${venta.user ? venta.user.name : 'Vendedor Desconocido'}</strong>
+                            <div style="font-size:0.75rem; color:#888;">ID: ${venta.user_id}</div>
                         </div>
                     </div>
-                </div>
-                <div style="display:flex; align-items:center;">
-                    <span class="price-tag">${parseFloat(venta.price).toFixed(2)}€</span>
-                    <button class="btn-add-mini" onclick="manualAdd(${index})">
+                </td>
+                <td>
+                    <span style="font-weight:bold;">${venta.condition}</span>
+                    ${venta.is_foil ? '<span class="badge badge-foil">Foil</span>' : '<span class="badge badge-normal">Normal</span>'}
+                </td>
+                <td>
+                    ${venta.card && venta.card.set ? venta.card.set.name : 'Edición Base'}
+                </td>
+                <td class="price-tag">${parseFloat(venta.price).toFixed(2)} €</td>
+                <td>
+                    <button class="btn-add" onclick="manualAdd(${index})" title="Añadir al carrito">
                         <i class="fas fa-plus"></i>
                     </button>
-                </div>
-            </div>
+                </td>
+            </tr>
         `).join('');
     }
 
-    // --- LÓGICA DRAG AND DROP ---
+    // --- LÓGICA DRAG AND DROP (ADAPTADA A TABLAS) ---
 
-    // 1. Cuando empiezas a arrastrar
     function handleDragStart(e, index) {
-        const row = e.target;
-        row.classList.add('dragging'); // Efecto visual
+        const row = e.target; // La fila <tr>
+        row.classList.add('dragging'); 
         
-        // Guardamos el índice del array en el paquete de datos del arrastre
+        // El "payload" es el índice del array de vendedores
         e.dataTransfer.setData("text/plain", index);
         e.dataTransfer.effectAllowed = "copy";
+        
+        // Imagen fantasma opcional (para que se vea bonito al arrastrar)
+        // e.dataTransfer.setDragImage(row, 0, 0); 
     }
 
-    // Evento global para quitar estilo cuando dejas de arrastrar
     document.addEventListener("dragend", (e) => {
-        if (e.target.classList.contains('seller-row')) {
+        // Limpiamos la clase visual al soltar
+        if (e.target.tagName === 'TR') {
             e.target.classList.remove('dragging');
         }
     });
 
-    // --- LÓGICA DE LA ZONA DE SOLTAR (CARRITO) ---
+    // --- LÓGICA DE DROP ZONE (CARRITO) ---
     const dropZone = document.getElementById('drop-zone');
 
-    // 2. Permitir soltar (Drag Over)
     dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Necesario para permitir el drop
-        dropZone.classList.add('drag-over-active'); // Hacemos el carrito grande
+        e.preventDefault(); 
+        dropZone.classList.add('drag-over-active');
     });
 
-    // 3. Si sales de la zona sin soltar
     dropZone.addEventListener('dragleave', (e) => {
         dropZone.classList.remove('drag-over-active');
     });
 
-    // 4. SOLTAR (Drop)
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('drag-over-active');
 
-        // Recuperar el índice que guardamos en dragStart
         const index = e.dataTransfer.getData("text/plain");
-        
-        // Llamar a la función de guardar
-        addToCart(index);
+        if(index !== "") {
+            addToCart(index);
+        }
     });
 
-    // --- LÓGICA DE GUARDADO ---
+    // --- GESTIÓN DEL CARRITO ---
 
     function manualAdd(index) {
         addToCart(index);
@@ -288,34 +336,33 @@
     function addToCart(index) {
         const venta = sellersData[index];
         
-        // Objeto a guardar
         const item = {
-            id: venta.id,
+            id: venta.id, // ID único de la venta (Listing ID)
+            scryfall_id: cardId,
             name: currentCardInfo.name,
             image: currentCardInfo.image,
-            rarity: currentCardInfo.rarity,
             price: parseFloat(venta.price),
+            seller: venta.user ? venta.user.name : 'Desconocido',
             condition: venta.condition,
+            is_foil: venta.is_foil,
             addedAt: new Date().getTime()
         };
 
-        // Guardar en LocalStorage
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         
-        // (Opcional) Verificar duplicados
+        // Evitar añadir la misma oferta dos veces
         if(cart.find(i => i.id === item.id)) {
-            alert("⚠️ Ya tienes esta carta exacta en el carrito.");
+            alert("⚠️ Esta oferta específica ya está en tu carrito.");
             return;
         }
 
         cart.push(item);
         localStorage.setItem('myCart', JSON.stringify(cart));
 
-        // Animación de éxito
+        // Animación visual
         dropZone.classList.add('pop-anim');
         setTimeout(() => dropZone.classList.remove('pop-anim'), 300);
         
-        // Actualizar contador visual
         updateCartCount();
     }
 

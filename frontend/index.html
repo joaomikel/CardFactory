@@ -557,22 +557,22 @@ footer {
         }
 
         function createCardHTML(card) {
-            const img = card.image_uris?.normal 
-                        || (card.card_faces && card.card_faces[0]?.image_uris?.normal) 
-                        || 'https://via.placeholder.com/488x680?text=No+Image';
-            
-            let finalPrice = 'Sin Stock';
-            if (card.prices?.eur) finalPrice = `${card.prices.eur} €`;
-            else if (card.prices?.usd) finalPrice = `${card.prices.usd} $`;
+        const img = card.image_uris?.normal 
+                    || (card.card_faces && card.card_faces[0]?.image_uris?.normal) 
+                    || 'https://via.placeholder.com/488x680?text=No+Image';
+        
+        let finalPrice = 'Sin Stock';
+        if (card.prices?.eur) finalPrice = `${card.prices.eur} €`;
+        else if (card.prices?.usd) finalPrice = `${card.prices.usd} $`;
 
-            // CAMBIO AQUÍ: Usamos <a href> y apuntamos a la raíz /carta.html
-            return `
-                <a href="/carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;">
-                    <img src="${img}" alt="${card.name}" crossorigin="anonymous" loading="lazy">
-                    <h3 style="font-size: 0.9rem; margin-bottom:5px;">${card.name}</h3>
-                    <p class="card-price">${finalPrice}</p>
-                </a>
-            `;
+        // CAMBIO AQUÍ: Usamos <a href> y apuntamos a la raíz /carta.html
+        return `
+            <a href="/carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;">
+                <img src="${img}" alt="${card.name}" crossorigin="anonymous" loading="lazy">
+                <h3 style="font-size: 0.9rem; margin-bottom:5px;">${card.name}</h3>
+                <p class="card-price">${finalPrice}</p>
+            </a>
+        `;
         }
 
         async function loadCards(endpoint, containerId, numCards = 4) {
