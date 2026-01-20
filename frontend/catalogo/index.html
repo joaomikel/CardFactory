@@ -7,33 +7,126 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #816EB2; --dark: #111827; --white: #ffffff; --bg: #f3f4f6; }
+        :root { 
+            --primary: #816EB2; 
+            --secondary: #958EA0;
+            --dark: #111827; 
+            --white: #ffffff; 
+            --bg: #f3f4f6; 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); padding-bottom: 50px; }
 
         header {
-            background: var(--white);
-            padding: 1rem 5%;
+            background: var(--primary);
+            height: 70px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-            position: sticky; top: 0; z-index: 100;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .btn-back { 
-            text-decoration: none; color: var(--primary); 
-            font-weight: 700; font-size: 0.95rem;
-            display: flex; align-items: center; gap: 8px;
-            padding: 8px 12px; border-radius: 8px;
-            transition: background 0.2s;
+        .menu-trigger {
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            padding: 10px;
         }
-        .btn-back:hover { background: #f0f0ff; }
+
+        .auth-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-header {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-login {
+            background: rgba(255,255,255,0.25);
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-register {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 101;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 320px;
+            height: 100%;
+            background: var(--white);
+            z-index: 102;
+            padding: 2rem;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .close-sidebar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        .sidebar a {
+            padding: 15px 10px;
+            font-weight: 500;
+            color: var(--secondary);
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
 
         .filters {
             background: white; padding: 20px;
             display: flex; flex-direction: column; gap: 15px;
             border-bottom: 1px solid #ddd;
+            margin-top: 0;
         }
 
         .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
@@ -63,7 +156,9 @@
             background: white; border-radius: 12px; overflow: hidden;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex; flex-direction: column;
+            transition: transform 0.2s;
         }
+        .card-catalog:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .card-catalog img { width: 100%; aspect-ratio: 2.5/3.5; object-fit: cover; }
         .card-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .card-info h3 { font-size: 0.85rem; color: var(--dark); margin-bottom: 8px; }
@@ -75,16 +170,33 @@
             .search-group { flex: 2; min-width: 200px; } 
             .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
             .btn-apply { padding: 12px 30px; margin-top: 0; }
+            header { padding: 0 40px; height: 90px; }
+            .sidebar { width: 300px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
+        <a href="/">Inicio</a> 
+        <a href="/dashboard">Perfil</a>
+        <a href="/colecciones/">Colecciones</a>
+        <a href="/catalogo/" style="color: var(--primary); font-weight: 700;">Catálogo</a>
+        <a href="#">Carrito</a>
+    </div>
+
     <header>
-        <div style="font-weight:800; font-size:1.2rem;">Catálogo</div>
-        <a href="/" class="btn-back">
-            <i class="fas fa-chevron-left"></i> Inicio
-        </a>
+        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">☰</button>
+        
+        <div style="color: white; font-weight: 800; font-size: 1.2rem;">Catálogo</div>
+
+        <div class="auth-actions">
+            <a href="/login" class="btn-header btn-login">Login</a>
+            <a href="/register" class="btn-header btn-register">Registro</a>
+        </div>
     </header>
 
     <section class="filters">
@@ -138,43 +250,14 @@
             <label>Colección</label>
             <select id="set" class="filter-control">
                 <option value="">Todas</option>
-                <option value="msm">Marvel's Spider-Man (MSM)</option>
-                <option value="eoe">Edge of Eternities (EOE)</option>
-                <option value="ffm">Final Fantasy (FFM)</option>
-                <option value="tds">Tarkir: Dragonstorm (TDS)</option>
                 <option value="dft">Aetherdrift (DFT)</option>
-                <option value="inr">Innistrad Remastered (INR)</option>
                 <option value="fdn">Foundations (FDN)</option>
                 <option value="dsk">Duskmourn (DSK)</option>
                 <option value="blb">Bloomburrow (BLB)</option>
-                <option value="otj">Outlaws of Thunder Junction (OTJ)</option>
-                <option value="mkm">Murders at Karlov Manor (MKM)</option>
-                <option value="lci">Lost Caverns of Ixalan (LCI)</option>
-                <option value="woe">Wilds of Eldraine (WOE)</option>
-                <option value="mom">March of the Machine (MOM)</option>
-                <option value="one">Phyrexia: All Will Be One (ONE)</option>
-                <option value="bro">The Brothers' War (BRO)</option>
-                <option value="dmu">Dominaria United (DMU)</option>
-                <option value="snc">Streets of New Capenna (SNC)</option>
-                <option value="neo">Kamigawa: Neon Dynasty (NEO)</option>
-                <option value="vow">Innistrad: Crimson Vow (VOW)</option>
-                <option value="mid">Innistrad: Midnight Hunt (MID)</option>
-                <option value="afr">Forgotten Realms (AFR)</option>
-                <option value="stx">Strixhaven (STX)</option>
-                <option value="khm">Kaldheim (KHM)</option>
-                <option value="znr">Zendikar Rising (ZNR)</option>
-                <option value="m21">Core Set 2021 (M21)</option>
-                <option value="iko">Ikoria (IKO)</option>
-                <option value="thb">Theros Beyond Death (THB)</option>
-                <option value="eld">Throne of Eldraine (ELD)</option>
+                <option value="otj">Thunder Junction (OTJ)</option>
                 <option value="mh3">Modern Horizons 3 (MH3)</option>
                 <option value="ltr">Lord of the Rings (LTR)</option>
-                <option value="mh2">Modern Horizons 2 (MH2)</option>
-                <option value="mh1">Modern Horizons 1 (MH1)</option>
-                <option value="dom">Dominaria (DOM)</option>
-                <option value="xln">Ixalan (XLN)</option>
                 <option value="lrw">Lorwyn (LRW)</option>
-                <option value="lea">Alpha (LEA)</option>
             </select>
         </div>
 
@@ -188,12 +271,19 @@
     </main>
 
     <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;">Cargando...</p>';
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Cargando...</p>';
 
             try {
-                const res = await fetch(`/api/cartas?q=${encodeURIComponent(q)}`);
+                // Usamos Scryfall para simular la búsqueda
+                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
+                
                 if (!res.ok) throw new Error('Error API');
                 const data = await res.json();
                 
@@ -204,15 +294,16 @@
 
                 grid.innerHTML = data.data.map(card => `
                     <div class="card-catalog">
-                        <img src="${card.image_uris?.normal || 'https://via.placeholder.com/488x680?text=No+Image'}" loading="lazy">
+                        <img src="${card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680?text=No+Image')}" loading="lazy">
                         <div class="card-info">
                             <h3>${card.name}</h3>
-                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : (card.prices.usd ? card.prices.usd + ' $' : '---')}</p>
+                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : (card.prices.usd ? card.prices.usd + ' $' : 'Sin Stock')}</p>
                         </div>
                     </div>
                 `).join('');
             } catch (error) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:red;">Error de conexión.</p>';
+                console.error(error);
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio específico.</p>';
             }
         }
 
@@ -226,7 +317,13 @@
             let queryParts = [];
 
             if (name) queryParts.push(name.trim());
-            if (!set && !name) queryParts.push('f:standard');
+            
+            // Si no hay filtros, por defecto busca standard
+            if (!set && !name && !color && !rarity && !cmc) {
+                fetchCards('f:standard');
+                return;
+            }
+            
             if (color) queryParts.push(`c:${color}`);
             if (rarity) queryParts.push(`r:${rarity}`);
             if (set) queryParts.push(`s:${set}`);
@@ -236,6 +333,7 @@
                 else queryParts.push(`cmc:${cmc}`);
             }
 
+            // Unimos todo para Scryfall
             fetchCards(queryParts.join(' '));
         }
 
@@ -243,13 +341,28 @@
             if (e.key === 'Enter') applyFilters();
         });
 
+        // --- AQUÍ ESTÁ LA MAGIA PARA CONECTAR CON LA LANDING ---
         window.onload = () => {
             const params = new URLSearchParams(window.location.search);
+            
+            // 1. Detectar parámetro 'q' (Input del Landing Page)
+            const qParam = params.get('q');
+            
+            // 2. Detectar parámetro 'set' (Botones de Colecciones del Landing)
             const setParam = params.get('set');
-            if (setParam) {
+
+            if (qParam) {
+                // Escribimos lo que buscó el usuario en el input visualmente
+                document.getElementById('search-name').value = qParam;
+                // Ejecutamos la búsqueda directa
+                fetchCards(qParam);
+            } else if (setParam) {
+                // Seleccionamos la colección en el desplegable
                 document.getElementById('set').value = setParam;
+                // Buscamos por código de set
                 fetchCards(`s:${setParam}`);
             } else {
+                // Carga inicial normal
                 fetchCards('f:standard');
             }
         };

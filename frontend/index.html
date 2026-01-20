@@ -422,8 +422,8 @@ footer {
 
     <section class="hero-search">
         <div class="search-wrapper">
-            <input type="text" placeholder="Busca cartas (e.g., Sheoldred)..." id="searchInput">
-            <button class="search-btn" aria-label="Buscar" onclick="window.location.href='/catalogo/'">🔍</button>
+            <input type="text" placeholder="Busca cartas (e.g., Sheoldred)..." id="searchInput" onkeypress="handleEnter(event)">
+            <button class="search-btn" aria-label="Buscar" onclick="performSearch()">🔍</button>
         </div>
     </section>
 
@@ -551,29 +551,20 @@ footer {
     </footer>
 
     <script>
-        /**
-         * 1. GESTIÓN DEL MENÚ LATERAL
-         */
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        /**
-         * 2. RENDERIZADO DE CARTAS (Corrección de CORS y bloqueo de imágenes)
-         */
         function createCardHTML(card) {
-            // Prioridad de imágenes y fallback
             const img = card.image_uris?.normal 
                         || (card.card_faces && card.card_faces[0]?.image_uris?.normal) 
                         || 'https://via.placeholder.com/488x680?text=No+Image';
             
-            // Formateo de precio
             let finalPrice = 'Sin Stock';
             if (card.prices?.eur) finalPrice = `${card.prices.eur} €`;
             else if (card.prices?.usd) finalPrice = `${card.prices.usd} $`;
 
-            // Atributo crossorigin="anonymous" es vital para evitar el error OpaqueResponseBlocking
             return `
                 <div class="card-item" style="animation: fadeIn 0.5s ease;">
                     <img src="${img}" alt="${card.name}" crossorigin="anonymous" loading="lazy">
@@ -583,31 +574,24 @@ footer {
             `;
         }
 
-        /**
-         * 3. CARGA DE DATOS DESDE LA API (Anti-caché)
-         */
-        async function loadCards(endpoint, containerId) {
+        async function loadCards(endpoint, containerId, numCards = 4) {
             const container = document.getElementById(containerId);
-            
             try {
-                // Generamos un número aleatorio para que la URL sea siempre distinta
-                // Ej: /api/lorwyn?v=123456789
                 const randomRef = Math.random().toString(36).substring(7);
                 const url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}v=${randomRef}`;
                 
                 const res = await fetch(url, {
-                    headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
-                    }
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
                 });
 
                 const data = await res.json();
                 const cards = data.data || [];
 
                 if (cards.length > 0) {
-                    // El backend ya debería mandarlas random, pero aquí barajamos otra vez por seguridad
-                    const displayCards = cards.sort(() => 0.5 - Math.random()).slice(0, 4);
+                    const displayCards = cards
+                        .sort(() => 0.5 - Math.random()) 
+                        .slice(0, numCards);             
+                    
                     container.innerHTML = displayCards.map(createCardHTML).join('');
                 }
             } catch (error) {
@@ -615,9 +599,6 @@ footer {
             }
         }
 
-        /**
-         * 4. RESEÑAS (Simulación de datos)
-         */
         function loadReviews() {
             const reviews = [
                 { name: "Adrian DLC", text: "Me encanta ver los precios actualizados.", img: "https://i.pravatar.cc/150?u=a" },
@@ -639,24 +620,39 @@ footer {
             }
         }
 
-        /**
-         * 5. CICLO DE VIDA (Ejecución inicial e intervalos)
-         */
+        /* --- NUEVA FUNCIONALIDAD: BÚSQUEDA --- */
+        function performSearch() {
+            const input = document.getElementById('searchInput');
+            const query = input.value.trim();
+            
+            if (query) {
+                // Redirige pasando el parámetro 'q'
+                window.location.href = `/catalogo/?q=${encodeURIComponent(query)}`;
+            } else {
+                // Si está vacío, solo va al catálogo
+                window.location.href = '/catalogo/';
+            }
+        }
+
+        // Permite pulsar Enter en el input
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        }
+
         window.onload = () => {
-            // Carga inmediata
-            loadCards('/api/trending', 'trending-container');
-            loadCards('/api/lorwyn', 'lorwyn-container');
+            loadCards('/api/trending', 'trending-container', 18);
+            loadCards('/api/lorwyn', 'lorwyn-container', 4);
             loadReviews();
 
-            // Refresco cada 10 segundos
             setInterval(() => {
-                console.log("Actualizando precios y stock...");
-                loadCards('/api/trending', 'trending-container');
-                loadCards('/api/lorwyn', 'lorwyn-container');
+                console.log("Actualizando precios...");
+                loadCards('/api/trending', 'trending-container', 18);
+                loadCards('/api/lorwyn', 'lorwyn-container', 4);
             }, 10000); 
         };
     </script>
-
 
 </body>
 </html>
