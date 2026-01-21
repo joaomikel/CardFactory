@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         // Al llamar solo a este, se ejecuta toda tu lógica en orden
         $this->call([
             MagicSeeder::class,
+            ReviewSeeder::class,
         ]);
     }
 }

@@ -4,22 +4,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http; 
 use App\Http\Controllers\Api\ListingController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
+use App\Http\Controllers\ReviewController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// --- RUTA QUE FALTABA O ESTABA MAL ---
-// He añadido "/card" para que coincida con tu HTML
+
 Route::get('/listings/card/{scryfall_id}', [ListingController::class, 'getByCard']);
-
-
-// --- TUS OTRAS RUTAS (ESTÁN BIEN) ---
 
 Route::get('/cartas', function (Request $request) {
     $busqueda = $request->input('q', 'f:standard');
@@ -49,3 +41,5 @@ Route::get('/trending', function () {
     ]);
     return $response->json();
 });
+
+Route::get('/reviews', [ReviewController::class, 'index']);

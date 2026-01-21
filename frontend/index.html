@@ -608,35 +608,33 @@ footer {
             document.getElementById('overlay').classList.toggle('active');
         }
 
+        /* --- LÓGICA DE CARTAS --- */
         function createCardHTML(card) {
-        const img = card.image_uris?.normal 
-                    || (card.card_faces && card.card_faces[0]?.image_uris?.normal) 
-                    || 'https://via.placeholder.com/488x680?text=No+Image';
-        
-        let finalPrice = 'Sin Stock';
-        if (card.prices?.eur) finalPrice = `${card.prices.eur} €`;
-        else if (card.prices?.usd) finalPrice = `${card.prices.usd} $`;
+            const img = card.image_uris?.normal 
+                        || (card.card_faces && card.card_faces[0]?.image_uris?.normal) 
+                        || 'https://via.placeholder.com/488x680?text=No+Image';
+            
+            let finalPrice = 'Sin Stock';
+            if (card.prices?.eur) finalPrice = `${card.prices.eur} €`;
+            else if (card.prices?.usd) finalPrice = `${card.prices.usd} $`;
 
-        // CAMBIO AQUÍ: Usamos <a href> y apuntamos a la raíz /carta.html
-        return `
-            <a href="/carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;">
-                <img src="${img}" alt="${card.name}" crossorigin="anonymous" loading="lazy">
-                <h3 style="font-size: 0.9rem; margin-bottom:5px;">${card.name}</h3>
-                <p class="card-price">${finalPrice}</p>
-            </a>
-        `;
+            return `
+                <a href="/carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;">
+                    <img src="${img}" alt="${card.name}" crossorigin="anonymous" loading="lazy">
+                    <h3 style="font-size: 0.9rem; margin-bottom:5px;">${card.name}</h3>
+                    <p class="card-price">${finalPrice}</p>
+                </a>
+            `;
         }
 
         async function loadCards(endpoint, containerId, numCards = 4) {
             const container = document.getElementById(containerId);
             try {
+                // Truco anti-caché para refrescar precios
                 const randomRef = Math.random().toString(36).substring(7);
                 const url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}v=${randomRef}`;
                 
-                const res = await fetch(url, {
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
-
+                const res = await fetch(url);
                 const data = await res.json();
                 const cards = data.data || [];
 
@@ -644,67 +642,73 @@ footer {
                     const displayCards = cards
                         .sort(() => 0.5 - Math.random()) 
                         .slice(0, numCards);             
-                    
                     container.innerHTML = displayCards.map(createCardHTML).join('');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error cargando cartas:', error);
             }
         }
 
-        function loadReviews() {
-            const reviews = [
-                { name: "Adrian DLC", text: "Me encanta ver los precios actualizados.", img: "https://i.pravatar.cc/150?u=a" },
-                { name: "Marina G.", text: "El diseño de Lorwyn me parece increíble.", img: "https://i.pravatar.cc/150?u=b" },
-                { name: "Carlos R.", text: "Muy intuitivo desde el móvil.", img: "https://i.pravatar.cc/150?u=c" }
-            ];
-            
+        async function loadReviews() {
             const container = document.getElementById('reviews-container');
-            if (container) {
-                container.innerHTML = reviews.map(r => `
-                    <div class="review-card">
-                        <img src="${r.img}" class="avatar" alt="User">
+            
+            try {
+                const res = await fetch('/api/reviews');
+                const reviews = await res.json();
+
+                const html = reviews.map(r => `
+                    <div class="review-card" style="animation: fadeIn 0.8s ease;">
+                        <img src="${r.img}" class="avatar" alt="${r.name}">
                         <div>
                             <strong>${r.name}</strong>
-                            <p style="color:#555; font-size:0.9rem;">"${r.text}"</p>
+                            <p style="color:#555; font-size:0.9rem; margin-top:4px;">"${r.text}"</p>
                         </div>
                     </div>
                 `).join('');
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error cargando reseñas:", error);
             }
         }
 
-        /* --- NUEVA FUNCIONALIDAD: BÚSQUEDA --- */
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
-            
-            if (query) {
-                // Redirige pasando el parámetro 'q'
-                window.location.href = `/catalogo/?q=${encodeURIComponent(query)}`;
-            } else {
-                // Si está vacío, solo va al catálogo
-                window.location.href = '/catalogo/';
-            }
+            if (query) window.location.href = `/catalogo/?q=${encodeURIComponent(query)}`;
+            else window.location.href = '/catalogo/';
         }
 
-        // Permite pulsar Enter en el input
         function handleEnter(e) {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
+            if (e.key === 'Enter') performSearch();
         }
 
         window.onload = () => {
             loadCards('/api/trending', 'trending-container', 18);
             loadCards('/api/lorwyn', 'lorwyn-container', 4);
-            loadReviews();
+            loadReviews(); 
 
+            
             setInterval(() => {
-                console.log("Actualizando precios...");
                 loadCards('/api/trending', 'trending-container', 18);
                 loadCards('/api/lorwyn', 'lorwyn-container', 4);
             }, 10000); 
+
+            setInterval(() => {
+                loadReviews();
+            }, 8000); 
         };
+
+        // Estilo extra para la animación suave
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
     </script>
 
 </body>
