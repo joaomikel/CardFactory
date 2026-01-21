@@ -182,7 +182,7 @@
                     <div class="sales-text">Productos disponibles</div>
                 </div>
 
-                <a href="/mis-productos" class="btn-products">
+                <a href="/vender.html" class="btn-products">
                     <i class="fas fa-box-open" style="margin-right: 8px;"></i> Gestionar Productos
                 </a>
             </div>

@@ -49,4 +49,23 @@ class ListingController extends Controller
 
         return response()->json($data);
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'card_id' => 'required',
+            'price' => 'required|numeric',
+            'condition' => 'required',
+        ]);
+
+        // Creamos la venta asociada al usuario autenticado por Sanctum
+        $listing = $request->user()->listings()->create([
+            'card_id' => $request->card_id,
+            'price' => $request->price,
+            'condition' => $request->condition,
+            'is_foil' => $request->is_foil ?? false,
+        ]);
+
+        return response()->json($listing, 201);
+    }
 }
