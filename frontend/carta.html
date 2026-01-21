@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
-            /* Usamos los colores del Landing Page para consistencia */
             --primary: #816EB2;
             --secondary: #958EA0;
             --dark: #111827; 
@@ -19,42 +18,37 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); color: var(--dark); padding-bottom: 100px; }
 
-        /* --- ESTILOS DEL HEADER Y SIDEBAR (Traídos del Index) --- */
+        /* --- HEADER --- */
         header {
-            background: var(--primary); /* CAMBIO: Color sólido para que se vea */
-            height: 70px;
+            background: var(--primary);
+            height: 60px; /* Un poco más compacto en móvil */
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            position: sticky; /* Sticky para que se quede arriba al bajar */
+            padding: 0 15px;
+            position: sticky;
             top: 0;
             z-index: 100;
             width: 100%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .menu-trigger {
-            font-size: 1.8rem; background: none; border: none;
-            color: var(--white); cursor: pointer; padding: 10px;
-        }
-
-        .auth-actions { display: flex; gap: 10px; }
+        .menu-trigger { font-size: 1.5rem; background: none; border: none; color: var(--white); cursor: pointer; padding: 5px; }
         
-        .btn-header {
-            padding: 8px 16px; border-radius: 20px; font-weight: 600;
-            text-decoration: none; font-size: 0.85rem; transition: 0.3s; white-space: nowrap;
-        }
-        .btn-login {
-            background: rgba(255,255,255,0.25); color: var(--white);
-            border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(4px);
-        }
-        .btn-register {
-            background: var(--dark); color: var(--white); /* Dark para contraste sobre morado */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        .brand-title {
+            color: white; font-weight: 800; font-size: 1.2rem; 
+            position: absolute; left: 50%; transform: translateX(-50%);
         }
 
-        /* Sidebar Styles */
+        .auth-actions { display: flex; gap: 8px; }
+        .btn-header {
+            padding: 6px 12px; border-radius: 20px; font-weight: 600;
+            text-decoration: none; font-size: 0.8rem; transition: 0.3s; white-space: nowrap;
+        }
+        .btn-login { background: rgba(255,255,255,0.25); color: var(--white); border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(4px); }
+        .btn-register { background: var(--dark); color: var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        /* --- SIDEBAR --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px);
@@ -62,7 +56,7 @@
         .sidebar-overlay.active { opacity: 1; pointer-events: all; }
         
         .sidebar {
-            position: fixed; top: 0; left: -100%; width: 85%; max-width: 320px; height: 100%;
+            position: fixed; top: 0; left: -100%; width: 85%; max-width: 300px; height: 100%;
             background: var(--white); z-index: 102; padding: 2rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; gap: 1rem; box-shadow: 5px 0 15px rgba(0,0,0,0.2);
         }
@@ -70,48 +64,101 @@
         .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; }
         .sidebar a { padding: 15px 10px; font-weight: 500; color: var(--secondary); border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; }
 
-        /* --- ESTILOS DE CARTA (Originales) --- */
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        /* --- LAYOUT CARTA --- */
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
         
         .detail-grid {
-            display: grid; grid-template-columns: 1fr; gap: 40px;
-            background: white; padding: 40px; border-radius: 12px;
-            margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: grid; grid-template-columns: 1fr; gap: 20px;
+            background: white; padding: 20px; border-radius: 12px;
+            margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        @media (min-width: 768px) { .detail-grid { grid-template-columns: 350px 1fr; } }
 
         .card-image-large {
-            width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%; max-width: 350px; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin: 0 auto; display: block;
         }
 
-        /* Tabla y Drag & Drop */
+        /* --- RESPONSIVE TABLE (La clave del cambio) --- */
         .table-container {
             background: white; border-radius: 12px; overflow: hidden;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         thead { background-color: var(--dark); color: white; }
-        th { padding: 15px 20px; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; }
+        th { padding: 15px 20px; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
         td { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
-        tbody tr { cursor: grab; transition: background-color 0.2s, transform 0.2s; }
-        tbody tr:hover { background-color: #f9fafb; transform: scale(1.01); box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; position: relative; }
-        tbody tr.dragging { opacity: 0.5; background: #e0e7ff; border: 2px dashed var(--primary); }
 
         .price-tag { font-weight: 800; color: var(--primary); font-size: 1.1rem; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
         .badge-foil { background: linear-gradient(135deg, #fceabb 0%,#f8b500 100%); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         .badge-normal { background: #e5e7eb; color: #666; }
-        .btn-add { background: var(--dark); color: white; border: none; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.1s; }
+        
+        .btn-add { 
+            background: var(--dark); color: white; border: none; 
+            width: 40px; height: 40px; border-radius: 8px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: 0.2s; font-size: 1.1rem;
+        }
         .btn-add:active { transform: scale(0.9); }
 
-        /* Carrito Flotante */
+        /* ESTILOS MOBILE FIRST PARA LA TABLA */
+        @media (max-width: 768px) {
+            /* Ocultar cabecera de tabla en móvil */
+            thead { display: none; }
+            
+            /* Convertir filas en "tarjetas" */
+            tbody tr {
+                display: block;
+                background: white;
+                margin-bottom: 15px;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+                padding: 10px;
+            }
+            
+            tbody tr:hover { transform: none; box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+
+            /* Convertir celdas en flexbox */
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 5px;
+                border-bottom: 1px solid #f3f4f6;
+                text-align: right;
+            }
+            td:last-child { border-bottom: none; justify-content: center; padding-top: 15px; }
+
+            /* Añadir etiquetas visuales antes del contenido */
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                text-align: left;
+                margin-right: 15px;
+                font-size: 0.9rem;
+            }
+
+            /* Ajustes específicos */
+            .btn-add { width: 100%; height: 45px; font-weight: bold; }
+            .btn-add::after { content: " AÑADIR AL CARRITO"; margin-left: 8px; font-size: 0.9rem; }
+        }
+
+        @media (min-width: 769px) {
+            .detail-grid { grid-template-columns: 350px 1fr; padding: 40px; }
+            tbody tr { cursor: grab; transition: background-color 0.2s, transform 0.2s; }
+            tbody tr:hover { background-color: #f9fafb; transform: scale(1.01); box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; position: relative; }
+        }
+
+        /* --- CARRITO FLOTANTE --- */
         .floating-cart-zone {
-            position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
+            position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px;
             background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;
             color: white; box-shadow: 0 10px 25px rgba(129, 110, 178, 0.4); z-index: 1000; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .floating-cart-zone i { font-size: 1.8rem; pointer-events: none; }
         .cart-badge {
             position: absolute; top: -5px; right: -5px; background: #ff4757; color: white;
             width: 25px; height: 25px; border-radius: 50%; font-size: 0.8rem; font-weight: bold;
@@ -120,6 +167,9 @@
         .drag-over-active { transform: scale(1.3); background: #00d2d3; }
         @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
         .pop-anim { animation: pop 0.3s ease; }
+        
+        .desktop-only-text { display: none; }
+        @media (min-width: 769px) { .desktop-only-text { display: inline; } }
 
     </style>
 </head>
@@ -137,11 +187,10 @@
     </div>
 
     <header>
-        <button class="menu-trigger" onclick="toggleMenu()">☰</button>
+        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Abrir menú">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
         
-        <div style="color: white; font-weight: 800; font-size: 1.2rem; position: absolute; left: 50%; transform: translateX(-50%);">
-            CardFactory
-        </div>
 
         <div class="auth-actions">
             <a href="/login" class="btn-header btn-login">Login</a>
@@ -152,7 +201,7 @@
     <main class="container">
         <div style="margin-bottom: 20px;">
             <a href="/" style="color: var(--secondary); text-decoration: none; font-weight: 600;">
-                <i class="fas fa-arrow-left"></i> Volver al Inicio
+                <i class="fas fa-arrow-left"></i> Volver
             </a>
         </div>
 
@@ -161,9 +210,9 @@
         </div>
 
         <div class="sellers-section">
-            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-store"></i> Ofertas de Vendedores
-                <span style="font-size: 0.9rem; font-weight: normal; color: #666; margin-left: auto;">
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <span><i class="fas fa-store"></i> Ofertas de Vendedores</span>
+                <span class="desktop-only-text" style="font-size: 0.9rem; font-weight: normal; color: #666; margin-left: auto;">
                     Arrastra una fila al carrito 🛒
                 </span>
             </h3>
@@ -172,7 +221,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Vendedor (Usuario)</th>
+                            <th>Vendedor</th>
                             <th>Estado</th>
                             <th>Edición</th>
                             <th>Precio</th>
@@ -180,7 +229,7 @@
                         </tr>
                     </thead>
                     <tbody id="sellers-tbody">
-                        <tr><td colspan="5" style="text-align:center; color: #999;">Buscando vendedores...</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding: 20px; color: #999;">Buscando vendedores...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -188,27 +237,24 @@
     </main>
 
     <div id="drop-zone" class="floating-cart-zone" onclick="window.location.href='carrito.html'">
-        <i class="fas fa-shopping-cart"></i>
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem;"></i>
         <span class="cart-badge" id="cart-count">0</span>
     </div>
 
     <script>
-    // --- LÓGICA DEL MENÚ (Del Index) ---
+    // --- LÓGICA DEL MENÚ ---
     function toggleMenu() {
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('overlay').classList.toggle('active');
     }
 
-    // URL de tu Backend 
     const API_URL = 'http://localhost:8000/api'; 
-    
     const params = new URLSearchParams(window.location.search);
-    const cardId = params.get('id'); // ID de Scryfall
+    const cardId = params.get('id');
     
     let currentCardInfo = {}; 
     let sellersData = []; 
 
-    // Inicializar
     updateCartCount();
     init();
 
@@ -228,24 +274,24 @@
                 name: card.name, 
                 image: img, 
                 rarity: card.rarity,
-                set_name: card.set_name 
+                set_name: card.set_name // Guardamos la edición real de Scryfall
             };
             
             document.getElementById('main-content').innerHTML = `
                 <div style="text-align:center;">
-                    <img src="${img}" class="card-image-large">
+                    <img src="${img}" class="card-image-large" alt="${card.name}">
                 </div>
                 <div>
-                    <h1 style="font-size:2rem; margin-bottom:10px;">${card.name}</h1>
-                    <p style="color:var(--secondary); font-weight:600;">${card.type_line}</p>
-                    <div style="margin-top:20px; background:#f9f9f9; padding:20px; border-radius:8px; line-height: 1.6;">
+                    <h1 style="font-size:1.8rem; margin-bottom:10px; line-height: 1.2;">${card.name}</h1>
+                    <p style="color:var(--secondary); font-weight:600; margin-bottom: 15px;">${card.type_line}</p>
+                    <div style="background:#f9f9f9; padding:20px; border-radius:8px; line-height: 1.6; font-size: 0.95rem;">
                         ${card.oracle_text ? card.oracle_text.replace(/\n/g, '<br>') : 'Sin descripción disponible.'}
                     </div>
                 </div>
             `;
         } catch(e) { console.error("Error Scryfall:", e); }
 
-        // 2. Cargar Vendedores desde TU LARAVEL (Base de Datos)
+        // 2. Cargar Vendedores desde Backend
         try {
             const res = await fetch(`${API_URL}/listings/card/${cardId}`);
             
@@ -253,18 +299,15 @@
                 sellersData = await res.json();
                 renderSellersTable(sellersData);
             } else {
-                console.warn("No se encontraron vendedores o error en API");
                 document.getElementById('sellers-tbody').innerHTML = 
-                    `<tr><td colspan="5" style="text-align:center;">No hay ofertas disponibles.</td></tr>`;
+                    `<tr><td colspan="5" style="text-align:center; padding:20px;">No hay ofertas disponibles.</td></tr>`;
             }
         } catch(e) { 
-            console.error("Error Backend:", e); 
-            document.getElementById('sellers-tbody').innerHTML = 
-                    `<tr><td colspan="5" style="text-align:center; color:red;">Error conectando con el servidor.</td></tr>`;
+            console.error("Error Backend:", e);
         }
     }
 
-    // Renderizar la TABLA
+    // Renderizar la TABLA (Versión Responsive)
     function renderSellersTable(listings) {
         const tbody = document.getElementById('sellers-tbody');
         
@@ -273,39 +316,59 @@
             return;
         }
 
-        tbody.innerHTML = listings.map((venta, index) => `
+        tbody.innerHTML = listings.map((venta, index) => {
+            // LÓGICA CORREGIDA PARA LA EDICIÓN:
+            // 1. Intentamos leer de la venta.
+            // 2. Si no, intentamos leer la relación del objeto card.
+            // 3. SI FALLA TODO, usamos currentCardInfo.set_name (que viene de Scryfall y es correcto)
+            let editionName = currentCardInfo.set_name; 
+            
+            if (venta.card && venta.card.set && venta.card.set.name) {
+                editionName = venta.card.set.name;
+            } else if (venta.set_name) {
+                editionName = venta.set_name;
+            }
+
+            return `
             <tr 
                 draggable="true" 
                 ondragstart="handleDragStart(event, ${index})"
             >
-                <td>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i class="fas fa-user-circle" style="font-size:1.5rem; color:#ccc;"></i>
-                        <div>
-                            <strong>${venta.user ? venta.user.name : 'Vendedor Desconocido'}</strong>
+                <td data-label="Vendedor">
+                    <div style="display:flex; align-items:center; gap:10px; justify-content: flex-end;">
+                        <div style="text-align:right;">
+                            <strong>${venta.user ? venta.user.name : 'Vendedor'}</strong>
                             <div style="font-size:0.75rem; color:#888;">ID: ${venta.user_id}</div>
                         </div>
+                        <i class="fas fa-user-circle" style="font-size:1.5rem; color:#ccc;"></i>
                     </div>
                 </td>
-                <td>
-                    <span style="font-weight:bold;">${venta.condition}</span>
-                    ${venta.is_foil ? '<span class="badge badge-foil">Foil</span>' : '<span class="badge badge-normal">Normal</span>'}
+                <td data-label="Estado">
+                    <div>
+                        <span style="font-weight:bold; margin-right:5px;">${venta.condition}</span>
+                        ${venta.is_foil ? '<span class="badge badge-foil">Foil</span>' : '<span class="badge badge-normal">Normal</span>'}
+                    </div>
                 </td>
-                <td>
-                    ${venta.card && venta.card.set ? venta.card.set.name : 'Edición Base'}
+                <td data-label="Edición">
+                    ${editionName}
                 </td>
-                <td class="price-tag">${parseFloat(venta.price).toFixed(2)} €</td>
+                <td data-label="Precio" class="price-tag">${parseFloat(venta.price).toFixed(2)} €</td>
                 <td>
                     <button class="btn-add" onclick="manualAdd(${index})" title="Añadir al carrito">
                         <i class="fas fa-plus"></i>
                     </button>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
     }
 
-    // --- LÓGICA DRAG AND DROP ---
+    // --- LÓGICA DRAG AND DROP (Sólo Desktop) ---
     function handleDragStart(e, index) {
+        // En móviles, evitar arrastre para no bloquear scroll
+        if(window.innerWidth < 769) {
+            e.preventDefault();
+            return;
+        }
         const row = e.target; 
         row.classList.add('dragging'); 
         e.dataTransfer.setData("text/plain", index);
@@ -313,60 +376,43 @@
     }
 
     document.addEventListener("dragend", (e) => {
-        if (e.target.tagName === 'TR') {
-            e.target.classList.remove('dragging');
-        }
+        if (e.target.tagName === 'TR') e.target.classList.remove('dragging');
     });
 
-    // --- DROP ZONE ---
     const dropZone = document.getElementById('drop-zone');
-
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault(); 
         dropZone.classList.add('drag-over-active');
     });
-
     dropZone.addEventListener('dragleave', (e) => {
         dropZone.classList.remove('drag-over-active');
     });
-
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('drag-over-active');
-
         const index = e.dataTransfer.getData("text/plain");
-        if(index !== "") {
-            addToCart(index);
-        }
+        if(index !== "") addToCart(index);
     });
 
-    // --- GESTIÓN DEL CARRITO ---
+    // --- GESTIÓN CARRITO ---
     function manualAdd(index) {
         addToCart(index);
     }
 
     function addToCart(index) {
-        // 1. VERIFICACIÓN MÁS ROBUSTA
-        // Buscamos cualquier indicio de que el usuario esté logueado
-        const token = localStorage.getItem('auth_token') || localStorage.getItem('token') || localStorage.getItem('access_token');
-        const userData = localStorage.getItem('user_data');
-
-        // Para depurar: Mira en la consola qué está detectando
-        console.log("Estado Login -> Token:", token, "User:", userData);
-
-        if (!token && !userData) {
-            // Si NO hay ni token ni datos de usuario, entonces pedimos login
-            const confirmar = confirm("🔒 Para añadir al carrito necesitas iniciar sesión. ¿Ir al login?");
-            if (confirmar) {
+        const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+        if (!token) {
+            if (confirm("🔒 Para añadir al carrito necesitas iniciar sesión. ¿Ir al login?")) {
                 window.location.href = '/login'; 
             }
-            return; // DETIENE LA EJECUCIÓN
+            return;
         }
 
-        // --- A PARTIR DE AQUÍ EL CÓDIGO DE AÑADIR ---
-        
         const venta = sellersData[index];
-        
+        // Aseguramos que el item en el carrito tenga la edición correcta
+        let finalSet = currentCardInfo.set_name;
+        if(venta.card && venta.card.set) finalSet = venta.card.set.name;
+
         const item = {
             id: venta.id,
             scryfall_id: cardId,
@@ -376,32 +422,29 @@
             seller: venta.user ? venta.user.name : 'Desconocido',
             condition: venta.condition,
             is_foil: venta.is_foil,
+            set_name: finalSet, // Guardamos la edición correcta
             addedAt: new Date().getTime()
         };
 
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-        
         if(cart.find(i => i.id === item.id)) {
             alert("⚠️ Esta oferta específica ya está en tu carrito.");
             return;
         }
-
         cart.push(item);
         localStorage.setItem('myCart', JSON.stringify(cart));
 
-        // Animación visual
         dropZone.classList.add('pop-anim');
         setTimeout(() => dropZone.classList.remove('pop-anim'), 300);
-        
         updateCartCount();
         
-        // Feedback visual sutil en lugar de alert
+        // Feedback Botón
         const btn = document.querySelectorAll('.btn-add')[index];
-        const iconoOriginal = btn.innerHTML;
+        const oldContent = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-check"></i>';
-        btn.style.background = '#10b981'; // Verde
+        btn.style.background = '#10b981';
         setTimeout(() => {
-            btn.innerHTML = iconoOriginal;
+            btn.innerHTML = oldContent;
             btn.style.background = 'var(--dark)';
         }, 1500);
     }
