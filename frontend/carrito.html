@@ -179,11 +179,36 @@
         }
 
         function checkout() {
+            // 1. Validación básica: Carrito vacío
             if(cart.length === 0) return alert("El carrito está vacío.");
             
-            // Simplemente simulamos la compra, sin pedir usuario
+            // --- NUEVA LÓGICA DE LOGIN ---
+            // Intentamos recuperar el token o dato que indica que está logueado.
+            // (Asegúrate de que tu Login guarde esto como 'auth_token' o similar)
+            const token = localStorage.getItem('auth_token'); 
+
+            // Si NO hay token (es null), es que no está logueado
+            if (!token) {
+                // Opcional: Avisar al usuario
+                alert("🔒 Para finalizar la compra necesitas iniciar sesión.");
+                
+                // REDIRECCIÓN: Aquí pones la dirección de tu Login de Laravel
+                // Si tu backend está en el puerto 8000, suele ser esta:
+                window.location.href = 'http://localhost:8000/login'; 
+                
+                return; // ¡Importante! Esto detiene la función para que no siga comprando.
+            }
+            // -----------------------------
+
+            // 2. Si llegamos aquí, es que SÍ está logueado. Procedemos.
+            // Aquí en el futuro harías un fetch() a tu API para guardar el pedido real.
+            
             if(confirm(`¿Confirmar compra por ${document.getElementById('total').innerText}?`)) {
-                alert("¡Compra realizada con éxito! 📦\n(Simulación sin Login)");
+                
+                // Aquí podrías enviar los datos al backend si quisieras:
+                // enviarPedidoAlBackend(cart, token);
+
+                alert("¡Compra realizada con éxito! 📦\n(Usuario verificado)");
                 
                 // Vaciar carrito
                 cart = [];

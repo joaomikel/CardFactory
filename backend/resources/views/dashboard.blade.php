@@ -74,7 +74,7 @@
             <h1 class="user-name">{{ Auth::user()->name }}</h1>
         </div>
 
-        <a href="#" class="menu-link">
+        <a href="{{ route('profile.edit') }}" class="menu-link">
             <span><i class="fas fa-cog icon-main"></i> Configuración</span>
             <i class="fas fa-chevron-right chevron"></i>
         </a>

@@ -11,39 +11,42 @@ return new class extends Migration
         // 1. Tabla de EDICIONES (Sets)
         Schema::create('sets', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Ej: Kamigawa: Neon Dynasty
-            $table->string('code')->unique(); // Ej: neo
-            $table->string('icon_svg')->nullable(); // Para el icono de Keyrune
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->string('icon_svg')->nullable();
             $table->timestamps();
         });
 
         // 2. Tabla de CARTAS (Cards)
-        // Relación 1:N -> Una edición tiene muchas cartas
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('scryfall_id')->nullable(); // Útil para imágenes
-            $table->string('image_url'); // URL de la imagen
-            $table->string('rarity'); // common, rare, etc.
-            
-            // FK hacia la tabla Sets
+            $table->string('scryfall_id')->nullable();
+            $table->string('image_url');
+            $table->string('rarity');
             $table->foreignId('set_id')->constrained('sets')->onDelete('cascade');
-            
             $table->timestamps();
         });
 
-        // 3. Tabla de VENTAS/LISTINGS (La relación N:M entre Usuarios y Cartas)
+        // 3. Tabla de VENTAS/LISTINGS
         Schema::create('listings', function (Blueprint $table) {
             $table->id();
             
-            // Relación N:M (Muchos usuarios venden muchas cartas)
+            // Relación con el Usuario (Vendedor)
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('card_id')->constrained('cards')->onDelete('cascade');
             
+            // --- ESTA ES LA LÍNEA QUE FALTABA (Relación con la Carta) ---
+            $table->foreignId('card_id')->constrained()->onDelete('cascade');
+            // ------------------------------------------------------------
+
+            // ID de Scryfall (Texto)
+            $table->string('scryfall_id'); 
+
             $table->decimal('price', 8, 2);
-            $table->string('condition')->default('NM'); // NM, LP, MP...
+            $table->integer('quantity')->default(1);
+            $table->string('condition')->default('NM');
+            $table->string('language')->default('ES');
             $table->boolean('is_foil')->default(false);
-            
             $table->timestamps();
         });
     }

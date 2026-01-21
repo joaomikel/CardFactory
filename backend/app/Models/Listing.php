@@ -9,8 +9,16 @@ class Listing extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'card_id', 'price', 'condition', 'is_foil'];
-
+    protected $fillable = [
+            'user_id',
+            'card_id',      // Relación con tu tabla cards interna
+            'scryfall_id',  // <--- IMPORTANTE: Para que MagicSeeder funcione
+            'price',
+            'quantity',
+            'condition',
+            'language',
+            'is_foil',
+    ];
     public function user() {
         return $this->belongsTo(User::class);
     }

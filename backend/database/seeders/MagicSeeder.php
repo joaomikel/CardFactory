@@ -83,12 +83,13 @@ class MagicSeeder extends Seeder
     }
 
     private function createRandomListings($card, $sellers) {
-        $numSellers = rand(1, 3); // 1 a 3 vendedores por carta
+        $numSellers = rand(1, 3); 
         
         for($i=0; $i<$numSellers; $i++) {
             Listing::create([
                 'card_id' => $card->id,
                 'user_id' => $sellers[rand(0, 2)]->id,
+                'scryfall_id' => $card->scryfall_id, 
                 'price' => rand(500, 8000) / 100, 
                 'condition' => ['NM', 'EX', 'GD'][rand(0, 2)],
                 'is_foil' => rand(0, 1) == 1
