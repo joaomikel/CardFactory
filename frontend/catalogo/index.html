@@ -2,23 +2,25 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Catálogo - CardFactory</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
             --primary: #816EB2; 
             --secondary: #958EA0;
-            --dark: #111827; 
+            --dark: #222; 
             --white: #ffffff; 
-            --bg: #f3f4f6; 
+            --bg: #f9f9f9;
+            --radius: 12px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); padding-bottom: 50px; }
+        body { background-color: var(--bg); padding-bottom: 50px; color: var(--dark); }
 
+        /* --- HEADER ESTILO INICIO --- */
         header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); /* Fondo sólido/gradiente para catálogo */
             height: 70px;
             display: flex;
             align-items: center;
@@ -27,7 +29,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
         .menu-trigger {
@@ -37,11 +39,20 @@
             color: var(--white);
             cursor: pointer;
             padding: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-title {
+            color: white; 
+            font-weight: 800; 
+            font-size: 1.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .auth-actions {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .btn-header {
@@ -54,19 +65,65 @@
             white-space: nowrap;
         }
 
+        /* Botones estilo cristal como en Inicio */
         .btn-login {
             background: rgba(255,255,255,0.25);
             color: var(--white);
             border: 1px solid rgba(255,255,255,0.5);
             backdrop-filter: blur(4px);
         }
+        .btn-login:hover { background: rgba(255,255,255,0.4); }
 
         .btn-register {
             background: var(--white);
             color: var(--primary);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .btn-register:hover { transform: translateY(-2px); }
 
+        /* --- WIDGET PERFIL USUARIO (Igual que Inicio) --- */
+        .user-profile-widget {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 5px 15px 5px 5px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .user-profile-widget:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+        .profile-name {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: none;
+        }
+        @media (min-width: 480px) { .profile-name { display: block; } }
+
+        /* --- SIDEBAR --- */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -80,10 +137,8 @@
             transition: 0.3s;
             backdrop-filter: blur(2px);
         }
-        .sidebar-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: all; }
+
         .sidebar {
             position: fixed;
             top: 0;
@@ -100,9 +155,8 @@
             gap: 1rem;
             box-shadow: 5px 0 15px rgba(0,0,0,0.2);
         }
-        .sidebar.active {
-            left: 0;
-        }
+        .sidebar.active { left: 0; }
+        
         .close-sidebar {
             position: absolute;
             top: 20px;
@@ -122,55 +176,61 @@
             font-size: 1.1rem;
         }
 
+        /* --- FILTROS --- */
         .filters {
             background: white; padding: 20px;
             display: flex; flex-direction: column; gap: 15px;
             border-bottom: 1px solid #ddd;
             margin-top: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
 
         .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-        .filter-group label { font-size: 0.75rem; font-weight: 800; color: #6b7280; text-transform: uppercase; }
+        .filter-group label { font-size: 0.75rem; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .filter-control { 
             padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; 
             font-size: 16px; background: #fafafa; width: 100%;
+            outline: none; transition: 0.3s;
         }
+        .filter-control:focus { border-color: var(--primary); background: white; }
 
         .btn-apply { 
             background: var(--primary); color: white; padding: 15px; border: none; 
             border-radius: 10px; font-weight: 700; cursor: pointer;
             box-shadow: 0 4px 12px rgba(129, 110, 178, 0.3);
-            margin-top: 10px;
+            margin-top: 10px; transition: 0.3s;
         }
+        .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(129, 110, 178, 0.4); }
 
-        .container { padding: 15px; max-width: 1200px; margin: 0 auto; }
+        /* --- GRID --- */
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
         
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Responsive automático */
+            gap: 20px; 
         }
 
         .card-catalog {
             background: white; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex; flex-direction: column;
-            transition: transform 0.2s;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        .card-catalog:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .card-catalog img { width: 100%; aspect-ratio: 2.5/3.5; object-fit: cover; }
-        .card-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-info h3 { font-size: 0.85rem; color: var(--dark); margin-bottom: 8px; }
-        .card-price { color: var(--primary); font-weight: 800; font-size: 1rem; }
+        .card-catalog:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .card-catalog img { width: 100%; aspect-ratio: 2.5/3.5; object-fit: cover; border-bottom: 1px solid #f0f0f0; }
+        .card-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-info h3 { font-size: 0.9rem; color: var(--dark); margin-bottom: 8px; line-height: 1.3; }
+        .card-price { color: var(--primary); font-weight: 800; font-size: 1.1rem; }
 
         @media (min-width: 768px) {
-            .filters { flex-direction: row; align-items: flex-end; justify-content: center; padding: 30px; flex-wrap: wrap; }
-            .filter-group { min-width: 150px; max-width: 180px; }
-            .search-group { flex: 2; min-width: 200px; } 
-            .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
-            .btn-apply { padding: 12px 30px; margin-top: 0; }
             header { padding: 0 40px; height: 90px; }
+            .filters { flex-direction: row; align-items: flex-end; justify-content: center; padding: 30px; flex-wrap: wrap; }
+            .filter-group { min-width: 140px; max-width: 180px; }
+            .search-group { flex: 2; min-width: 250px; } 
+            .grid { gap: 25px; }
+            .btn-apply { padding: 12px 30px; margin-top: 0; height: 46px; }
             .sidebar { width: 300px; }
         }
     </style>
@@ -182,18 +242,18 @@
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="/">Inicio</a> 
-        <a href="/dashboard">Perfil</a>
+        <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
         <a href="/colecciones/">Colecciones</a>
-        <a href="/catalogo/" style="color: var(--primary); font-weight: 700;">Catálogo</a>
+        <a href="/catalogo/" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;">Catálogo</a>
         <a href="#">Carrito</a>
     </div>
 
     <header>
         <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">☰</button>
         
-        <div style="color: white; font-weight: 800; font-size: 1.2rem;">Catálogo</div>
+        <div class="header-title">Catálogo</div>
 
-        <div class="auth-actions">
+        <div class="auth-actions" id="auth-container">
             <a href="/login" class="btn-header btn-login">Login</a>
             <a href="/register" class="btn-header btn-register">Registro</a>
         </div>
@@ -261,7 +321,7 @@
             </select>
         </div>
 
-        <button class="btn-apply" onclick="applyFilters()">Aplicar Filtros</button>
+        <button class="btn-apply" onclick="applyFilters()">Aplicar</button>
     </section>
 
     <main class="container">
@@ -271,19 +331,56 @@
     </main>
 
     <script>
+        // 1. Alternar Menú Lateral
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
+        // 2. Verificar Login (Igual que en Home)
+        function checkLoginStatus() {
+            const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+            const authContainer = document.getElementById('auth-container');
+            
+            let userData = { name: 'Usuario' };
+            try {
+                const storedUser = localStorage.getItem('user_data');
+                if (storedUser) userData = JSON.parse(storedUser);
+            } catch (e) { console.log('Error parseando user data'); }
+
+            if (token && authContainer) {
+                // ESTÁ LOGUEADO: Mostrar Widget de Perfil
+                const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
+                
+                authContainer.innerHTML = `
+                    <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="profile-name">${userName}</span>
+                    </a>
+                `;
+
+                // Actualizar Sidebar
+                const linkSidebar = document.getElementById('link-perfil-sidebar');
+                if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
+
+            } else if (authContainer) {
+                // NO ESTÁ LOGUEADO
+                authContainer.innerHTML = `
+                    <a href="/login" class="btn-header btn-login">Login</a>
+                    <a href="/register" class="btn-header btn-register">Registro</a>
+                `;
+            }
+        }
+
+        // 3. Lógica del Catálogo
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Cargando...</p>';
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--secondary);"><i class="fas fa-circle-notch fa-spin"></i> Cargando cartas...</p>';
 
             try {
-                // Usamos Scryfall para simular la búsqueda
                 const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
-                
                 if (!res.ok) throw new Error('Error API');
                 const data = await res.json();
                 
@@ -292,18 +389,22 @@
                     return;
                 }
 
-                grid.innerHTML = data.data.map(card => `
+                grid.innerHTML = data.data.map(card => {
+                    const img = card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680?text=No+Img');
+                    const price = card.prices.eur ? `${card.prices.eur} €` : (card.prices.usd ? `${card.prices.usd} $` : 'Sin Stock');
+                    
+                    return `
                     <a href="/carta.html?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
-                        <img src="${card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680')}" loading="lazy">
+                        <img src="${img}" loading="lazy" alt="${card.name}">
                         <div class="card-info">
                             <h3>${card.name}</h3>
-                            <p class="card-price">${card.prices.eur ? card.prices.eur + ' €' : 'Consultar'}</p>
+                            <p class="card-price">${price}</p>
                         </div>
                     </a>
-                `).join('');
+                `}).join('');
             } catch (error) {
                 console.error(error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio específico.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio o hubo un error.</p>';
             }
         }
 
@@ -333,7 +434,6 @@
                 else queryParts.push(`cmc:${cmc}`);
             }
 
-            // Unimos todo para Scryfall
             fetchCards(queryParts.join(' '));
         }
 
@@ -341,31 +441,26 @@
             if (e.key === 'Enter') applyFilters();
         });
 
-        // --- AQUÍ ESTÁ LA MAGIA PARA CONECTAR CON LA LANDING ---
-        window.onload = () => {
+        // 4. Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // A) Verificar Login
+            checkLoginStatus();
+
+            // B) Cargar Cartas según URL (param 'q' o 'set')
             const params = new URLSearchParams(window.location.search);
-            
-            // 1. Detectar parámetro 'q' (Input del Landing Page)
             const qParam = params.get('q');
-            
-            // 2. Detectar parámetro 'set' (Botones de Colecciones del Landing)
             const setParam = params.get('set');
 
             if (qParam) {
-                // Escribimos lo que buscó el usuario en el input visualmente
                 document.getElementById('search-name').value = qParam;
-                // Ejecutamos la búsqueda directa
                 fetchCards(qParam);
             } else if (setParam) {
-                // Seleccionamos la colección en el desplegable
                 document.getElementById('set').value = setParam;
-                // Buscamos por código de set
                 fetchCards(`s:${setParam}`);
             } else {
-                // Carga inicial normal
                 fetchCards('f:standard');
             }
-        };
+        });
     </script>
 </body>
 </html>
