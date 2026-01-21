@@ -219,21 +219,69 @@ h2 {
     transition: color 0.3s;
 }
 
-/* --- ESTILOS NUEVOS PARA COLECCIONES CLICKABLES --- */
-.collection-link {
-    text-decoration: none; 
-    color: inherit;        
-    display: block;        
-    transition: transform 0.2s ease;
-    background: white;
+/* --- ESTILOS MEJORADOS PARA COLECCIONES --- */
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+.collection-card {
+    display: block;
+    text-decoration: none;
+    background: var(--white);
     border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
-.collection-link:hover {
-    transform: translateY(-5px); 
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+
+.collection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(129, 110, 178, 0.2);
+}
+
+.collection-img-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.collection-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.collection-card:hover .collection-img-container img {
+    transform: scale(1.08);
+}
+
+.collection-info {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 1px solid #f0f0f0;
+}
+
+.collection-info h3 {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.collection-info p {
+    color: var(--secondary);
+    font-size: 0.9rem;
 }
 
 .section-footer {
@@ -457,48 +505,52 @@ footer {
         <section style="position: relative; z-index: 10;">
             <h2>Explorar Colecciones</h2>
             
-            <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+            <div class="collections-grid">
                 
-                <a href="/catalogo/?set=fdn" class="collection-link">
-                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/a/8/a88d52a2-3837-4592-8a9d-16bd428387fd.jpg" 
-                        alt="Foundations" 
-                        style="width: 100%; height: 160px; object-fit: cover;">
-                    <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Foundations</h3>
-                        <p style="color: #6b7280; font-size: 0.85rem;">La esencia de Magic</p>
+                <a href="/catalogo/?set=fdn" class="collection-card">
+                    <div class="collection-img-container">
+                        <img src="img/Foundations.jpg" alt="Foundations">
+                    </div>
+                    <div class="collection-info">
+                        <h3>Foundations</h3>
+                        <p>La esencia de Magic</p>
                     </div>
                 </a>
 
-                <a href="/catalogo/?set=dsk" class="collection-link">
-                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/d/e/de37130c-253c-411a-8288-51846b0d5c07.jpg" 
-                        alt="Duskmourn" 
-                        style="width: 100%; height: 160px; object-fit: cover;">
-                    <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Duskmourn</h3>
-                        <p style="color: #6b7280; font-size: 0.85rem;">Terror en la casa</p>
+                <a href="/catalogo/?set=dsk" class="collection-card">
+                    <div class="collection-img-container">
+                        <img src="img/Duskmourn.jpg" alt="Duskmourn">
+                    </div>
+                    <div class="collection-info">
+                        <h3>Duskmourn</h3>
+                        <p>Terror en la casa</p>
                     </div>
                 </a>
 
-                <a href="/catalogo/?set=blb" class="collection-link">
-                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/3/0/30349666-b529-450b-9343-855c3c08a984.jpg" 
-                        alt="Bloomburrow" 
-                        style="width: 100%; height: 160px; object-fit: cover;">
-                    <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Bloomburrow</h3>
-                        <p style="color: #6b7280; font-size: 0.85rem;">Pequeños héroes</p>
+                <a href="/catalogo/?set=blb" class="collection-card">
+                    <div class="collection-img-container">
+                        <img src="img/Bloomborrow.jpg" alt="Bloomburrow">
+                    </div>
+                    <div class="collection-info">
+                        <h3>Bloomburrow</h3>
+                        <p>Pequeños héroes</p>
                     </div>
                 </a>
 
-                <a href="/catalogo/?set=otj" class="collection-link">
-                    <img src="/api/image-proxy?url=https://cards.scryfall.io/art_crop/front/f/2/f2066d48-679a-4c28-941e-53906a5b06bd.jpg" 
-                        alt="Thunder Junction" 
-                        style="width: 100%; height: 160px; object-fit: cover;">
-                    <div style="padding: 15px;">
-                        <h3 style="font-size: 1.1rem; margin-bottom: 5px; color: var(--primary);">Thunder Junction</h3>
-                        <p style="color: #6b7280; font-size: 0.85rem;">Forajidos del Oeste</p>
+                <a href="/catalogo/?set=otj" class="collection-card">
+                    <div class="collection-img-container">
+                        <img src="img/Outlaws.jpg" alt="Thunder Junction">
+                    </div>
+                    <div class="collection-info">
+                        <h3>Thunder Junction</h3>
+                        <p>Forajidos del Oeste</p>
                     </div>
                 </a>
 
+            </div>
+
+            <div class="section-footer">
+                <a href="/colecciones/" class="btn-more">Ver todas las colecciones</a>
             </div>
         </section>
 
