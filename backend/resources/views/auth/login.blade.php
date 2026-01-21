@@ -144,13 +144,6 @@
     </div>
 
     <script>
-        // 1. Script del Menú (Igual que Registro)
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
-        }
-
-        // 2. Script para manejar la Sesión del Carrito
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
 
@@ -164,35 +157,40 @@
 
             fetch(form.action, {
                 method: 'POST',
+                body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
-                },
-                body: formData
+                }
             })
             .then(response => {
+                // Si la respuesta es 200 (OK), extraemos el JSON
                 if (response.ok) {
-                    return response.json().catch(() => ({}));
+                    return response.json();
                 }
-                throw response;
+                // Si el servidor devuelve 422 (datos incorrectos), lanzamos error para el alert
+                return response.json().then(err => { throw err; });
             })
             .then(data => {
-                // Guardamos el token para que el Carrito sepa que estamos logueados
-                localStorage.setItem('auth_token', 'session_active'); 
-                
-                // Redirigimos al Dashboard (o al carrito si prefieres)
-                window.location.href = "{{ url('/dashboard') }}"; 
+                // 1. Guardamos el token para que el carrito funcione
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                }
+
+                // 2. REDIRECCIÓN DIRECTA AL PERFIL (Sin alertas)
+                window.location.href = "{{ route('dashboard') }}";
             })
-            .catch(async (error) => {
+            .catch(error => {
+                // Restauramos el botón
                 btn.innerText = originalText;
                 btn.disabled = false;
-                
-                let msg = "Credenciales incorrectas.";
-                if (error.status === 422) {
-                    const data = await error.json();
-                    msg = data.message || msg;
+
+                // Solo mostramos alerta si hay un mensaje de error real del servidor
+                if (error.errors || error.message) {
+                    const msg = error.message || "Credenciales incorrectas";
+                    alert("❌ " + msg);
                 }
-                alert("❌ " + msg);
             });
         });
     </script>

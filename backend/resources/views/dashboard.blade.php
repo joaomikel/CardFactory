@@ -95,7 +95,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" id="logoutForm">
             @csrf
             <button type="submit" class="menu-link btn-logout">
                 <span><i class="fas fa-sign-out-alt icon-main" style="color:#ef4444"></i> Cerrar sesión</span>
@@ -105,5 +105,16 @@
 
     </div>
 
+    <script>
+        // Escuchamos cuando el usuario envía el formulario de cerrar sesión
+        document.getElementById('logoutForm').addEventListener('submit', function() {
+            // BORRAMOS EL TOKEN DEL NAVEGADOR
+            // Esto hace que el carrito sepa que ya no hay nadie logueado
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_data');
+            
+            console.log("Sesión local eliminada. El carrito ahora está bloqueado.");
+        });
+    </script>
 </body>
 </html>
