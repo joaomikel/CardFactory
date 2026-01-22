@@ -8,6 +8,8 @@ use App\Http\Controllers\ReviewController;
 use App\Models\Card;
 use App\Models\Listing;
 
+Route::get('/listings/card/{id}', [ListingController::class, 'getByCard']);
+
 Route::get('/listings/card/{scryfall_id}', function ($scryfall_id) {
     
     // 1. Buscamos la carta en TU base de datos usando el ID de Scryfall

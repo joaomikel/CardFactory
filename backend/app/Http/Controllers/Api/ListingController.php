@@ -11,6 +11,27 @@ use Illuminate\Support\Facades\Http;
 
 class ListingController extends Controller
 {
+    // --- ESTA ES LA FUNCIÓN NUEVA QUE NECESITAS ---
+    public function getByCard($scryfall_id)
+    {
+        // 1. Buscamos si la carta existe en nuestra base de datos local
+        $card = Card::where('scryfall_id', $scryfall_id)->first();
+
+        // 2. Si no la tenemos registrada, devolvemos lista vacía (nadie la vende)
+        if (!$card) {
+            return response()->json([]);
+        }
+
+        // 3. Si existe, buscamos las ventas asociadas a esa carta (ID interno)
+        $listings = Listing::where('card_id', $card->id)
+            ->where('is_sold', false) // Solo las que NO se han vendido
+            ->with(['user', 'card.set']) // Cargamos datos del vendedor y la edición
+            ->get();
+
+        return response()->json($listings);
+    }
+
+    // --- TU FUNCIÓN STORE (La he dejado tal cual la tenías) ---
     public function store(Request $request)
     {
         // 1. Validamos los datos básicos
