@@ -99,6 +99,8 @@
     <div class="register-card">
         <div class="logo">Únete a CardFactory</div>
         
+        <div id="js-errors" class="error-list" style="display:none;"></div>
+
         @if ($errors->any())
             <div class="error-list">
                 <ul>
@@ -109,7 +111,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" id="registerForm">
             @csrf
 
             <div class="form-group">
@@ -155,6 +157,72 @@
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
+
+        // --- SCRPT DE REGISTRO AJAX (Igual que el Login) ---
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Evitamos que el formulario recargue la página
+
+            const form = this;
+            const formData = new FormData(form);
+            const btn = form.querySelector('.btn-register');
+            const errorDiv = document.getElementById('js-errors');
+            
+            // Estado visual "Cargando"
+            const originalText = btn.innerText;
+            btn.innerText = 'Registrando...';
+            btn.disabled = true;
+            errorDiv.style.display = 'none';
+            errorDiv.innerHTML = '';
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json', // Importante para que el Controller devuelva JSON
+                }
+            })
+            .then(response => {
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        throw data; // Lanzamos error si no es 200 OK
+                    }
+                    return data;
+                });
+            })
+            .then(data => {
+                // AQUÍ ESTÁ LA CLAVE: Guardamos el token igual que en el login
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                }
+
+                // Redirección
+                window.location.href = "{{ route('dashboard') }}";
+            })
+            .catch(error => {
+                // Restauramos botón
+                btn.innerText = originalText;
+                btn.disabled = false;
+
+                // Mostramos errores
+                let errorMsg = "Ocurrió un error al registrarse.";
+                
+                if (error.errors) {
+                    // Si Laravel devuelve errores de validación (ej: email duplicado)
+                    errorMsg = "<ul>";
+                    for (const [key, messages] of Object.entries(error.errors)) {
+                        errorMsg += `<li>${messages[0]}</li>`;
+                    }
+                    errorMsg += "</ul>";
+                } else if (error.message) {
+                    errorMsg = error.message;
+                }
+
+                errorDiv.innerHTML = errorMsg;
+                errorDiv.style.display = 'block';
+            });
+        });
     </script>
 </body>
 </html>
