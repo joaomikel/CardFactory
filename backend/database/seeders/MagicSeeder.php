@@ -23,7 +23,7 @@ class MagicSeeder extends Seeder
         $users[] = User::create(['name' => 'Tienda Magic Madrid', 'email' => 'madrid@test.com', 'password' => bcrypt('123456')]);
         $users[] = User::create(['name' => 'Juan Coleccionista', 'email' => 'juan@test.com', 'password' => bcrypt('123456')]);
         $users[] = User::create(['name' => 'CardMarket Pro', 'email' => 'pro@test.com', 'password' => bcrypt('123456')]);
-        
+          
         // Creamos algunos usuarios extra para variedad
         for($i=1; $i<=5; $i++) {
             $users[] = User::factory()->create(); // Asumiendo que tienes UserFactory, si no, borra esta línea

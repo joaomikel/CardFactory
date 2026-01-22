@@ -8,7 +8,12 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    // 1. Obtenemos las ventas del usuario
+    // Usamos 'with' para cargar también los datos de la carta (nombre, imagen...)
+    $listings = Auth::user()->listings()->with('card')->latest()->get();
+
+    // 2. Pasamos la variable $listings a la vista
+    return view('dashboard', ['listings' => $listings]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -22,6 +27,10 @@ Route::get('/catalogo', function () {
 
 Route::get('/colecciones', function () {
     return view('colecciones.index');
+});
+
+Route::get('/carta', function () {
+    return view('carta');
 });
 
 require __DIR__.'/auth.php';

@@ -178,13 +178,37 @@
 
             <div id="tabs-sales">
                 <div class="sales-card">
-                    <div class="sales-number">{{ $salesCount ?? 0 }}</div>
+                    <div class="sales-number">{{ $listings->count() }}</div>
                     <div class="sales-text">Productos disponibles</div>
                 </div>
 
                 <a href="/vender.html" class="btn-products">
-                    <i class="fas fa-box-open" style="margin-right: 8px;"></i> Gestionar Productos
+                    <i class="fas fa-box-open" style="margin-right: 8px;"></i> Publicar Nuevo Producto
                 </a>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px; font-weight: 800;">Mis Cartas en Venta</h3>
+
+                @if($listings->isEmpty())
+                    <p style="text-align: center; color: #6b7280;">No tienes cartas a la venta.</p>
+                @else
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        @foreach($listings as $listing)
+                            <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;">
+                                <img src="{{ $listing->card->image_url }}" 
+                                     alt="{{ $listing->card->name }}" 
+                                     style="width: 100%; height: 150px; object-fit: contain; margin-bottom: 10px;">
+                                
+                                <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $listing->card->name }}
+                                </h4>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                                    <span style="color: #816EB2; font-weight: 800;">{{ $listing->price }} €</span>
+                                    <span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">{{ $listing->condition }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
         <div class="info-card">

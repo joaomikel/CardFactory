@@ -11,8 +11,8 @@ class Listing extends Model
 
     protected $fillable = [
             'user_id',
-            'card_id',      // Relación con tu tabla cards interna
-            'scryfall_id',  // <--- IMPORTANTE: Para que MagicSeeder funcione
+            'card_id',      
+            'scryfall_id',  
             'price',
             'quantity',
             'condition',

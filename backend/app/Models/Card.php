@@ -9,19 +9,23 @@ class Card extends Model
 {
     use HasFactory;
 
-    // Una Carta pertenece a un Set (Relación inversa del 1:N)
-    public function set() {
+    protected $fillable = [
+        'name', 
+        'scryfall_id', 
+        'image_url', 
+        'rarity', 
+        'set_id'
+    ];
+
+    // Relación con el Set 
+    public function set()
+    {
         return $this->belongsTo(Set::class);
     }
 
-    // Una Carta tiene muchas Ventas (Listings)
-    public function listings() {
+    // Relación con los Listings
+    public function listings()
+    {
         return $this->hasMany(Listing::class);
-    }
-    
-    // Relación directa N:M con Usuarios a través de Listings (Opcional, pero útil)
-    public function sellers() {
-        return $this->belongsToMany(User::class, 'listings')
-                    ->withPivot('price', 'condition', 'is_foil');
     }
 }
