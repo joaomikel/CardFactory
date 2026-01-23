@@ -9,8 +9,9 @@
     
 <style> 
 :root {
-    --primary: #816EB2;
-    --secondary: #958EA0;
+    /* CORRECCIÓN CONTRASTE: Oscurecido para cumplir ratio 4.5:1 sobre blanco */
+    --primary: #5e4c8d; 
+    --secondary: #5e5866; 
     --text-dark: #222;
     --text-light: #f4f4f4;
     --white: #ffffff;
@@ -38,11 +39,10 @@ header {
     height: 70px;
     display: flex;
     align-items: center;
-    /* space-between empuja el primer elemento al inicio (izq) y el último al final (der) */
     justify-content: space-between; 
     padding: 0 20px;
     position: absolute;
-    width: 100%; /* Asegura que ocupe todo el ancho */
+    width: 100%;
     top: 0;
     z-index: 100;
 }
@@ -53,9 +53,8 @@ header {
     border: none;
     color: var(--white);
     cursor: pointer;
-    padding: 10px; /* Area de click más grande */
+    padding: 10px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    /* Aseguramos que no tenga márgenes extraños */
     margin-right: auto; 
     margin: 0;
 }
@@ -64,8 +63,7 @@ header {
     display: flex;
     gap: 10px;
     align-items: center;
-    /* Aseguramos alineación a la derecha */
-    margin-left: auto; /* Aunque space-between ya lo hace, esto lo fuerza por seguridad */
+    margin-left: auto;
 }
 
 .btn-header {
@@ -78,12 +76,12 @@ header {
     white-space: nowrap;
 }
 .btn-login {
-    background: rgba(255,255,255,0.25);
+    background: rgba(0, 0, 0, 0.4); 
     color: var(--white);
     border: 1px solid rgba(255,255,255,0.5);
     backdrop-filter: blur(4px);
 }
-.btn-login:hover { background: rgba(255,255,255,0.4); }
+.btn-login:hover { background: rgba(0,0,0,0.6); }
 
 .btn-register {
     background: var(--primary);
@@ -97,7 +95,7 @@ header {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.4); 
     padding: 5px 15px 5px 5px;
     border-radius: 30px;
     border: 1px solid rgba(255, 255, 255, 0.4);
@@ -107,7 +105,7 @@ header {
     cursor: pointer;
 }
 .user-profile-widget:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.6);
     transform: translateY(-2px);
 }
 .profile-avatar {
@@ -181,7 +179,7 @@ header {
     background: none;
     border: none;
     cursor: pointer;
-    color: #666;
+    color: #444; 
 }
 .sidebar a {
     padding: 15px 10px;
@@ -199,7 +197,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(129, 110, 178, 0.85) 100%), url("img/Black Lotus.jpg");
+    background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(94, 76, 141, 0.9) 100%), url("img/Black Lotus.jpg");
     background-size: cover;
     background-position: center;
     background-color: #333;
@@ -305,7 +303,7 @@ h2 {
 }
 .collection-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(129, 110, 178, 0.2);
+    box-shadow: 0 15px 30px rgba(94, 76, 141, 0.2);
 }
 .collection-img-container {
     width: 100%;
@@ -368,7 +366,7 @@ h2 {
     background: var(--primary);
     color: var(--white);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(129, 110, 178, 0.4);
+    box-shadow: 0 5px 15px rgba(94, 76, 141, 0.4);
 }
 .reviews-grid {
     display: grid;
@@ -507,17 +505,17 @@ footer {
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <button class="close-sidebar" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="/" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;">Inicio</a> 
         <a href="/dashboard" id="link-perfil-sidebar">Login</a>
-        <a href="/colecciones/">Colecciones</a>
-        <a href="/catalogo/">Catálogo</a>
+        <a href="colecciones.html">Colecciones</a>
+        <a href="catalogo.html">Catálogo</a>
         <a href="carrito.html">Carrito</a>
     </div>
 
     <header>
-        <button class="menu-trigger" onclick="toggleMenu()">☰</button>
+        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
         
         <div class="auth-actions" id="auth-container">
             <a href="/login" class="btn-header btn-login">Login</a>
@@ -527,7 +525,7 @@ footer {
 
     <section class="hero-search">
         <div class="search-wrapper">
-            <input type="text" placeholder="Busca cartas (e.g., Sheoldred)..." id="searchInput" onkeypress="handleEnter(event)">
+            <input type="text" placeholder="Busca cartas (e.g., Sheoldred)..." id="searchInput" onkeypress="handleEnter(event)" aria-label="Buscar cartas">
             <button class="search-btn" aria-label="Buscar" onclick="performSearch()">🔍</button>
         </div>
     </section>
@@ -540,7 +538,7 @@ footer {
                 <p style="grid-column: 1/-1; text-align: center;">Cargando tendencias...</p>
             </div>
             <div class="section-footer">
-                <a href="/catalogo" class="btn-more">Ver más...</a>
+                <a href="catalogo.html" class="btn-more">Ver más...</a>
             </div>
         </section>
 
@@ -551,7 +549,7 @@ footer {
             <div class="cards-grid" id="lorwyn-container">
             </div>
             <div class="section-footer">
-                <a href="/catalogo/?set=lrw" class="btn-more">Ver más...</a>
+                <a href="catalogo.html?set=lrw" class="btn-more">Ver más...</a>
             </div>
         </section>
 
@@ -560,36 +558,36 @@ footer {
         <section style="position: relative; z-index: 10;">
             <h2>Explorar Colecciones</h2>
             <div class="collections-grid">
-                <a href="/catalogo/?set=fdn" class="collection-card">
+                <a href="catalogo.html?set=fdn" class="collection-card">
                     <div class="collection-img-container">
-                        <img src="img/Foundations.jpg" alt="Foundations">
+                        <img src="img/Foundations.jpg" alt="Arte conceptual de Foundations">
                     </div>
                     <div class="collection-info">
                         <h3>Foundations</h3>
                         <p>La esencia de Magic</p>
                     </div>
                 </a>
-                <a href="/catalogo/?set=dsk" class="collection-card">
+                <a href="catalogo.html?set=dsk" class="collection-card">
                     <div class="collection-img-container">
-                        <img src="img/Duskmourn.jpg" alt="Duskmourn">
+                         <img src="img/Duskmourn.jpg" alt="Arte de la casa encantada Duskmourn">
                     </div>
                     <div class="collection-info">
                         <h3>Duskmourn</h3>
                         <p>Terror en la casa</p>
                     </div>
                 </a>
-                <a href="/catalogo/?set=blb" class="collection-card">
+                <a href="catalogo.html?set=blb" class="collection-card">
                     <div class="collection-img-container">
-                        <img src="img/Bloomborrow.jpg" alt="Bloomburrow">
+                         <img src="img/Bloomborrow.jpg" alt="Arte de animales de Bloomburrow">
                     </div>
                     <div class="collection-info">
                         <h3>Bloomburrow</h3>
                         <p>Pequeños héroes</p>
                     </div>
                 </a>
-                <a href="/catalogo/?set=otj" class="collection-card">
+                <a href="catalogo.html?set=otj" class="collection-card">
                     <div class="collection-img-container">
-                        <img src="img/Outlaws.jpg" alt="Thunder Junction">
+                         <img src="img/Outlaws.jpg" alt="Forajidos de Thunder Junction">
                     </div>
                     <div class="collection-info">
                         <h3>Thunder Junction</h3>
@@ -598,7 +596,7 @@ footer {
                 </a>
             </div>
             <div class="section-footer">
-                <a href="/colecciones/" class="btn-more">Ver todas las colecciones</a>
+                <a href="colecciones.html" class="btn-more">Ver todas las colecciones</a>
             </div>
         </section>
 
@@ -617,16 +615,16 @@ footer {
                 <h3>CardFactory</h3>
                 <p>Tu mercado de confianza para comprar y vender cartas de Magic: The Gathering.</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
             <div class="footer-section">
                 <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="/catalogo">Catálogo</a></li>
-                    <li><a href="/colecciones">Colecciones</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="colecciones.html">Colecciones</a></li>
                     <li><a href="/login" id="footer-login-link">Login</a></li>
                 </ul>
             </div>
@@ -646,10 +644,7 @@ footer {
         function checkLoginStatus() {
             const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
             const authContainer = document.getElementById('auth-container');
-            
-            // --- CAMBIO AQUÍ: Seleccionamos el enlace del footer ---
             const footerLoginLink = document.getElementById('footer-login-link');
-            // --------------------------------------------------------
 
             let userData = { name: 'Usuario' };
             try {
@@ -664,7 +659,7 @@ footer {
                 // 1. Actualizar Header
                 if (authContainer) {
                     authContainer.innerHTML = `
-                        <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                        <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil" aria-label="Ver mi perfil">
                             <div class="profile-avatar">
                                 <i class="fas fa-user"></i>
                             </div>
@@ -677,12 +672,11 @@ footer {
                 const linkSidebar = document.getElementById('link-perfil-sidebar');
                 if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
 
-                // 3. --- CAMBIO AQUÍ: Actualizar Footer ---
+                // 3. Actualizar Footer
                 if (footerLoginLink) {
                     footerLoginLink.textContent = "Mi Perfil";
                     footerLoginLink.href = "/dashboard";
                 }
-                // ------------------------------------------
 
             } else {
                 // CASO: NO LOGUEADO
@@ -695,12 +689,11 @@ footer {
                     `;
                 }
 
-                // 2. --- CAMBIO AQUÍ: Restaurar Footer ---
+                // 2. Restaurar Footer
                 if (footerLoginLink) {
                     footerLoginLink.textContent = "Login";
                     footerLoginLink.href = "/login";
                 }
-                // -----------------------------------------
             }
         }
 
@@ -714,7 +707,7 @@ footer {
             else if (card.prices?.usd) finalPrice = `${card.prices.usd} $`;
 
             return `
-                <a href="/carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;">
+                <a href="carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;">
                     <img src="${img}" alt="${card.name}" crossorigin="anonymous" loading="lazy">
                     <h3 style="font-size: 0.9rem; margin-bottom:5px;">${card.name}</h3>
                     <p class="card-price">${finalPrice}</p>
@@ -749,7 +742,7 @@ footer {
                 const reviews = await res.json();
                 const html = reviews.map(r => `
                     <div class="review-card" style="animation: fadeIn 0.8s ease;">
-                        <img src="${r.img}" class="avatar" alt="${r.name}">
+                        <img src="${r.img}" class="avatar" alt="Foto de perfil de ${r.name}">
                         <div>
                             <strong>${r.name}</strong>
                             <p style="color:#555; font-size:0.9rem; margin-top:4px;">"${r.text}"</p>
@@ -762,11 +755,13 @@ footer {
             }
         }
 
+        // --- CORRECCIÓN CRÍTICA DEL BUSCADOR ---
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
-            if (query) window.location.href = `/catalogo/?q=${encodeURIComponent(query)}`;
-            else window.location.href = '/catalogo/';
+            // Ahora redirige explícitamente a catalogo.html
+            if (query) window.location.href = `catalogo.html?q=${encodeURIComponent(query)}`;
+            else window.location.href = 'catalogo.html';
         }
 
         function handleEnter(e) {

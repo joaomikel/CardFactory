@@ -226,7 +226,9 @@
         .set-icon {
             width: 40px; height: 40px;
             flex-shrink: 0;
-            fill: var(--text-dark);
+            /* CAMBIO: Filtro para colorear SVG negro a Púrpura #816EB2 */
+            filter: invert(53%) sepia(12%) saturate(1469%) hue-rotate(218deg) brightness(88%) contrast(86%);
+            opacity: 0.9;
         }
         
         .set-info { 
@@ -359,10 +361,10 @@
     <div class="sidebar" id="sidebar">
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Menú</h3>
-        <a href="/">Inicio</a>
-        <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
-        <a href="/colecciones" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px;">Colecciones</a>
-        <a href="/catalogo">Catálogo</a>
+        <a href="index.html">Inicio</a>
+        <a href="dashboard.html" id="link-perfil-sidebar">Perfil</a>
+        <a href="colecciones.html" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px;">Colecciones</a>
+        <a href="catalogo.html">Catálogo</a>
         <a href="carrito.html">Carrito</a>
     </div>
 
@@ -370,8 +372,8 @@
         <button class="menu-trigger" onclick="toggleMenu()">☰</button>
         
         <div class="auth-actions" id="auth-container">
-            <a href="/login" class="btn-header btn-login">Login</a>
-            <a href="/register" class="btn-header btn-register">Registro</a>
+            <a href="login.html" class="btn-header btn-login">Login</a>
+            <a href="register.html" class="btn-header btn-register">Registro</a>
         </div>
     </header>
 
@@ -406,9 +408,9 @@
             <div class="footer-section">
                 <h4>Enlaces Rápidos</h4>
                 <ul class="footer-links">
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/catalogo">Catálogo</a></li>
-                    <li><a href="/colecciones">Colecciones</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="colecciones.html">Colecciones</a></li>
                 </ul>
             </div>
 
@@ -438,8 +440,9 @@
             if (token && authContainer) {
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
                 
+                // Actualizado para usar .html
                 authContainer.innerHTML = `
-                    <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                    <a href="dashboard.html" class="user-profile-widget" title="Ir a mi perfil">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
                         </div>
@@ -452,9 +455,10 @@
                 if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
 
             } else if (authContainer) {
+                // Actualizado para usar .html
                 authContainer.innerHTML = `
-                    <a href="/login" class="btn-header btn-login">Login</a>
-                    <a href="/register" class="btn-header btn-register">Registro</a>
+                    <a href="login.html" class="btn-header btn-login">Login</a>
+                    <a href="register.html" class="btn-header btn-register">Registro</a>
                 `;
             }
         }
@@ -488,8 +492,9 @@
 
             container.innerHTML = setsList.map(set => {
                 const dateYear = new Date(set.released_at).getFullYear();
+                // CAMBIO AQUÍ: 'catalogo.html?set=' en lugar de '/catalogo?set='
                 return `
-                <div class="set-item" onclick="window.location.href='/catalogo?set=${set.code}'">
+                <div class="set-item" onclick="window.location.href='catalogo.html?set=${set.code}'">
                     <img src="${set.icon_svg_uri}" class="set-icon" alt="" loading="lazy">
                     <div class="set-info">
                         <h3>${set.name}</h3>
