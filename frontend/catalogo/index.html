@@ -16,11 +16,19 @@
             --radius: 12px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); padding-bottom: 50px; color: var(--dark); }
+        
+        /* Ajuste: flex column para que el footer baje si hay poco contenido */
+        body { 
+            background-color: var(--bg); 
+            color: var(--dark); 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
         /* --- HEADER ESTILO INICIO --- */
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary)); /* Fondo sólido/gradiente para catálogo */
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             height: 70px;
             display: flex;
             align-items: center;
@@ -30,6 +38,7 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            flex-shrink: 0;
         }
 
         .menu-trigger {
@@ -65,7 +74,6 @@
             white-space: nowrap;
         }
 
-        /* Botones estilo cristal como en Inicio */
         .btn-login {
             background: rgba(255,255,255,0.25);
             color: var(--white);
@@ -81,7 +89,7 @@
         }
         .btn-register:hover { transform: translateY(-2px); }
 
-        /* --- WIDGET PERFIL USUARIO (Igual que Inicio) --- */
+        /* --- WIDGET PERFIL USUARIO --- */
         .user-profile-widget {
             display: flex;
             align-items: center;
@@ -204,11 +212,17 @@
         .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(129, 110, 178, 0.4); }
 
         /* --- GRID --- */
-        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .container { 
+            padding: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            flex-grow: 1; /* Empuja el footer hacia abajo */
+            width: 100%;
+        }
         
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Responsive automático */
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 20px; 
         }
 
@@ -223,6 +237,93 @@
         .card-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .card-info h3 { font-size: 0.9rem; color: var(--dark); margin-bottom: 8px; line-height: 1.3; }
         .card-price { color: var(--primary); font-weight: 800; font-size: 1.1rem; }
+
+        /* --- FOOTER ESTILO LANDING PAGE --- */
+        footer {
+            /* Cambio: Gradiente morado en lugar de fondo negro sólido */
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white); /* Texto blanco */
+            padding-top: 60px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            /* Padding inferior añadido para separar del fondo oscuro */
+            padding: 0 20px 40px; 
+        }
+
+        .footer-section h4 {
+            color: var(--white);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .footer-section p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            opacity: 0.9; /* Ligera transparencia para texto párrafo */
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.9); /* Blanco casi opaco */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+            padding-left: 5px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .social-btn:hover {
+            background: var(--white);
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            /* Cambio: Fondo oscuro semitransparente overlay */
+            background: rgba(0,0,0,0.2); 
+            border-top: none; /* Quitamos borde */
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+        }
 
         @media (min-width: 768px) {
             header { padding: 0 40px; height: 90px; }
@@ -329,6 +430,33 @@
             <p style="grid-column: 1/-1; text-align: center; padding: 50px;">Buscando cartas...</p>
         </div>
     </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>CardFactory</h4>
+                <p>Tu tienda de confianza para cartas Magic: The Gathering. Encuentra las mejores singles, sellado y accesorios al mejor precio.</p>
+                <div class="social-icons">
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Enlaces Rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/catalogo">Catálogo</a></li>
+                    <li><a href="/colecciones">Colecciones</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CardFactory. Todos los derechos reservados. Magic: The Gathering es marca registrada de Wizards of the Coast.</p>
+        </div>
+    </footer>
 
     <script>
         // 1. Alternar Menú Lateral

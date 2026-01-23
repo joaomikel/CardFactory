@@ -510,7 +510,7 @@ footer {
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="/" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;">Inicio</a> 
-        <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
+        <a href="/dashboard" id="link-perfil-sidebar">Login</a>
         <a href="/colecciones/">Colecciones</a>
         <a href="/catalogo/">Catálogo</a>
         <a href="carrito.html">Carrito</a>
@@ -547,7 +547,7 @@ footer {
         <br><br>
 
         <section style="position: relative; z-index: 10;">
-            <h2>Nueva Colección: Aetherdrift</h2>
+            <h2>Nueva Colección: Lorwyn</h2>
             <div class="cards-grid" id="lorwyn-container">
             </div>
             <div class="section-footer">
@@ -626,24 +626,11 @@ footer {
                 <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
                     <li><a href="/catalogo">Catálogo</a></li>
-                    <li><a href="#">Vender</a></li>
-                    <li><a href="#">Nosotros</a></li>
+                    <li><a href="/colecciones">Colecciones</a></li>
+                    <li><a href="/login" id="footer-login-link">Login</a></li>
                 </ul>
             </div>
-            <div class="footer-section">
-                <h3>Soporte</h3>
-                <ul class="footer-links">
-                    <li><a href="#">Ayuda</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Newsletter</h3>
-                <div style="display: flex; margin-top: 15px;">
-                    <input type="email" placeholder="Email..." style="padding: 10px; border:none; border-radius: 8px 0 0 8px; width:100%;">
-                    <button style="padding: 10px; background: var(--primary); color:white; border:none; border-radius: 0 8px 8px 0;">Ir</button>
-                </div>
-            </div>
+
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 CardFactory.</p>
@@ -660,29 +647,60 @@ footer {
             const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
             const authContainer = document.getElementById('auth-container');
             
+            // --- CAMBIO AQUÍ: Seleccionamos el enlace del footer ---
+            const footerLoginLink = document.getElementById('footer-login-link');
+            // --------------------------------------------------------
+
             let userData = { name: 'Usuario' };
             try {
                 const storedUser = localStorage.getItem('user_data');
                 if (storedUser) userData = JSON.parse(storedUser);
             } catch (e) { console.log('Error parseando user data'); }
 
-            if (token && authContainer) {
+            if (token) {
+                // CASO: LOGUEADO
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
-                authContainer.innerHTML = `
-                    <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <span class="profile-name">${userName}</span>
-                    </a>
-                `;
+                
+                // 1. Actualizar Header
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="profile-name">${userName}</span>
+                        </a>
+                    `;
+                }
+                
+                // 2. Actualizar Sidebar
                 const linkSidebar = document.getElementById('link-perfil-sidebar');
                 if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
-            } else if (authContainer) {
-                authContainer.innerHTML = `
-                    <a href="/login" class="btn-header btn-login">Login</a>
-                    <a href="/register" class="btn-header btn-register">Registro</a>
-                `;
+
+                // 3. --- CAMBIO AQUÍ: Actualizar Footer ---
+                if (footerLoginLink) {
+                    footerLoginLink.textContent = "Mi Perfil";
+                    footerLoginLink.href = "/dashboard";
+                }
+                // ------------------------------------------
+
+            } else {
+                // CASO: NO LOGUEADO
+                
+                // 1. Actualizar Header
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/login" class="btn-header btn-login">Login</a>
+                        <a href="/register" class="btn-header btn-register">Registro</a>
+                    `;
+                }
+
+                // 2. --- CAMBIO AQUÍ: Restaurar Footer ---
+                if (footerLoginLink) {
+                    footerLoginLink.textContent = "Login";
+                    footerLoginLink.href = "/login";
+                }
+                // -----------------------------------------
             }
         }
 
@@ -716,7 +734,7 @@ footer {
                 if (cards.length > 0) {
                     const displayCards = cards
                         .sort(() => 0.5 - Math.random()) 
-                        .slice(0, numCards);             
+                        .slice(0, numCards);            
                     container.innerHTML = displayCards.map(createCardHTML).join('');
                 }
             } catch (error) {
