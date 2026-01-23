@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 
 class ListingController extends Controller
 {
+    // --- FUNCIÓN PARA GUARDAR (YA LA TENÍAS) ---
     public function store(Request $request)
     {
         // 1. Validamos los datos básicos
@@ -27,7 +28,6 @@ class ListingController extends Controller
 
         // 3. SI NO EXISTE: La creamos
         if (!$card) {
-            // withoutVerifying() es vital para que no falle en local (XAMPP/Laragon)
             $response = Http::withoutVerifying()->get("https://api.scryfall.com/cards/$scryfallId");            
             
             if ($response->failed()) {
@@ -64,7 +64,7 @@ class ListingController extends Controller
 
         // 4. CREAR LA VENTA
         $listing = $request->user()->listings()->create([
-            'card_id' => $card->id, // ID interno (1, 2, 3...)
+            'card_id' => $card->id,
             'price' => $request->price,
             'quantity' => 1,
             'condition' => $request->condition,
@@ -78,5 +78,16 @@ class ListingController extends Controller
             'listing' => $listing,
             'card' => $card
         ], 201);
+    }
+
+    // --- ¡ESTA ES LA FUNCIÓN QUE TE FALTABA! ---
+    public function getByCard($scryfallId)
+    {
+        // Buscamos las ventas que coincidan con el ID de Scryfall
+        $listings = Listing::where('scryfall_id', $scryfallId)
+            ->with(['user', 'card.set']) // <--- AQUÍ ESTÁ LA SOLUCIÓN: Carga el usuario y la carta
+            ->get();
+
+        return response()->json($listings);
     }
 }

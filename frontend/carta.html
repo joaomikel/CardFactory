@@ -154,9 +154,12 @@
         /* --- CARRITO FLOTANTE --- */
         .floating-cart-zone {
             position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px;
-            background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; box-shadow: 0 10px 25px rgba(129, 110, 178, 0.4); z-index: 1000; cursor: pointer;
+            background: var(--primary); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            color: white; box-shadow: 0 10px 25px rgba(129, 110, 178, 0.4); 
+            z-index: 1000; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
         }
         .cart-badge {
             position: absolute; top: -5px; right: -5px; background: #ff4757; color: white;
@@ -182,7 +185,7 @@
         <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
         <a href="/colecciones">Colecciones</a>
         <a href="/catalogo">Catálogo</a>
-        <a href="/carrito">Carrito</a>    
+        <a href="carrito.html">Carrito</a>    
     </div>
 
     <header>
@@ -232,9 +235,10 @@
         </div>
     </main>
 
-    <div id="drop-zone" class="floating-cart-zone" onclick="window.location.href='/carrito'">        
+    <a id="drop-zone" class="floating-cart-zone" onclick="window.location.href='carrito.html'">        
         <span class="cart-badge" id="cart-count">0</span>
-    </div>
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem;"></i>
+    </a>
 
     <script>
     // --- LÓGICA DEL MENÚ ---
@@ -470,6 +474,20 @@
     }
 
     window.onload = init;
+
+    // 1. "El Despertador": Se activa cuando vuelves a la página usando "Atrás"
+    window.addEventListener('pageshow', function(event) {
+        // Obligamos a volver a contar lo que hay en el carrito
+        updateCartCount();
+    });
+
+    // 2. "El Sincronizador": Por si tienes dos pestañas abiertas
+    // Si borras algo en una pestaña, la otra se actualiza sola al instante
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'myCart') {
+            updateCartCount();
+        }
+    });
     </script>
 </body>
 </html>

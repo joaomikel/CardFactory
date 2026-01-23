@@ -83,3 +83,7 @@ Route::get('/trending', function () {
 });
 
 Route::get('/reviews', [ReviewController::class, 'index']);
+Route::get('/listings/card/{id}', [ListingController::class, 'getByCard']);
+
+// Ruta para crear venta (esta ya la tendrás protegida seguramente)
+Route::middleware('auth:sanctum')->post('/listings', [ListingController::class, 'store']);
