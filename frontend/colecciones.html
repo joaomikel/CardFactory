@@ -10,11 +10,13 @@
     <style>
         :root {
             --primary: #816EB2;
+            --primary-dark: #5e4c8d; /* Añadido para compatibilidad con el footer */
             --secondary: #958EA0;
             --text-dark: #222;
             --text-light: #f4f4f4;
             --white: #ffffff;
             --radius: 16px;
+            --focus-ring: #ffbf00; /* Añadido para accesibilidad */
         }
 
         * { 
@@ -196,7 +198,7 @@
             width: 100%; 
             padding: 0 15px; 
             margin: 0 auto; 
-            flex: 1; /* Empuja el footer hacia abajo */
+            flex: 1; 
         }
         
         .sets-grid { 
@@ -226,7 +228,6 @@
         .set-icon {
             width: 40px; height: 40px;
             flex-shrink: 0;
-            /* CAMBIO: Filtro para colorear SVG negro a Púrpura #816EB2 */
             filter: invert(53%) sepia(12%) saturate(1469%) hue-rotate(218deg) brightness(88%) contrast(86%);
             opacity: 0.9;
         }
@@ -257,91 +258,61 @@
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        /* --- FOOTER COMPLETO (ESTILO LANDING PAGE) --- */
-        footer {
-            margin-top: auto;
-            /* CAMBIO: Usamos el gradiente morado de la landing page */
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--text-light); /* Texto claro */
-            padding-top: 60px;
-        }
-
+        /* --- FOOTER (ESTILO INDEX.HTML) --- */
+        footer { margin-top: auto; background: #2b2440; color: var(--text-light); padding-top: 60px; }
         .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            /* Añadimos padding inferior aquí */
-            padding: 0 20px 40px;
+            display: grid; grid-template-columns: 1fr; gap: 40px;
+            max-width: 1200px; margin: 0 auto; padding: 0 20px 40px;
         }
-
-        .footer-section h4 {
-            color: var(--white);
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .footer-section p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
+        .footer-section h3 { font-size: 1.3rem; margin-bottom: 20px; color: var(--white); }
+        .footer-section p { font-size: 1rem; line-height: 1.6; opacity: 1; color: #e0e0e0; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
         .footer-links a {
-            color: var(--text-light); /* Enlaces claros */
-            text-decoration: none;
-            transition: color 0.3s ease;
-            opacity: 0.8;
+            text-decoration: underline; text-underline-offset: 4px;
+            color: #e0e0e0; transition: 0.3s; font-size: 1rem; cursor: pointer;
         }
-
-        .footer-links a:hover {
-            color: var(--white);
-            opacity: 1;
-            padding-left: 5px;
+        .footer-links a:hover, .footer-links a:focus {
+            color: var(--white); background-color: rgba(255,255,255,0.1);
+            outline: 2px solid var(--focus-ring);
         }
-
-        .social-icons {
-            display: flex;
-            gap: 15px;
+        .social-icons { display: flex; gap: 15px; margin-top: 20px; }
+        .social-icons a {
+            width: 44px; height: 44px; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--white); text-decoration: none; transition: 0.3s;
         }
+        .social-icons a:hover, .social-icons a:focus { background: var(--primary); transform: translateY(-3px); }
+        .footer-bottom { background: #1a1626; padding: 20px; text-align: center; font-size: 0.9rem; color: #ccc; }
 
-        .social-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
+        /* --- ACCESSIBILITY MODAL (ESTILO INDEX.HTML) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+        .modal-content {
+            background: white; width: 90%; max-width: 600px; max-height: 85vh;
+            overflow-y: auto; border-radius: 12px; padding: 30px;
+            position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 2px solid var(--secondary);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .modal-title { color: var(--primary-dark); font-size: 1.5rem; font-weight: 800; }
+        .modal-close {
+            background: transparent; border: 2px solid var(--secondary); color: var(--secondary);
+            width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;
             transition: 0.3s;
         }
-
-        .social-btn:hover {
-            background: var(--primary);
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            /* CAMBIO: Fondo oscuro semitransparente como en landing */
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
+        .modal-close:hover, .modal-close:focus { background: var(--primary); border-color: var(--primary); color: white; }
+        .acc-list { margin-left: 20px; margin-bottom: 20px; }
+        .acc-list li { margin-bottom: 10px; color: #333; }
+        .acc-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
+        .tag-aa { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (min-width: 768px) {
             .container { max-width: 1200px; padding: 0 40px; }
@@ -352,10 +323,37 @@
             .hero-mini { padding: 160px 40px 80px 40px; border-radius: 0; }
             .hero-mini h1 { font-size: 3rem; }
             header { padding: 0 40px; height: 90px; }
+            .footer-content { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .footer-content { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
 <body>
+
+    <div class="modal-overlay" id="acc-modal" aria-modal="true" role="dialog" aria-labelledby="acc-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="acc-title">Declaración de Accesibilidad</h2>
+                <button class="modal-close" onclick="closeAccModal()" aria-label="Cerrar declaración">&times;</button>
+            </div>
+            <div style="font-size: 1rem; line-height: 1.6;">
+                <p style="margin-bottom: 15px;">CardFactory se compromete a garantizar la accesibilidad digital para personas con discapacidad, aplicando los estándares WCAG 2.1.</p>
+                
+                <h3 style="color: var(--secondary); margin-bottom: 10px;">Cumplimiento Nivel AA</h3>
+                <ul class="acc-list">
+                    <li><span class="acc-tag tag-aa">Contraste</span> Los colores de texto y fondo superan el ratio 4.5:1 para garantizar legibilidad.</li>
+                    <li><span class="acc-tag tag-aa">Teclado</span> Toda la navegación es operable sin ratón, con foco visible en todos los elementos interactivos.</li>
+                    <li><span class="acc-tag tag-aa">Lectores</span> Las imágenes tienen atributos ALT y los iconos decorativos están ocultos (aria-hidden).</li>
+                    <li><span class="acc-tag tag-aa">Zoom</span> Se permite escalar la página hasta un 500% sin pérdida de funcionalidad.</li>
+                    <li><span class="acc-tag tag-aa">Cognitivo</span> Movimiento reducido y actualizaciones pausadas.</li>
+                </ul>
+                <p>Si encuentras alguna barrera de acceso, contáctanos en soporte@cardfactory.com.</p>
+                <button onclick="closeAccModal()" style="margin-top: 15px; width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Entendido</button>
+            </div>
+        </div>
+    </div>
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
@@ -392,31 +390,29 @@
         <button class="btn-more" id="loadMoreBtn">Cargar más</button>
     </main>
 
-    <footer>
+    <footer role="contentinfo">
         <div class="footer-content">
             <div class="footer-section">
-                <h4>CardFactory</h4>
-                <p>Tu tienda de confianza para cartas Magic: The Gathering. Encuentra las mejores singles, sellado y accesorios al mejor precio.</p>
+                <h3>CardFactory</h3>
+                <p>Tu mercado de confianza para comprar y vender cartas de Magic: The Gathering.</p>
                 <div class="social-icons">
-                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-btn"><i class="fab fa-discord"></i></a>
+                    <a href="#" aria-label="Síguenos en Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Síguenos en Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Síguenos en Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                 </div>
             </div>
-
             <div class="footer-section">
-                <h4>Enlaces Rápidos</h4>
+                <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="catalogo.html">Catálogo</a></li>
-                    <li><a href="colecciones.html">Colecciones</a></li>
+                    <li><a href="catalogo.html">Catálogo Completo</a></li>
+                    <li><a href="colecciones.html">Ver Colecciones</a></li>
+                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li>
+                    <li><a href="javascript:void(0)" onclick="openAccModal()" id="acc-trigger" style="color: #ffbf00;">Declaración de Accesibilidad</a></li>
                 </ul>
             </div>
-
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 CardFactory. Todos los derechos reservados. Magic: The Gathering es marca registrada de Wizards of the Coast.</p>
+            <p>&copy; 2026 CardFactory. Todos los derechos reservados.</p>
         </div>
     </footer>
 
@@ -440,7 +436,6 @@
             if (token && authContainer) {
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
                 
-                // Actualizado para usar .html
                 authContainer.innerHTML = `
                     <a href="dashboard.html" class="user-profile-widget" title="Ir a mi perfil">
                         <div class="profile-avatar">
@@ -450,12 +445,10 @@
                     </a>
                 `;
 
-                // Actualizar Sidebar
                 const linkSidebar = document.getElementById('link-perfil-sidebar');
                 if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
 
             } else if (authContainer) {
-                // Actualizado para usar .html
                 authContainer.innerHTML = `
                     <a href="login.html" class="btn-header btn-login">Login</a>
                     <a href="register.html" class="btn-header btn-register">Registro</a>
@@ -492,7 +485,6 @@
 
             container.innerHTML = setsList.map(set => {
                 const dateYear = new Date(set.released_at).getFullYear();
-                // CAMBIO AQUÍ: 'catalogo.html?set=' en lugar de '/catalogo?set='
                 return `
                 <div class="set-item" onclick="window.location.href='catalogo.html?set=${set.code}'">
                     <img src="${set.icon_svg_uri}" class="set-icon" alt="" loading="lazy">
@@ -523,9 +515,39 @@
             if (currentCount >= listToRender.length) document.getElementById('loadMoreBtn').style.display = 'none';
         });
 
+        // --- LÓGICA DE ACCESIBILIDAD MODAL (AÑADIDA) ---
+        let lastFocusedElement;
+        
+        function openAccModal() {
+            lastFocusedElement = document.activeElement;
+            const modal = document.getElementById('acc-modal');
+            modal.classList.add('active');
+            
+            setTimeout(() => {
+                modal.querySelector('.modal-close').focus();
+            }, 100);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAccModal() {
+            const modal = document.getElementById('acc-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            if (lastFocusedElement) lastFocusedElement.focus();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('acc-modal');
+                if (modal.classList.contains('active')) closeAccModal();
+            }
+        });
+
         window.onload = () => {
-            checkLoginStatus(); // Verificar usuario logueado
-            loadSets(); // Cargar cartas
+            checkLoginStatus(); 
+            loadSets(); 
         };
     </script>
 </body>
