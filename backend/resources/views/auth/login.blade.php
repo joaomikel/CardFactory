@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* --- ESTILOS DEL SIDEBAR Y HEADER (Igual que Registro) --- */
+        /* --- ESTILOS DEL SIDEBAR Y HEADER --- */
         header {
             position: absolute; top: 0; left: 0; width: 100%; height: 70px;
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
@@ -54,14 +54,14 @@
         .sidebar a { padding: 15px 10px; font-weight: 500; color: #958EA0; border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; }
         .sidebar h3 { color: var(--sidebar-primary); margin-bottom: 1rem; }
 
-        /* --- ESTILOS LOGIN CARD (Adaptado al estilo de Registro) --- */
+        /* --- ESTILOS LOGIN CARD --- */
         .login-card {
             background: rgba(255, 255, 255, 0.95);
             padding: 30px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             width: 100%;
-            max-width: 400px; /* Un poco más estrecho que el registro */
+            max-width: 400px;
             position: relative;
             z-index: 1;
         }
@@ -144,6 +144,13 @@
     </div>
 
     <script>
+        // --- FUNCIÓN DEL MENÚ (AÑADIDA) ---
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // --- LÓGICA DE LOGIN ---
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
 
@@ -164,29 +171,22 @@
                 }
             })
             .then(response => {
-                // Si la respuesta es 200 (OK), extraemos el JSON
                 if (response.ok) {
                     return response.json();
                 }
-                // Si el servidor devuelve 422 (datos incorrectos), lanzamos error para el alert
                 return response.json().then(err => { throw err; });
             })
             .then(data => {
-                // 1. Guardamos el token para que el carrito funcione
                 if (data.token) {
                     localStorage.setItem('auth_token', data.token);
                     localStorage.setItem('user_data', JSON.stringify(data.user));
                 }
-
-                // 2. REDIRECCIÓN DIRECTA AL PERFIL (Sin alertas)
                 window.location.href = "{{ route('dashboard') }}";
             })
             .catch(error => {
-                // Restauramos el botón
                 btn.innerText = originalText;
                 btn.disabled = false;
 
-                // Solo mostramos alerta si hay un mensaje de error real del servidor
                 if (error.errors || error.message) {
                     const msg = error.message || "Credenciales incorrectas";
                     alert("❌ " + msg);
@@ -194,5 +194,5 @@
             });
         });
     </script>
-</body>
+</body> 
 </html>
