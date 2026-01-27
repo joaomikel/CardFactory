@@ -109,12 +109,16 @@
         </button>
     </div>
 </div>
-
 <script>
-    // 1. Verificación inicial de sesión
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-        window.location.href = '/login';
+    // URL DE TU SERVIDOR (UBUNTU)
+    const API_URL = 'http://10.10.18.108:8000';
+
+    // Función auxiliar para leer la cookie XSRF (Seguridad de Laravel)
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
     }
 
     async function searchCards() {
@@ -176,14 +180,15 @@
         };
 
         try {
-            // AJUSTA ESTA URL SEGÚN TU BACKEND
-            const res = await fetch('http://localhost:8000/api/listings', {
+            // PETICIÓN AL BACKEND CON COOKIES
+            const res = await fetch(`${API_URL}/api/listings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') // Token de seguridad
                 },
+                credentials: 'include', // ¡IMPORTANTE! Envía la sesión del usuario
                 body: JSON.stringify(payload)
             });
 
@@ -191,11 +196,19 @@
                 alert("¡Excelente! Tu carta ya está a la venta.");
                 window.location.href = "/dashboard"; 
             } else {
-                const error = await res.json();
-                alert("Error: " + (error.message || "No se pudo publicar."));
+                // Si falla (ej: 401), intentamos leer el mensaje
+                const error = await res.json().catch(() => ({}));
+                
+                if (res.status === 401) {
+                    alert("Tu sesión ha caducado. Por favor, identifícate de nuevo.");
+                    window.location.href = "/login";
+                } else {
+                    alert("Error: " + (error.message || "No se pudo publicar."));
+                }
             }
         } catch(e) {
-            alert("Error de conexión con el servidor.");
+            console.error(e);
+            alert("Error de conexión con el servidor (" + API_URL + ").");
         } finally {
             publishBtn.disabled = false;
             publishBtn.innerText = "Publicar en el Mercado";
