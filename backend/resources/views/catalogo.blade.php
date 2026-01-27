@@ -473,7 +473,7 @@
                     const price = card.prices.eur ? `${card.prices.eur} €` : (card.prices.usd ? `${card.prices.usd} $` : 'Sin Stock');
                     
                     return `
-                    <a href="/carta?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
+                    <a href="/carta.html?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
                         <img src="${img}" loading="lazy" alt="${card.name}">
                         <div class="card-info">
                             <h3>${card.name}</h3>

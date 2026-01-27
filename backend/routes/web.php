@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\CatalogController; // <--- No olvides importar esto arriba
 
 Route::get('/', function () {
     return view('index');
@@ -22,9 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::get('/catalogo', function () {
-    return view('catalogo');
-});
+Route::get('/catalogo', [CatalogController::class, 'index'])->name('catalogo');
 
 Route::get('/colecciones', function () {
     return view('colecciones');
