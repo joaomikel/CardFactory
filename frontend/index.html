@@ -352,9 +352,9 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         <h3 style="color: var(--primary-dark); margin-bottom: 1rem; padding-left: 10px;">Menú</h3>
         <a href="/" style="color: var(--primary-dark); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;" aria-current="page">Inicio</a> 
         <a href="/dashboard" id="link-perfil-sidebar">Login</a>
-        <a href="colecciones.html">Colecciones</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
+        <a href="/colecciones">Colecciones</a>
+        <a href="/catalogo">Catálogo</a>
+        <a href="/carrito">Carrito</a>
     </nav>
 
     <header role="banner">
@@ -383,7 +383,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                 <p style="grid-column: 1/-1; text-align: center;">Cargando tendencias...</p>
             </div>
             <div class="section-footer">
-                <a href="catalogo.html" class="btn-more">Ver más tendencias</a>
+                <a href="/catalogo" class="btn-more">Ver más tendencias</a>
             </div>
         </section>
 
@@ -393,7 +393,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             <h2 id="heading-lorwyn">Nueva Colección: Lorwyn</h2>
             <div class="cards-grid" id="lorwyn-container"></div>
             <div class="section-footer">
-                <a href="catalogo.html?set=lrw" class="btn-more">Ver cartas de Lorwyn</a>
+                <a href="/catalogo?set=lrw" class="btn-more">Ver cartas de Lorwyn</a>
             </div>
         </section>
 
@@ -402,7 +402,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         <section aria-labelledby="heading-collections">
             <h2 id="heading-collections">Explorar Colecciones</h2>
             <div class="collections-grid">
-                <a href="catalogo.html?set=fdn" class="collection-card">
+                <a href="/catalogo?set=fdn" class="collection-card">
                     <div class="collection-img-container">
                         <img src="img/Foundations.jpg" alt="" role="presentation"> 
                     </div>
@@ -411,7 +411,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                         <p>La esencia de Magic</p>
                     </div>
                 </a>
-                <a href="catalogo.html?set=dsk" class="collection-card">
+                <a href="/catalogo?set=dsk" class="collection-card">
                     <div class="collection-img-container">
                          <img src="img/Duskmourn.jpg" alt="" role="presentation">
                     </div>
@@ -420,7 +420,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                         <p>Terror en la casa</p>
                     </div>
                 </a>
-                <a href="catalogo.html?set=blb" class="collection-card">
+                <a href="/catalogo?set=blb" class="collection-card">
                     <div class="collection-img-container">
                          <img src="img/Bloomborrow.jpg" alt="" role="presentation">
                     </div>
@@ -429,7 +429,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                         <p>Pequeños héroes</p>
                     </div>
                 </a>
-                <a href="catalogo.html?set=otj" class="collection-card">
+                <a href="/catalogo?set=otj" class="collection-card">
                     <div class="collection-img-container">
                          <img src="img/Outlaws.jpg" alt="" role="presentation">
                     </div>
@@ -440,7 +440,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                 </a>
             </div>
             <div class="section-footer">
-                <a href="colecciones.html" class="btn-more">Ver todas las colecciones</a>
+                <a href="/colecciones" class="btn-more">Ver todas las colecciones</a>
             </div>
         </section>
 
@@ -467,8 +467,8 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             <div class="footer-section">
                 <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="catalogo.html">Catálogo Completo</a></li>
-                    <li><a href="colecciones.html">Ver Colecciones</a></li>
+                    <li><a href="/catalogo">Catálogo Completo</a></li>
+                    <li><a href="/colecciones">Ver Colecciones</a></li>
                     <li><a href="/login" id="footer-login-link">Acceso Login</a></li>
                     <li><a href="javascript:void(0)" onclick="openAccModal()" id="acc-trigger" style="color: #ffbf00;">Declaración de Accesibilidad</a></li>
                 </ul>
@@ -572,7 +572,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             let finalPrice = card.prices?.eur ? `${card.prices.eur} €` : (card.prices?.usd ? `${card.prices.usd} $` : 'Sin Stock');
 
             return `
-                <a href="carta.html?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;" aria-label="${card.name}, precio ${finalPrice}">
+                <a href="/carta?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;" aria-label="${card.name}, precio ${finalPrice}">
                     <img src="${img}" alt="" role="presentation" crossorigin="anonymous" loading="lazy">
                     <h3 style="font-size: 0.9rem; margin-bottom:5px;">${card.name}</h3>
                     <p class="card-price" aria-hidden="true">${finalPrice}</p>
@@ -630,8 +630,8 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
-            if (query) window.location.href = `catalogo.html?q=${encodeURIComponent(query)}`;
-            else window.location.href = 'catalogo.html';
+            if (query) window.location.href = `/catalogo?q=${encodeURIComponent(query)}`;
+            else window.location.href = '/catalogo';
         }
 
         function handleEnter(e) { if (e.key === 'Enter') performSearch(); }

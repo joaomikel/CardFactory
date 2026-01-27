@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
     return view('index');
 });
@@ -22,11 +23,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/catalogo', function () {
-    return view('catalogo.index');
+    return view('catalogo');
 });
 
 Route::get('/colecciones', function () {
-    return view('colecciones.index');
+    return view('colecciones');
 });
 
 Route::get('/carta', function () {
