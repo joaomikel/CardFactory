@@ -11,7 +11,15 @@ use App\Models\Listing;
 // -------------------------------------------------------------------------
 // RUTAS PÚBLICAS (Cualquiera puede verlas sin loguearse)
 // -------------------------------------------------------------------------
-
+Route::get('/tendencias', function () {
+    // Busca las 4 últimas cartas con stock
+    // Devuelve JSON puro para que el HTML lo lea
+    return Listing::with('card')
+        ->where('quantity', '>', 0)
+        ->latest()
+        ->take(4)
+        ->get();
+});
 // 1. Ver cartas por ID de Scryfall (Esta estaba repetida, dejamos una sola)
 Route::get('/listings/card/{scryfall_id}', [ListingController::class, 'getByCard']);
 

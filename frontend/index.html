@@ -570,7 +570,8 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         function createCardHTML(card) {
             const img = card.image_uris?.normal || (card.card_faces && card.card_faces[0]?.image_uris?.normal) || 'https://via.placeholder.com/488x680?text=No+Image';
             let finalPrice = card.prices?.eur ? `${card.prices.eur} €` : (card.prices?.usd ? `${card.prices.usd} $` : 'Sin Stock');
-
+            
+            // Link actualizado a ruta /carta, Nginx se encarga del proxy
             return `
                 <a href="/carta?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;" aria-label="${card.name}, precio ${finalPrice}">
                     <img src="${img}" alt="" role="presentation" crossorigin="anonymous" loading="lazy">
@@ -630,6 +631,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
+            // Nginx redirigirá /catalogo a tu backend
             if (query) window.location.href = `/catalogo?q=${encodeURIComponent(query)}`;
             else window.location.href = '/catalogo';
         }
@@ -638,9 +640,10 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 
         window.onload = () => {
             checkLoginStatus(); 
+            // Las APIs también funcionan directo con /api/ porque Nginx las redirige
             loadCards('/api/trending', 'trending-container', 18);
             loadCards('/api/lorwyn', 'lorwyn-container', 4);
-            loadReviews(); // Ahora carga los datos estáticos
+            loadReviews(); 
             
             setInterval(() => { loadCards('/api/trending', 'trending-container', 18); }, 30000); 
         };

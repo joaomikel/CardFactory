@@ -304,74 +304,74 @@
         </div>
     </header>
 
-    <section class="filters">
+    <form action="{{ route('catalogo') }}" method="GET" class="filters">
+        
         <div class="filter-group search-group">
             <label>Nombre de la carta</label>
             <div style="position: relative;">
-                <input type="text" id="search-name" placeholder="Ej: Black Lotus..." class="filter-control">
+                <input type="text" name="name" value="{{ request('name') }}" placeholder="Ej: Black Lotus..." class="filter-control">
                 <i class="fas fa-search" style="position: absolute; right: 15px; top: 15px; color: #9ca3af;"></i>
             </div>
         </div>
 
         <div class="filter-group">
             <label>Color</label>
-            <select id="color" class="filter-control">
+            <select name="color" class="filter-control">
                 <option value="">Todos</option>
-                <option value="w">Blanco</option>
-                <option value="u">Azul</option>
-                <option value="b">Negro</option>
-                <option value="r">Rojo</option>
-                <option value="g">Verde</option>
+                <option value="w" {{ request('color') == 'w' ? 'selected' : '' }}>Blanco</option>
+                <option value="u" {{ request('color') == 'u' ? 'selected' : '' }}>Azul</option>
+                <option value="b" {{ request('color') == 'b' ? 'selected' : '' }}>Negro</option>
+                <option value="r" {{ request('color') == 'r' ? 'selected' : '' }}>Rojo</option>
+                <option value="g" {{ request('color') == 'g' ? 'selected' : '' }}>Verde</option>
             </select>
         </div>
 
         <div class="filter-group">
             <label>Rareza</label>
-            <select id="rarity" class="filter-control">
+            <select name="rarity" class="filter-control">
                 <option value="">Todas</option>
-                <option value="common">Común</option>
-                <option value="uncommon">Infrecuente</option>
-                <option value="rare">Rara</option>
-                <option value="mythic">Mítica</option>
+                <option value="common" {{ request('rarity') == 'common' ? 'selected' : '' }}>Común</option>
+                <option value="uncommon" {{ request('rarity') == 'uncommon' ? 'selected' : '' }}>Infrecuente</option>
+                <option value="rare" {{ request('rarity') == 'rare' ? 'selected' : '' }}>Rara</option>
+                <option value="mythic" {{ request('rarity') == 'mythic' ? 'selected' : '' }}>Mítica</option>
             </select>
         </div>
 
-        <div class="filter-group">
-            <label>Mana (CMC)</label>
-            <select id="cmc" class="filter-control">
-                <option value="">Cualquiera</option>
-                <option value="0">0</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7+</option>
-            </select>
-        </div>
+        <button type="submit" class="btn-apply">Aplicar</button>
+        
+        <a href="{{ route('catalogo') }}" style="margin-left:10px; font-size:0.9rem; color:var(--secondary);">Limpiar</a>
+    </form>
 
-        <div class="filter-group">
-            <label>Colección</label>
-            <select id="set" class="filter-control">
-                <option value="">Todas</option>
-                <option value="dft">Aetherdrift (DFT)</option>
-                <option value="fdn">Foundations (FDN)</option>
-                <option value="dsk">Duskmourn (DSK)</option>
-                <option value="blb">Bloomburrow (BLB)</option>
-                <option value="otj">Thunder Junction (OTJ)</option>
-                <option value="mh3">Modern Horizons 3 (MH3)</option>
-                <option value="ltr">Lord of the Rings (LTR)</option>
-                <option value="lrw">Lorwyn (LRW)</option>
-            </select>
-        </div>
-
-        <button class="btn-apply" onclick="applyFilters()">Aplicar</button>
-    </section>
-
-    <main class="container">
+<main class="container">
         <div class="grid" id="catalog-grid">
-            <p style="grid-column: 1/-1; text-align: center; padding: 50px;">Buscando cartas...</p>
+            
+            @forelse($listings as $listing)
+                <div class="card-catalog">
+                    <img src="{{ $listing->card->image_url ?? 'https://via.placeholder.com/488x680' }}" loading="lazy" alt="{{ $listing->card->name }}">
+                    
+                    <div class="card-info">
+                        <h3>{{ $listing->card->name }}</h3>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <p class="card-price">{{ number_format($listing->price, 2) }} €</p>
+                            <span style="font-size:0.8rem; color:#666;">x{{ $listing->quantity }}</span>
+                        </div>
+
+                        <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">
+                            Vendedor: {{ $listing->user->name ?? 'Anónimo' }}
+                        </p>
+
+                        <a href="/carta?id={{ $listing->card->scryfall_id }}" style="margin-top:10px; display:block; text-align:center; background:var(--primary); color:white; padding:5px; border-radius:6px; text-decoration:none; font-size:0.8rem;">
+                            Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <p style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    No hemos encontrado cartas con esos filtros.
+                </p>
+            @endforelse
+
         </div>
     </main>
 
@@ -408,7 +408,7 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // 2. MODAL ACCESIBILIDAD (NUEVO)
+        // 2. MODAL ACCESIBILIDAD
         function openAccModal() {
             document.getElementById('acc-modal').classList.add('active');
         }
@@ -416,36 +416,34 @@
             document.getElementById('acc-modal').classList.remove('active');
         }
 
-        // 3. Verificar Login
+        // 3. Verificar Login (Para cambiar el header)
         function checkLoginStatus() {
-            const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+            // Intenta leer el token o datos si usas localStorage
+            // (Si usas sesiones de Laravel puras, esto se podría hacer con @auth en Blade, 
+            // pero dejamos esto por si usas una mezcla)
+            const token = localStorage.getItem('auth_token');
             const authContainer = document.getElementById('auth-container');
             
             let userData = { name: 'Usuario' };
             try {
                 const storedUser = localStorage.getItem('user_data');
                 if (storedUser) userData = JSON.parse(storedUser);
-            } catch (e) { console.log('Error parseando user data'); }
+            } catch (e) { console.log('Error datos usuario'); }
 
             if (token && authContainer) {
-                // ESTÁ LOGUEADO: Mostrar Widget de Perfil
+                // LOGUEADO
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
-                
                 authContainer.innerHTML = `
                     <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
+                        <div class="profile-avatar"><i class="fas fa-user"></i></div>
                         <span class="profile-name">${userName}</span>
                     </a>
                 `;
-
-                // Actualizar Sidebar
                 const linkSidebar = document.getElementById('link-perfil-sidebar');
                 if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
 
             } else if (authContainer) {
-                // NO ESTÁ LOGUEADO
+                // NO LOGUEADO
                 authContainer.innerHTML = `
                     <a href="/login" class="btn-header btn-login">Login</a>
                     <a href="/register" class="btn-header btn-register">Registro</a>
@@ -453,90 +451,11 @@
             }
         }
 
-        // 4. Lógica del Catálogo
-        async function fetchCards(q = 'f:standard') {
-            const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--secondary);"><i class="fas fa-circle-notch fa-spin"></i> Cargando cartas...</p>';
-
-            try {
-                const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
-                if (!res.ok) throw new Error('Error API');
-                const data = await res.json();
-                
-                if(!data.data || data.data.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados.</p>';
-                    return;
-                }
-
-                grid.innerHTML = data.data.map(card => {
-                    const img = card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680?text=No+Img');
-                    const price = card.prices.eur ? `${card.prices.eur} €` : (card.prices.usd ? `${card.prices.usd} $` : 'Sin Stock');
-                    
-                    return `
-                    <a href="/carta.html?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
-                        <img src="${img}" loading="lazy" alt="${card.name}">
-                        <div class="card-info">
-                            <h3>${card.name}</h3>
-                            <p class="card-price">${price}</p>
-                        </div>
-                    </a>
-                `}).join('');
-            } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio o hubo un error.</p>';
-            }
-        }
-
-        function applyFilters() {
-            const name = document.getElementById('search-name').value;
-            const color = document.getElementById('color').value;
-            const rarity = document.getElementById('rarity').value;
-            const cmc = document.getElementById('cmc').value;
-            const set = document.getElementById('set').value;
-
-            let queryParts = [];
-
-            if (name) queryParts.push(name.trim());
-            
-            // Si no hay filtros, por defecto busca standard
-            if (!set && !name && !color && !rarity && !cmc) {
-                fetchCards('f:standard');
-                return;
-            }
-            
-            if (color) queryParts.push(`c:${color}`);
-            if (rarity) queryParts.push(`r:${rarity}`);
-            if (set) queryParts.push(`s:${set}`);
-            
-            if (cmc) {
-                if (cmc === "7") queryParts.push(`cmc>=7`);
-                else queryParts.push(`cmc:${cmc}`);
-            }
-
-            fetchCards(queryParts.join(' '));
-        }
-
-        document.getElementById('search-name').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') applyFilters();
-        });
-
-        // 5. Inicialización
+        // 4. Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             checkLoginStatus();
-
-            const params = new URLSearchParams(window.location.search);
-            const qParam = params.get('q');
-            const setParam = params.get('set');
-
-            if (qParam) {
-                document.getElementById('search-name').value = qParam;
-                fetchCards(qParam);
-            } else if (setParam) {
-                document.getElementById('set').value = setParam;
-                fetchCards(`s:${setParam}`);
-            } else {
-                fetchCards('f:standard');
-            }
+            // YA NO HACEMOS FETCHCARDS AQUÍ
+            // Laravel ya ha pintado las cartas al cargar la página.
         });
     </script>
 </body>
