@@ -288,9 +288,9 @@
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="/">Inicio</a> 
         <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
-        <a href="colecciones.html">Colecciones</a>
-        <a href="catalogo.html" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
+        <a href="/colecciones">Colecciones</a>
+        <a href="/catalogo" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;">Catálogo</a>
+        <a href="/carrito">Carrito</a>
     </div>
 
     <header>
@@ -389,8 +389,8 @@
             <div class="footer-section">
                 <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="catalogo.html">Catálogo Completo</a></li>
-                    <li><a href="colecciones.html">Ver Colecciones</a></li>
+                    <li><a href="/catalogo">Catálogo Completo</a></li>
+                    <li><a href="/colecciones">Ver Colecciones</a></li>
                     <li><a href="/login">Acceso Login</a></li>
                     <li><a href="javascript:void(0)" onclick="openAccModal()" style="color: var(--focus-ring);">Declaración de Accesibilidad</a></li>
                 </ul>
@@ -473,7 +473,7 @@
                     const price = card.prices.eur ? `${card.prices.eur} €` : (card.prices.usd ? `${card.prices.usd} $` : 'Sin Stock');
                     
                     return `
-                    <a href="/carta.html?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
+                    <a href="/carta?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
                         <img src="${img}" loading="lazy" alt="${card.name}">
                         <div class="card-info">
                             <h3>${card.name}</h3>

@@ -183,9 +183,9 @@
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="/">Inicio</a>
         <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
-        <a href="colecciones.html">Colecciones</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>    
+        <a href="/colecciones">Colecciones</a>
+        <a href="/catalogo">Catálogo</a>
+        <a href="/carrito">Carrito</a>    
     </div>
 
     <header>
@@ -235,7 +235,7 @@
         </div>
     </main>
 
-    <a id="drop-zone" class="floating-cart-zone" onclick="window.location.href='carrito.html'">        
+    <a id="drop-zone" class="floating-cart-zone" onclick="window.location.href='/carrito'">        
         <span class="cart-badge" id="cart-count">0</span>
         <i class="fas fa-shopping-cart" style="font-size: 1.5rem;"></i>
     </a>

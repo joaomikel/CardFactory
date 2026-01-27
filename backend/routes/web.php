@@ -30,6 +30,10 @@ Route::get('/colecciones', function () {
     return view('colecciones');
 });
 
+Route::get('/carrito', function () {
+    return view('carrito');
+});
+
 Route::get('/carta', function () {
     return view('carta');
 });
