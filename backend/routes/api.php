@@ -53,8 +53,10 @@ Route::get('/trending', function () {
 });
 
 // 6. Reviews
+// Leer reviews (ya la tenías)
 Route::get('/reviews', [ReviewController::class, 'index']);
 
+Route::post('/reviews', [ReviewController::class, 'store']);
 
 // -------------------------------------------------------------------------
 // RUTAS PRIVADAS (Necesitas estar logueado)

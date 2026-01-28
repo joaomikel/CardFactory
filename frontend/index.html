@@ -250,6 +250,110 @@ h2 {
     background: #eee; object-fit: cover; border: 2px solid var(--primary);
 }
 
+/* --- REVIEW FORM ESTILIZADO (NUEVO) --- */
+.review-form-wrapper {
+    background: var(--white);
+    padding: 30px;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    border: 1px solid #f0f0f0;
+    max-width: 600px;
+    margin: 40px auto 0; /* Centrado horizontalmente */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Una barrita decorativa arriba */
+.review-form-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 6px;
+    background: linear-gradient(90deg, var(--primary), #9d85d6);
+}
+
+.review-form-wrapper h3 {
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fdfdfd;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-input:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(94, 76, 141, 0.1);
+    outline: none;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn-submit-review {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(94, 76, 141, 0.3);
+}
+
+.btn-submit-review:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(94, 76, 141, 0.4);
+}
+
+.btn-submit-review:active {
+    transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+    .btn-submit-review {
+        width: auto;
+        min-width: 200px;
+    }
+}
+
 /* --- FOOTER --- */
 footer { margin-top: auto; background: #2b2440; color: var(--text-light); padding-top: 60px; }
 .footer-content {
@@ -448,7 +552,28 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 
         <section aria-labelledby="heading-reviews">
             <h2 id="heading-reviews">Reseñas de Usuarios</h2>
-            <div class="reviews-grid" id="reviews-container"></div>
+            <div class="reviews-grid" id="reviews-container">
+                <p style="text-align: center;">Cargando reseñas...</p>
+            </div>
+            
+            <div class="review-form-wrapper">
+                <h3><i class="fas fa-comment-dots" aria-hidden="true"></i> Tu opinión cuenta</h3>
+                
+                <div class="form-group">
+                    <label for="reviewName" class="form-label">Nombre</label>
+                    <input type="text" id="reviewName" class="form-input" placeholder="Ej. Jace Beleren">
+                </div>
+
+                <div class="form-group">
+                    <label for="reviewText" class="form-label">Reseña</label>
+                    <textarea id="reviewText" class="form-input" placeholder="¿Qué te pareció tu experiencia de compra?"></textarea>
+                </div>
+
+                <button onclick="enviarReview()" class="btn-submit-review">
+                    Publicar Reseña <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
         </section>
         
     </main>
@@ -591,7 +716,7 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                 const data = await res.json();
                 const cards = data.data || [];
                 if (cards.length > 0) {
-                    const displayCards = cards.sort(() => 0.5 - Math.random()).slice(0, numCards);            
+                    const displayCards = cards.sort(() => 0.5 - Math.random()).slice(0, numCards);             
                     container.innerHTML = displayCards.map(createCardHTML).join('');
                 } else {
                     container.innerHTML = '<p>No se encontraron cartas.</p>';
@@ -605,29 +730,84 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             }
         }
 
-        // --- CORRECCIÓN: DATOS DE RESEÑAS MOCKEADOS ---
-        function loadReviews() {
+        async function loadReviews() {
             const container = document.getElementById('reviews-container');
             
-            // Datos estáticos en lugar de fetch('/api/reviews') que fallaba
-            const reviewsData = [
-                { name: "Carlos M.", text: "El envío llegó en perfecto estado y super rápido.", img: "https://randomuser.me/api/portraits/men/32.jpg" },
-                { name: "Lucía G.", text: "Encontré la carta que me faltaba para mi Commander.", img: "https://randomuser.me/api/portraits/women/44.jpg" },
-                { name: "David R.", text: "Los precios son muy competitivos comparados con otras webs.", img: "https://randomuser.me/api/portraits/men/85.jpg" }
-            ];
+            try {
+                // 1. Llamada a la API
+                const res = await fetch('/api/reviews'); 
+                
+                if (!res.ok) throw new Error('Error HTTP: ' + res.status);
+                
+                // 2. Obtener datos
+                const data = await res.json();
+                
+                // Laravel a veces devuelve array directo [...] o paginado { data: [...] }
+                // Esto maneja ambos casos:
+                const reviews = Array.isArray(data) ? data : (data.data || []);
+                
+                console.log("Reseñas recibidas:", reviews); // Míralo en la consola del navegador (F12)
 
-            const html = reviewsData.map(r => `
-                <div class="review-card" style="animation: fadeIn 0.8s ease;">
-                    <img src="${r.img}" class="avatar" alt="Foto de perfil de ${r.name}">
-                    <div>
-                        <strong>${r.name}</strong>
-                        <p style="color:#555; font-size:0.9rem; margin-top:4px;">"${r.text}"</p>
-                    </div>
-                </div>
-            `).join('');
-            container.innerHTML = html;
+                if (reviews.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Aún no hay reseñas.</p>';
+                    return;
+                }
+
+                // 3. Generar HTML usando TUS campos del modelo (name, text, img)
+                container.innerHTML = reviews.map(r => {
+                    // Si el campo img viene vacío, usamos ui-avatars como fallback
+                    const avatarUrl = r.img ? r.img : `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name)}&background=random`;
+                    
+                    return `
+                        <div class="review-card" style="animation: fadeIn 0.8s ease;">
+                            <img src="${avatarUrl}" class="avatar" alt="Avatar de ${r.name}">
+                            <div>
+                                <strong>${r.name}</strong>
+                                <p style="color:#555; font-size:0.9rem; margin-top:4px;">"${r.text}"</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error cargando reseñas:', error);
+                container.innerHTML = '<p style="text-align: center; color: red;">Error al cargar reseñas.</p>';
+            }
         }
+        async function enviarReview() {
+            const name = document.getElementById('reviewName').value;
+            const text = document.getElementById('reviewText').value;
 
+            if (!name || !text) {
+                alert("Por favor completa ambos campos");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ name: name, text: text })
+                });
+
+                if (res.ok) {
+                    alert("¡Gracias por tu reseña!");
+                    // Limpiamos los campos
+                    document.getElementById('reviewName').value = '';
+                    document.getElementById('reviewText').value = '';
+                    // Recargamos las reviews para que salga la nueva
+                    loadReviews(); 
+                } else {
+                    alert("Hubo un error al guardar.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error de conexión");
+            }
+        }
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
@@ -640,10 +820,10 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 
         window.onload = () => {
             checkLoginStatus(); 
-            // Las APIs también funcionan directo con /api/ porque Nginx las redirige
+            // Cargas iniciales
             loadCards('/api/trending', 'trending-container', 18);
             loadCards('/api/lorwyn', 'lorwyn-container', 4);
-            loadReviews(); 
+            loadReviews(); // Ahora llama a la API real
             
             setInterval(() => { loadCards('/api/trending', 'trending-container', 18); }, 30000); 
         };
