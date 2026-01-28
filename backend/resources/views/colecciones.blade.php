@@ -359,11 +359,11 @@
     <div class="sidebar" id="sidebar">
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Menú</h3>
-        <a href="index.html">Inicio</a>
-        <a href="dashboard.html" id="link-perfil-sidebar">Perfil</a>
-        <a href="colecciones.html" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px;">Colecciones</a>
-        <a href="catalogo.html">Catálogo</a>
-        <a href="carrito.html">Carrito</a>
+        <a href="/">Inicio</a>
+        <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
+        <a href="/colecciones" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px;">Colecciones</a>
+        <a href="/catalogo">Catálogo</a>
+        <a href="/carrito">Carrito</a>
     </div>
 
     <header>
@@ -486,7 +486,7 @@
             container.innerHTML = setsList.map(set => {
                 const dateYear = new Date(set.released_at).getFullYear();
                 return `
-                <div class="set-item" onclick="window.location.href='catalogo.html?set=${set.code}'">
+                <div class="set-item" onclick="window.location.href='catalogo?set=${set.code}'">
                     <img src="${set.icon_svg_uri}" class="set-icon" alt="" loading="lazy">
                     <div class="set-info">
                         <h3>${set.name}</h3>

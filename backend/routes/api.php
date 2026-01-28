@@ -8,9 +8,6 @@ use App\Http\Controllers\ReviewController;
 use App\Models\Card;
 use App\Models\Listing;
 
-// -------------------------------------------------------------------------
-// RUTAS PÚBLICAS (Cualquiera puede verlas sin loguearse)
-// -------------------------------------------------------------------------
 Route::get('/tendencias', function () {
     // Busca las 4 últimas cartas con stock
     // Devuelve JSON puro para que el HTML lo lea
@@ -20,7 +17,7 @@ Route::get('/tendencias', function () {
         ->take(4)
         ->get();
 });
-// 1. Ver cartas por ID de Scryfall (Esta estaba repetida, dejamos una sola)
+// 1. Ver cartas por ID de Scryfall 
 Route::get('/listings/card/{scryfall_id}', [ListingController::class, 'getByCard']);
 
 // 2. Buscar vendedores de una carta
@@ -53,14 +50,9 @@ Route::get('/trending', function () {
 });
 
 // 6. Reviews
-// Leer reviews (ya la tenías)
 Route::get('/reviews', [ReviewController::class, 'index']);
 
 Route::post('/reviews', [ReviewController::class, 'store']);
-
-// -------------------------------------------------------------------------
-// RUTAS PRIVADAS (Necesitas estar logueado)
-// -------------------------------------------------------------------------
 
 Route::middleware('auth:sanctum')->group(function () {
     
