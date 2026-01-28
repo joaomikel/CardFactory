@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CatalogController; // <--- No olvides importar esto arriba
+use App\Http\Controllers\CatalogController;
+use Illuminate\Support\Facades\Auth; // Asegúrate de importar Auth
 
 Route::get('/', function () {
     return view('index');
@@ -10,7 +11,6 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     // 1. Obtenemos las ventas del usuario
-    // Usamos 'with' para cargar también los datos de la carta (nombre, imagen...)
     $listings = Auth::user()->listings()->with('card')->latest()->get();
 
     // 2. Pasamos la variable $listings a la vista
@@ -20,6 +20,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::get('/catalogo', [CatalogController::class, 'index'])->name('catalogo');

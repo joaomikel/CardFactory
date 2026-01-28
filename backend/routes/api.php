@@ -8,15 +8,15 @@ use App\Http\Controllers\ReviewController;
 use App\Models\Card;
 use App\Models\Listing;
 
+// 0. Tendencias (Tu código original)
 Route::get('/tendencias', function () {
-    // Busca las 4 últimas cartas con stock
-    // Devuelve JSON puro para que el HTML lo lea
     return Listing::with('card')
         ->where('quantity', '>', 0)
         ->latest()
         ->take(4)
         ->get();
 });
+
 // 1. Ver cartas por ID de Scryfall 
 Route::get('/listings/card/{scryfall_id}', [ListingController::class, 'getByCard']);
 
@@ -51,9 +51,9 @@ Route::get('/trending', function () {
 
 // 6. Reviews
 Route::get('/reviews', [ReviewController::class, 'index']);
-
 Route::post('/reviews', [ReviewController::class, 'store']);
 
+// Rutas protegidas por API Token (Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     
     // Obtener el usuario actual
@@ -61,6 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    // CREAR UNA VENTA (Aquí es donde te daba el 401)
+    // CREAR UNA VENTA
     Route::post('/listings', [ListingController::class, 'store']);
 });

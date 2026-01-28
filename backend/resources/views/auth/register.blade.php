@@ -158,9 +158,9 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // --- SCRPT DE REGISTRO AJAX (Igual que el Login) ---
+        // --- SCRIPT DE REGISTRO AJAX CORREGIDO ---
         document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Evitamos que el formulario recargue la página
+            e.preventDefault(); 
 
             const form = this;
             const formData = new FormData(form);
@@ -177,27 +177,37 @@
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
+                // --- ESTO ES LO QUE SOLUCIONA EL ERROR DE COOKIE/XSRF ---
+                credentials: 'include', 
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json', // Importante para que el Controller devuelva JSON
+                    'Accept': 'application/json',
                 }
             })
             .then(response => {
+                // Si la respuesta es una redirección (Laravel a veces redirige tras registro exitoso)
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return null;
+                }
+                
                 return response.json().then(data => {
                     if (!response.ok) {
-                        throw data; // Lanzamos error si no es 200 OK
+                        throw data; // Lanzamos error si hay fallos de validación
                     }
                     return data;
                 });
             })
             .then(data => {
-                // AQUÍ ESTÁ LA CLAVE: Guardamos el token igual que en el login
+                if (!data) return; // Si hubo redirección, paramos aquí
+
+                // Guardamos el token si la API lo devuelve
                 if (data.token) {
                     localStorage.setItem('auth_token', data.token);
-                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                    if(data.user) localStorage.setItem('user_data', JSON.stringify(data.user));
                 }
 
-                // Redirección
+                // Redirección al dashboard
                 window.location.href = "{{ route('dashboard') }}";
             })
             .catch(error => {
@@ -209,8 +219,8 @@
                 let errorMsg = "Ocurrió un error al registrarse.";
                 
                 if (error.errors) {
-                    // Si Laravel devuelve errores de validación (ej: email duplicado)
-                    errorMsg = "<ul>";
+                    // Errores de validación de Laravel (ej: email duplicado, password corto)
+                    errorMsg = "<ul style='padding-left: 20px; text-align: left;'>";
                     for (const [key, messages] of Object.entries(error.errors)) {
                         errorMsg += `<li>${messages[0]}</li>`;
                     }
