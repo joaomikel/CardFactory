@@ -63,7 +63,7 @@
 <body>
 
 <div class="container">
-    <a href="/dashboard" class="btn-back"><i class="fas fa-chevron-left"></i> Volver al Perfil</a>
+    <a href="{{ route('dashboard') }}" class="btn-back"><i class="fas fa-chevron-left"></i> Volver al Perfil</a>
     
     <h1><i class="fas fa-magic"></i> ¿Qué vas a vender hoy?</h1>
     
@@ -80,6 +80,8 @@
         
         <div class="form-grid">
             <input type="hidden" id="scryfall-id">
+            <input type="hidden" id="hidden-card-name">
+            <input type="hidden" id="hidden-image-url">
             
             <div>
                 <label><i class="fas fa-euro-sign"></i> Precio de venta</label>
@@ -109,11 +111,9 @@
         </button>
     </div>
 </div>
-<script>
-    // URL DE TU SERVIDOR (UBUNTU)
-    const API_URL = 'http://10.10.18.108:8000';
 
-    // Función auxiliar para leer la cookie XSRF (Seguridad de Laravel)
+<script>
+    // Función para obtener el Token CSRF de Laravel
     function getCookie(name) {
         let matches = document.cookie.match(new RegExp(
             "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -137,25 +137,44 @@
             
             if(data.data) {
                 data.data.slice(0, 10).forEach(card => {
-                    const img = card.image_uris ? card.image_uris.normal : (card.card_faces ? card.card_faces[0].image_uris.normal : '');
-                    resultsDiv.innerHTML += `
-                        <div class="card-item" onclick="selectCard('${card.id}', '${card.name.replace(/'/g, "")}')">
-                            <img src="${img}">
-                            <h4>${card.name}</h4>
-                        </div>
-                    `;
+                    // Lógica para sacar la imagen correcta
+                    let img = '';
+                    if(card.image_uris) {
+                        img = card.image_uris.normal;
+                    } else if (card.card_faces && card.card_faces[0].image_uris) {
+                        img = card.card_faces[0].image_uris.normal;
+                    }
+
+                    if(img) {
+                        // Pasamos ID, Nombre e Imagen al hacer click
+                        // Escapamos las comillas simples en el nombre para no romper el HTML
+                        const safeName = card.name.replace(/'/g, "\\'"); 
+                        resultsDiv.innerHTML += `
+                            <div class="card-item" onclick="selectCard('${card.id}', '${safeName}', '${img}')">
+                                <img src="${img}">
+                                <h4>${card.name}</h4>
+                            </div>
+                        `;
+                    }
                 });
             }
         } catch(e) {
-            alert("Error al buscar cartas");
+            alert("Error al buscar cartas en Scryfall");
         } finally {
             btn.innerText = "Buscar Carta";
         }
     }
 
-    function selectCard(id, name) {
+    function selectCard(id, name, imageUrl) {
+        // Rellenamos los inputs ocultos
         document.getElementById('scryfall-id').value = id;
+        document.getElementById('hidden-card-name').value = name;
+        document.getElementById('hidden-image-url').value = imageUrl;
+        
+        // Mostramos el nombre visualmente
         document.getElementById('selected-card-name').innerText = name;
+        
+        // Mostramos el formulario con animación
         document.getElementById('listing-form').style.display = 'block';
         document.getElementById('listing-form').scrollIntoView({ behavior: 'smooth' });
     }
@@ -172,43 +191,48 @@
         publishBtn.disabled = true;
         publishBtn.innerText = "Publicando...";
 
+        // Preparamos los datos
         const payload = {
-            card_id: document.getElementById('scryfall-id').value,
-            price: price,
-            condition: document.getElementById('condition').value,
-            is_foil: document.getElementById('is_foil').checked,
+            scryfall_id: document.getElementById('scryfall-id').value,
+            card_name:   document.getElementById('hidden-card-name').value,
+            image_url:   document.getElementById('hidden-image-url').value,
+            price:       price,
+            condition:   document.getElementById('condition').value,
+            is_foil:     document.getElementById('is_foil').checked,
         };
 
         try {
-            // PETICIÓN AL BACKEND CON COOKIES
-            const res = await fetch(`${API_URL}/api/listings`, {
+            // PETICIÓN AL BACKEND (Ruta relativa, sin IP fija)
+            const res = await fetch('/listings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') // Token de seguridad
                 },
-                credentials: 'include', // ¡IMPORTANTE! Envía la sesión del usuario
                 body: JSON.stringify(payload)
             });
 
             if(res.ok) {
                 alert("¡Excelente! Tu carta ya está a la venta.");
-                window.location.href = "/dashboard"; 
+                window.location.href = "/dashboard"; // Redirigir al perfil
             } else {
-                // Si falla (ej: 401), intentamos leer el mensaje
                 const error = await res.json().catch(() => ({}));
+                console.error("Error backend:", error); // Para depurar en consola
                 
                 if (res.status === 401) {
-                    alert("Tu sesión ha caducado. Por favor, identifícate de nuevo.");
+                    alert("Tu sesión ha caducado. Loguéate de nuevo.");
                     window.location.href = "/login";
+                } else if (res.status === 422) {
+                    // Error de validación de Laravel
+                    alert("Faltan datos o son incorrectos. Revisa el formulario.");
                 } else {
-                    alert("Error: " + (error.message || "No se pudo publicar."));
+                    alert("Ocurrió un error al publicar: " + (error.message || "Desconocido"));
                 }
             }
         } catch(e) {
             console.error(e);
-            alert("Error de conexión con el servidor (" + API_URL + ").");
+            alert("Error de red. No se pudo conectar con el servidor.");
         } finally {
             publishBtn.disabled = false;
             publishBtn.innerText = "Publicar en el Mercado";

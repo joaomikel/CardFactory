@@ -182,7 +182,7 @@
                     <div class="sales-text">Productos disponibles</div>
                 </div>
 
-                <a href="/vender.html" class="btn-products">
+                <a href="{{ route('vender') }}" class="btn-products">
                     <i class="fas fa-box-open" style="margin-right: 8px;"></i> Publicar Nuevo Producto
                 </a>
 
