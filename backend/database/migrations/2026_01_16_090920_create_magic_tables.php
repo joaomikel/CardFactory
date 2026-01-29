@@ -24,8 +24,7 @@ return new class extends Migration
             $table->string('scryfall_id')->nullable();
             $table->string('image_url');
             $table->string('rarity');
-            $table->foreignId('set_id')->constrained('sets')->onDelete('cascade');
-            $table->timestamps();
+            $table->foreignId('set_id')->nullable()->constrained('sets')->onDelete('cascade');            $table->timestamps();
         });
 
         // 3. Tabla de VENTAS/LISTINGS

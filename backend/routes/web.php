@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CatalogController;
 use App\Models\Listing;
-use App\Models\Card; 
+use App\Models\Card;
+use App\Models\Set; // Importante: Importamos el modelo Set
 
 /*
 |--------------------------------------------------------------------------
@@ -45,57 +46,66 @@ Route::get('/carta', function () {
 
 // --- ZONA DE VENTAS ---
 
-// 1. Mostrar el formulario
 Route::get('/vender', function () {
     return view('vender');
 })->middleware(['auth'])->name('vender');
 
-// 2. Procesar la venta
 Route::post('/listings', function (Request $request) {
     
-    // Validamos los datos que vienen del formulario
-    $validated = $request->validate([
-        'scryfall_id' => 'required|string',
-        'card_name'   => 'required|string',
-        'image_url'   => 'required|string',
-        'price'       => 'required|numeric|min:0.5',
-        'condition'   => 'required|string',
-        'is_foil'     => 'boolean',
-    ]);
+    // 1. Envolvemos todo en try-catch para ver el error si falla
+    try {
+        $validated = $request->validate([
+            'scryfall_id' => 'required|string',
+            'card_name'   => 'required|string',
+            'image_url'   => 'required|string',
+            'price'       => 'required|numeric|min:0.5',
+            'condition'   => 'required|string',
+            'is_foil'     => 'boolean',
+        ]);
 
-    // A. BUSCAR O CREAR LA CARTA
-    // Adaptado a tu Card.php que pide 'rarity' y 'set_id'
-    $card = Card::firstOrCreate(
-        ['scryfall_id' => $validated['scryfall_id']], 
-        [
-            'name' => $validated['card_name'],       
-            'image_url' => $validated['image_url'],
-            
-            // NUEVO: Valores por defecto para que no falle tu modelo Card
-            'rarity' => 'unknown', // Ponemos un valor genérico si no lo sabemos
-            'set_id' => null       // IMPORTANTE: Asegúrate de que tu columna 'set_id' en la BD acepte NULL
-        ]
-    );
+        $defaultSet = Set::firstOrCreate(
+            ['code' => 'GEN'], // Buscamos por código 'GEN'
+            [
+                'name' => 'General / Desconocido',
+                'code' => 'GEN',
+                'icon_svg' => null // Asumiendo que es nullable, si no, pon ''
+            ]
+        );
 
-    // B. CREAR EL ANUNCIO (LISTING)
-    $listing = new Listing();
-    $listing->user_id = Auth::id(); 
-    $listing->card_id = $card->id;
-    
-    // NUEVO: Tu modelo Listing pide scryfall_id también
-    $listing->scryfall_id = $validated['scryfall_id'];
-    
-    $listing->price = $validated['price'];
-    $listing->condition = $validated['condition'];
-    $listing->is_foil = $validated['is_foil'] ?? false;
+        // 2. BUSCAR O CREAR LA CARTA
+        $card = Card::firstOrCreate(
+            ['scryfall_id' => $validated['scryfall_id']], 
+            [
+                'name' => $validated['card_name'],       
+                'image_url' => $validated['image_url'],
+                'rarity' => 'unknown', 
+                'set_id' => $defaultSet->id 
+            ]
+        );
 
-    // NUEVO: Tu modelo Listing pide quantity y language
-    $listing->quantity = 1;       // Por defecto vendemos 1 unidad
-    $listing->language = 'en';    // Por defecto inglés (o puedes poner 'es')
+        // 3. CREAR EL ANUNCIO
+        $listing = new Listing();
+        $listing->user_id = Auth::id(); 
+        $listing->card_id = $card->id;
+        $listing->scryfall_id = $validated['scryfall_id'];
+        $listing->price = $validated['price'];
+        $listing->condition = $validated['condition'];
+        $listing->is_foil = $validated['is_foil'] ?? false;
+        $listing->quantity = 1;
+        $listing->language = 'en';
 
-    $listing->save();
+        $listing->save();
 
-    return response()->json(['message' => '¡Carta publicada con éxito!']);
+        return response()->json(['message' => '¡Carta publicada con éxito!']);
+
+    } catch (\Exception $e) {
+        // Si falla, devolvemos el error exacto al navegador
+        return response()->json([
+            'message' => 'Error: ' . $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ], 500);
+    }
 
 })->middleware(['auth']); 
 
