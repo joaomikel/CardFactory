@@ -27,39 +27,38 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+// Asegúrate de importar Validator arriba del todo:
+    // use Illuminate\Support\Facades\Validator; 
+
     public function store(Request $request)
     {
-        // 1. AÑADIR VALIDACIONES PARA APELLIDO Y TELÉFONO
+        // 1. Validar
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'], // <--- NUEVO
-            'phone' => ['required', 'string', 'max:20'],      // <--- NUEVO
+            'last_name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:20'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // 2. AÑADIR LOS CAMPOS A LA CREACIÓN DEL USUARIO
+        // 2. Crear Usuario
         $user = User::create([
             'name' => $request->name,
-            'surname' => $request->last_name, // <--- NUEVO
-            'phone' => $request->phone,         // <--- NUEVO
+            'surname' => $request->last_name, 
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
-
         Auth::login($user);
 
-        // Lógica JSON para API (App Móvil o SPA)
-        if ($request->wantsJson()) {
-            $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->json([
-                'token' => $token,
-                'user' => $user,
-            ]);
-        }
-
-        return redirect(route('dashboard', absolute: false));
+        // 3. RESPUESTA JSON (La clave para tu idea)
+        return response()->json([
+            'status' => 'success',
+            'user_name' => $user->name,
+            'visual_token' => 'sesion_activa_' . time(), // Token inventado
+            'redirect_url' => route('dashboard', absolute: false)
+        ]);
     }
 }

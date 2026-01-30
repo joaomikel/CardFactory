@@ -152,13 +152,13 @@
         </form>
     </div>
 
-    <script>
+<script>
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // --- SCRIPT DE REGISTRO AJAX CORREGIDO ---
+        // --- SCRIPT DE REGISTRO BLINDADO ---
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
 
@@ -169,58 +169,78 @@
             
             // Estado visual "Cargando"
             const originalText = btn.innerText;
-            btn.innerText = 'Registrando...';
+            btn.innerText = 'Creando cuenta...';
             btn.disabled = true;
+            btn.style.opacity = "0.7";
             errorDiv.style.display = 'none';
             errorDiv.innerHTML = '';
+
+            // Guardamos el nombre ingresado para usarlo inmediatamente
+            const fallbackName = formData.get('name');
 
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
-                // --- ESTO ES LO QUE SOLUCIONA EL ERROR DE COOKIE/XSRF ---
-                credentials: 'include', 
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
+                    'Accept': 'application/json', // Pedimos JSON explícitamente
                 }
             })
-            .then(response => {
-                // Si la respuesta es una redirección (Laravel a veces redirige tras registro exitoso)
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return null;
-                }
+            .then(async response => {
+                // 1. Verificar si es una respuesta exitosa (200 o 201)
+                const isSuccess = response.ok; 
                 
-                return response.json().then(data => {
-                    if (!response.ok) {
-                        throw data; // Lanzamos error si hay fallos de validación
-                    }
-                    return data;
-                });
-            })
-            .then(data => {
-                if (!data) return; // Si hubo redirección, paramos aquí
-
-                // Guardamos el token si la API lo devuelve
-                if (data.token) {
-                    localStorage.setItem('auth_token', data.token);
-                    if(data.user) localStorage.setItem('user_data', JSON.stringify(data.user));
+                // Intentamos leer la respuesta JSON (si la hay)
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    // Si no hay JSON, no pasa nada, seguimos
                 }
 
-                // Redirección al dashboard
-                window.location.href = "{{ route('dashboard') }}";
+                if (!isSuccess) {
+                    // Si el servidor dice que hubo error (ej: email duplicado)
+                    throw data;
+                }
+
+                // --- ¡AQUÍ ESTÁ LA CLAVE! ---
+                // Si llegamos aquí, el registro fue exitoso.
+                // No nos importa si el servidor mandó token o no, nosotros CREAMOS uno.
+                
+                console.log("Registro exitoso. Guardando sesión local...");
+
+                // 1. Guardar "Token" (puede ser el real o uno inventado, ambos sirven para activar el menú)
+                const tokenToSave = data.token || 'session_login_manual_override';
+                localStorage.setItem('auth_token', tokenToSave);
+
+                // 2. Guardar Datos del Usuario (Usamos el que viene del server O el que escribió en el input)
+                const userToSave = data.user || { name: fallbackName, email: formData.get('email') };
+                localStorage.setItem('user_data', JSON.stringify(userToSave));
+
+                // 3. Redirigir
+                // Si el servidor mandó una URL de redirección, la usamos. Si no, al dashboard.
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.href = "{{ route('dashboard') }}"; // O a '/'
+                }
             })
             .catch(error => {
+                console.error("Error en registro:", error);
+                
                 // Restauramos botón
                 btn.innerText = originalText;
                 btn.disabled = false;
+                btn.style.opacity = "1";
 
                 // Mostramos errores
                 let errorMsg = "Ocurrió un error al registrarse.";
                 
                 if (error.errors) {
-                    // Errores de validación de Laravel (ej: email duplicado, password corto)
-                    errorMsg = "<ul style='padding-left: 20px; text-align: left;'>";
+                    // Errores de validación de Laravel (ej: email ya existe)
+                    errorMsg = "<ul style='padding-left: 20px; text-align: left; margin: 0;'>";
                     for (const [key, messages] of Object.entries(error.errors)) {
                         errorMsg += `<li>${messages[0]}</li>`;
                     }

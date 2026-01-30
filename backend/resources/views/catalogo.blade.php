@@ -52,7 +52,7 @@
         .tag-aa { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- HEADER ESTILO INICIO --- */
+        /* --- HEADER --- */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             height: 70px;
@@ -221,7 +221,7 @@
         .card-info h3 { font-size: 0.9rem; color: var(--dark); margin-bottom: 8px; line-height: 1.3; }
         .card-price { color: var(--primary); font-weight: 800; font-size: 1.1rem; }
 
-        /* --- FOOTER (ESTILO INDEX OSCURO) --- */
+        /* --- FOOTER --- */
         footer { margin-top: auto; background: #2b2440; color: var(--text-light); padding-top: 60px; }
         .footer-content {
             display: grid; grid-template-columns: 1fr; gap: 40px;
@@ -295,9 +295,7 @@
 
     <header>
         <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">☰</button>
-        
         <div class="header-title">Catálogo</div>
-
         <div class="auth-actions" id="auth-container">
             <a href="/login" class="btn-header btn-login">Login</a>
             <a href="/register" class="btn-header btn-register">Registro</a>
@@ -391,8 +389,7 @@
                 <ul class="footer-links">
                     <li><a href="/catalogo">Catálogo Completo</a></li>
                     <li><a href="/colecciones">Ver Colecciones</a></li>
-                    <li><a href="/login">Acceso Login</a></li>
-                    <li><a href="javascript:void(0)" onclick="openAccModal()" style="color: var(--focus-ring);">Declaración de Accesibilidad</a></li>
+                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li> <li><a href="javascript:void(0)" onclick="openAccModal()" style="color: var(--focus-ring);">Declaración de Accesibilidad</a></li>
                 </ul>
             </div>
         </div>
@@ -404,11 +401,15 @@
     <script>
         // 1. Alternar Menú Lateral
         function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if(sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
         }
 
-        // 2. MODAL ACCESIBILIDAD (NUEVO)
+        // 2. MODAL ACCESIBILIDAD
         function openAccModal() {
             document.getElementById('acc-modal').classList.add('active');
         }
@@ -416,46 +417,80 @@
             document.getElementById('acc-modal').classList.remove('active');
         }
 
-        // 3. Verificar Login
+        // 3. LOGICA DE LOGIN (BLINDADA)
         function checkLoginStatus() {
-            const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-            const authContainer = document.getElementById('auth-container');
+            console.log("Comprobando sesión..."); // Para depuración
+
+            // Recuperamos el token
+            const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
             
-            let userData = { name: 'Usuario' };
+            // Referencias al DOM
+            const authContainer = document.getElementById('auth-container');
+            const linkSidebar = document.getElementById('link-perfil-sidebar');
+            const footerLoginLink = document.getElementById('footer-login-link');
+            
+            // Intentamos leer los datos del usuario de forma segura
+            let userData = {};
+            let userName = "Mi Perfil"; 
+
             try {
-                const storedUser = localStorage.getItem('user_data');
-                if (storedUser) userData = JSON.parse(storedUser);
-            } catch (e) { console.log('Error parseando user data'); }
+                const storedUser = localStorage.getItem('user_data') || sessionStorage.getItem('user_data');
+                if (storedUser) {
+                    userData = JSON.parse(storedUser);
+                    // Si existe el nombre, lo usamos, si no, "Usuario"
+                    if (userData && userData.name) {
+                        userName = String(userData.name).split(' ')[0]; // Solo el primer nombre
+                    }
+                }
+            } catch (e) { 
+                console.error('Error leyendo datos de usuario:', e); 
+            }
 
-            if (token && authContainer) {
-                // ESTÁ LOGUEADO: Mostrar Widget de Perfil
-                const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
-                
-                authContainer.innerHTML = `
-                    <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <span class="profile-name">${userName}</span>
-                    </a>
-                `;
+            if (token) {
+                console.log("Usuario LOGUEADO detectado:", userName);
 
-                // Actualizar Sidebar
-                const linkSidebar = document.getElementById('link-perfil-sidebar');
-                if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
+                // --- ACTUALIZAR HEADER (Icono Usuario) ---
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="profile-name">${userName}</span>
+                        </a>
+                    `;
+                }
 
-            } else if (authContainer) {
-                // NO ESTÁ LOGUEADO
-                authContainer.innerHTML = `
-                    <a href="/login" class="btn-header btn-login">Login</a>
-                    <a href="/register" class="btn-header btn-register">Registro</a>
-                `;
+                // --- ACTUALIZAR SIDEBAR ---
+                if(linkSidebar) {
+                    linkSidebar.innerHTML = `Hola, ${userName} <i class="fas fa-check-circle" style="font-size:0.8rem; margin-left:5px; color:#4ade80;"></i>`;
+                    linkSidebar.href = "/dashboard";
+                    linkSidebar.style.color = "var(--primary)";
+                }
+
+                // --- ACTUALIZAR FOOTER ---
+                if(footerLoginLink) {
+                    footerLoginLink.textContent = "Ir a mi Perfil";
+                    footerLoginLink.href = "/dashboard";
+                }
+
+            } else {
+                console.log("Usuario NO logueado");
+                // Aseguramos que se vean los botones de Login/Registro si no hay token
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/login" class="btn-header btn-login">Login</a>
+                        <a href="/register" class="btn-header btn-register">Registro</a>
+                    `;
+                }
             }
         }
 
         // 4. Lógica del Catálogo
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
+            if(!grid) return;
+            
             grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--secondary);"><i class="fas fa-circle-notch fa-spin"></i> Cargando cartas...</p>';
 
             try {
@@ -469,7 +504,15 @@
                 }
 
                 grid.innerHTML = data.data.map(card => {
-                    const img = card.image_uris?.normal || (card.card_faces ? card.card_faces[0].image_uris.normal : 'https://via.placeholder.com/488x680?text=No+Img');
+                    // Manejo seguro de imágenes
+                    let img = 'https://via.placeholder.com/488x680?text=No+Img';
+                    if (card.image_uris && card.image_uris.normal) {
+                        img = card.image_uris.normal;
+                    } else if (card.card_faces && card.card_faces[0].image_uris) {
+                        img = card.card_faces[0].image_uris.normal;
+                    }
+
+                    // Manejo seguro de precios
                     const price = card.prices.eur ? `${card.prices.eur} €` : (card.prices.usd ? `${card.prices.usd} $` : 'Sin Stock');
                     
                     return `
@@ -483,7 +526,7 @@
                 `}).join('');
             } catch (error) {
                 console.error(error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio o hubo un error.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio.</p>';
             }
         }
 
@@ -498,7 +541,6 @@
 
             if (name) queryParts.push(name.trim());
             
-            // Si no hay filtros, por defecto busca standard
             if (!set && !name && !color && !rarity && !cmc) {
                 fetchCards('f:standard');
                 return;
@@ -516,12 +558,16 @@
             fetchCards(queryParts.join(' '));
         }
 
-        document.getElementById('search-name').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') applyFilters();
-        });
+        const searchInput = document.getElementById('search-name');
+        if(searchInput){
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') applyFilters();
+            });
+        }
 
-        // 5. Inicialización
+        // 5. Inicialización (IMPORTANTE)
         document.addEventListener('DOMContentLoaded', () => {
+            // Ejecutamos la comprobación de sesión inmediatamente
             checkLoginStatus();
 
             const params = new URLSearchParams(window.location.search);
@@ -529,10 +575,11 @@
             const setParam = params.get('set');
 
             if (qParam) {
-                document.getElementById('search-name').value = qParam;
+                if(searchInput) searchInput.value = qParam;
                 fetchCards(qParam);
             } else if (setParam) {
-                document.getElementById('set').value = setParam;
+                const setSelect = document.getElementById('set');
+                if(setSelect) setSelect.value = setParam;
                 fetchCards(`s:${setParam}`);
             } else {
                 fetchCards('f:standard');
