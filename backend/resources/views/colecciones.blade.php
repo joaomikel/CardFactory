@@ -436,8 +436,9 @@
             if (token && authContainer) {
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
                 
+                // AQUÍ ESTABA EL ERROR: Cambiamos "dashboard.html" por "/dashboard"
                 authContainer.innerHTML = `
-                    <a href="dashboard.html" class="user-profile-widget" title="Ir a mi perfil">
+                    <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
                         </div>
