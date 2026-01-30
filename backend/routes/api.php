@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http; 
 use App\Http\Controllers\Api\ListingController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CatalogController; 
 use App\Models\Card;
 use App\Models\Listing;
 
@@ -19,7 +20,8 @@ Route::get('/tendencias', function () {
 
 // 1. Ver cartas por ID de Scryfall 
 Route::get('/listings/card/{scryfall_id}', [ListingController::class, 'getByCard']);
-
+// 1.1 Ver cartas de Listings
+Route::post('/check-stock-batch', [CatalogController::class, 'checkStockBatch']);
 // 2. Buscar vendedores de una carta
 Route::get('/sellers/{scryfall_id}', function ($scryfall_id) {
     $localCard = Card::where('scryfall_id', $scryfall_id)->first();
@@ -64,3 +66,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // CREAR UNA VENTA
     Route::post('/listings', [ListingController::class, 'store']);
 });
+

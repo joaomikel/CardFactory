@@ -487,24 +487,60 @@
         }
 
         // 4. Lógica del Catálogo
+       // --- NUEVA LÓGICA: CRUCE DE DATOS SCRYFALL VS BASE DE DATOS LOCAL ---
+
+        // 1. Función para consultar tu Backend (Simulada)
+        // Esta función toma un array de IDs de Scryfall y pregunta a tu servidor si hay ventas.
+        async function checkLocalStock(scryfallIds) {
+            try {
+                // NOTA: Aquí debes poner la URL de tu API real que consulta la tabla 'listings'
+                // Tu backend debería esperar un JSON { ids: [...] } y devolver un objeto { "uuid-carta": precio_minimo, ... }
+                // Ejemplo de respuesta esperada del backend: { "b029c...": 19.50, "a1b2...": 5.00 }
+                
+                const response = await fetch('/api/check-stock-batch', { // <--- CAMBIA ESTO POR TU RUTA REAL
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: scryfallIds })
+                });
+
+                if (!response.ok) return {}; // Si falla, asumimos que no hay stock
+                return await response.json();
+
+            } catch (error) {
+                console.error("Error consultando stock local:", error);
+                return {}; // En caso de error, devolvemos objeto vacío (todo saldrá Sin Stock)
+            }
+        }
+
+        // 2. Función fetchCards Modificada
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
             if(!grid) return;
             
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--secondary);"><i class="fas fa-circle-notch fa-spin"></i> Cargando cartas...</p>';
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--secondary);"><i class="fas fa-circle-notch fa-spin"></i> Buscando cartas y comprobando stock...</p>';
 
             try {
+                // PASO A: Buscar en Scryfall (Como hacías antes)
                 const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
-                if (!res.ok) throw new Error('Error API');
+                if (!res.ok) throw new Error('Error API Scryfall');
                 const data = await res.json();
                 
                 if(!data.data || data.data.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados.</p>';
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados en Scryfall.</p>';
                     return;
                 }
 
+                // PASO B: Recolectar IDs para comprobar stock local
+                const scryfallIds = data.data.map(card => card.id);
+
+                // PASO C: Consultar a TU base de datos (Listings)
+                // Aquí llamamos a la función que creamos arriba. 
+                // Si aún no tienes el backend listo, esto devolverá {} y todo saldrá "Sin Stock" (lo cual es correcto según tu lógica).
+                const localStockData = await checkLocalStock(scryfallIds);
+
+                // PASO D: Renderizar mezclando datos
                 grid.innerHTML = data.data.map(card => {
-                    // Manejo seguro de imágenes
+                    // Manejo de imagen
                     let img = 'https://via.placeholder.com/488x680?text=No+Img';
                     if (card.image_uris && card.image_uris.normal) {
                         img = card.image_uris.normal;
@@ -512,21 +548,41 @@
                         img = card.card_faces[0].image_uris.normal;
                     }
 
-                    // Manejo seguro de precios
-                    const price = card.prices.eur ? `${card.prices.eur} €` : (card.prices.usd ? `${card.prices.usd} $` : 'Sin Stock');
+                    // --- LÓGICA DE PRECIO CRÍTICA ---
+                    // Buscamos si el ID de esta carta existe en la respuesta de tu backend
+                    const localPrice = localStockData[card.id]; 
                     
+                    let priceHtml = '';
+                    let stockClass = '';
+
+                    if (localPrice !== undefined && localPrice !== null) {
+                        // SI hay stock en listings: Mostramos TU precio
+                        priceHtml = `${parseFloat(localPrice).toFixed(2)} €`;
+                        stockClass = 'in-stock'; 
+                    } else {
+                        // NO hay stock en listings: Ignoramos precio Scryfall, ponemos Sin Stock
+                        priceHtml = 'Sin Stock';
+                        stockClass = 'out-of-stock';
+                    }
+                    
+                    // Estilo dinámico para el precio
+                    const priceStyle = stockClass === 'out-of-stock' 
+                        ? 'color: #999; font-size: 0.9rem; font-weight: normal;' 
+                        : 'color: var(--primary); font-weight: 800; font-size: 1.1rem;';
+
                     return `
                     <a href="/carta?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
                         <img src="${img}" loading="lazy" alt="${card.name}">
                         <div class="card-info">
                             <h3>${card.name}</h3>
-                            <p class="card-price">${price}</p>
+                            <p class="card-price" style="${priceStyle}">${priceHtml}</p>
                         </div>
                     </a>
                 `}).join('');
+
             } catch (error) {
                 console.error(error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">No hemos encontrado cartas con ese criterio.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">Ocurrió un error al cargar el catálogo.</p>';
             }
         }
 
