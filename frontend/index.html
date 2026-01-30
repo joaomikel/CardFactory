@@ -665,30 +665,59 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             }
         }
 
+        // --- CORRECCIÓN AQUÍ: CAMBIO A SESSION STORAGE ---
         function checkLoginStatus() {
-            const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+            // 1. LIMPIEZA: Si hay rastros antiguos en localStorage, los borramos para evitar conflictos
+            if (localStorage.getItem('auth_token')) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+            }
+
+            // 2. LECTURA: Leemos de sessionStorage (Memoria que se borra al cerrar navegador)
+            const token = sessionStorage.getItem('auth_token');
+            
             const authContainer = document.getElementById('auth-container');
             const footerLoginLink = document.getElementById('footer-login-link');
+            
             let userData = { name: 'Usuario' };
             try {
-                const storedUser = localStorage.getItem('user_data');
+                const storedUser = sessionStorage.getItem('user_data'); // Cambiado a sessionStorage
                 if (storedUser) userData = JSON.parse(storedUser);
             } catch (e) {}
 
             if (token) {
+                // ESTÁ LOGUEADO
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
+                
                 if (authContainer) {
                     authContainer.innerHTML = `
-                        <a href="/dashboard" class="user-profile-widget" aria-label="Ver perfil de ${userName}"><div class="profile-avatar"><i class="fas fa-user"></i></div><span class="profile-name">${userName}</span></a>`;
+                        <a href="/dashboard" class="user-profile-widget" aria-label="Ver perfil de ${userName}">
+                            <div class="profile-avatar"><i class="fas fa-user"></i></div>
+                            <span class="profile-name">${userName}</span>
+                        </a>`;
                 }
+                
                 const linkSidebar = document.getElementById('link-perfil-sidebar');
-                if(linkSidebar) { linkSidebar.innerHTML = `Hola, ${userName}`; linkSidebar.href = "/dashboard"; }
-                if (footerLoginLink) { footerLoginLink.textContent = "Mi Perfil"; footerLoginLink.href = "/dashboard"; }
-            } else {
-                if (authContainer) {
-                    authContainer.innerHTML = `<a href="/login" class="btn-header btn-login">Login</a><a href="/register" class="btn-header btn-register">Registro</a>`;
+                if(linkSidebar) { 
+                    linkSidebar.innerHTML = `Hola, ${userName}`; 
+                    linkSidebar.href = "/dashboard"; 
                 }
-                if (footerLoginLink) { footerLoginLink.textContent = "Login"; footerLoginLink.href = "/login"; }
+                
+                if (footerLoginLink) { 
+                    footerLoginLink.textContent = "Mi Perfil"; 
+                    footerLoginLink.href = "/dashboard"; 
+                }
+            } else {
+                // NO ESTÁ LOGUEADO
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/login" class="btn-header btn-login">Login</a>
+                        <a href="/register" class="btn-header btn-register">Registro</a>`;
+                }
+                if (footerLoginLink) { 
+                    footerLoginLink.textContent = "Login"; 
+                    footerLoginLink.href = "/login"; 
+                }
             }
         }
 
@@ -696,7 +725,6 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             const img = card.image_uris?.normal || (card.card_faces && card.card_faces[0]?.image_uris?.normal) || 'https://via.placeholder.com/488x680?text=No+Image';
             let finalPrice = card.prices?.eur ? `${card.prices.eur} €` : (card.prices?.usd ? `${card.prices.usd} $` : 'Sin Stock');
             
-            // Link actualizado a ruta /carta, Nginx se encarga del proxy
             return `
                 <a href="/carta?id=${card.id}" class="card-item" style="text-decoration:none; color:inherit; animation: fadeIn 0.5s ease;" aria-label="${card.name}, precio ${finalPrice}">
                     <img src="${img}" alt="" role="presentation" crossorigin="anonymous" loading="lazy">
@@ -716,14 +744,13 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                 const data = await res.json();
                 const cards = data.data || [];
                 if (cards.length > 0) {
-                    const displayCards = cards.sort(() => 0.5 - Math.random()).slice(0, numCards);             
+                    const displayCards = cards.sort(() => 0.5 - Math.random()).slice(0, numCards);            
                     container.innerHTML = displayCards.map(createCardHTML).join('');
                 } else {
                     container.innerHTML = '<p>No se encontraron cartas.</p>';
                 }
             } catch (error) {
                 console.error('Error cargando cartas:', error);
-                // Fallback visual si falla la carga para no dejarlo roto
                 container.innerHTML = '<p>Error de conexión temporal.</p>';
             } finally {
                 container.setAttribute('aria-busy', 'false');
@@ -732,32 +759,19 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 
         async function loadReviews() {
             const container = document.getElementById('reviews-container');
-            
             try {
-                // 1. Llamada a la API
                 const res = await fetch('/api/reviews'); 
-                
                 if (!res.ok) throw new Error('Error HTTP: ' + res.status);
-                
-                // 2. Obtener datos
                 const data = await res.json();
-                
-                // Laravel a veces devuelve array directo [...] o paginado { data: [...] }
-                // Esto maneja ambos casos:
                 const reviews = Array.isArray(data) ? data : (data.data || []);
                 
-                console.log("Reseñas recibidas:", reviews); // Míralo en la consola del navegador (F12)
-
                 if (reviews.length === 0) {
                     container.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Aún no hay reseñas.</p>';
                     return;
                 }
 
-                // 3. Generar HTML usando TUS campos del modelo (name, text, img)
                 container.innerHTML = reviews.map(r => {
-                    // Si el campo img viene vacío, usamos ui-avatars como fallback
                     const avatarUrl = r.img ? r.img : `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name)}&background=random`;
-                    
                     return `
                         <div class="review-card" style="animation: fadeIn 0.8s ease;">
                             <img src="${avatarUrl}" class="avatar" alt="Avatar de ${r.name}">
@@ -774,14 +788,24 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                 container.innerHTML = '<p style="text-align: center; color: red;">Error al cargar reseñas.</p>';
             }
         }
+
         async function enviarReview() {
-            const name = document.getElementById('reviewName').value;
-            const text = document.getElementById('reviewText').value;
+            const nameInput = document.getElementById('reviewName');
+            const textInput = document.getElementById('reviewText');
+            
+            const name = nameInput.value.trim();
+            const text = textInput.value.trim();
 
             if (!name || !text) {
                 alert("Por favor completa ambos campos");
                 return;
             }
+
+            // Feedback visual de carga
+            const btn = document.querySelector('.btn-submit-review');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Enviando...';
+            btn.disabled = true;
 
             try {
                 const res = await fetch('/api/reviews', {
@@ -795,10 +819,8 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 
                 if (res.ok) {
                     alert("¡Gracias por tu reseña!");
-                    // Limpiamos los campos
-                    document.getElementById('reviewName').value = '';
-                    document.getElementById('reviewText').value = '';
-                    // Recargamos las reviews para que salga la nueva
+                    nameInput.value = '';
+                    textInput.value = '';
                     loadReviews(); 
                 } else {
                     alert("Hubo un error al guardar.");
@@ -806,12 +828,15 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
             } catch (error) {
                 console.error(error);
                 alert("Error de conexión");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
+
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
-            // Nginx redirigirá /catalogo a tu backend
             if (query) window.location.href = `/catalogo?q=${encodeURIComponent(query)}`;
             else window.location.href = '/catalogo';
         }
@@ -819,12 +844,10 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         function handleEnter(e) { if (e.key === 'Enter') performSearch(); }
 
         window.onload = () => {
-            checkLoginStatus(); 
-            // Cargas iniciales
+            checkLoginStatus(); // Verificar sesión al cargar
             loadCards('/api/trending', 'trending-container', 18);
             loadCards('/api/lorwyn', 'lorwyn-container', 4);
-            loadReviews(); // Ahora llama a la API real
-            
+            loadReviews(); 
             setInterval(() => { loadCards('/api/trending', 'trending-container', 18); }, 30000); 
         };
 

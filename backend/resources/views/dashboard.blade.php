@@ -235,12 +235,15 @@
     <script>
         // Escuchamos cuando el usuario envía el formulario de cerrar sesión
         document.getElementById('logoutForm').addEventListener('submit', function() {
-            // BORRAMOS EL TOKEN DEL NAVEGADOR
-            // Esto hace que el carrito sepa que ya no hay nadie logueado
+            // BORRAMOS EL TOKEN DE AMBOS ALMACENAMIENTOS
+            // Esto asegura que se limpie SessionStorage (nuevo) y LocalStorage (viejo/seguridad)
+            sessionStorage.removeItem('auth_token');
+            sessionStorage.removeItem('user_data');
+            
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_data');
             
-            console.log("Sesión local eliminada. El carrito ahora está bloqueado.");
+            console.log("Sesión eliminada por completo.");
         });
 
         $( function() {

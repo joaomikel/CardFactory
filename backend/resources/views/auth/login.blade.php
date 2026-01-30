@@ -144,7 +144,7 @@
     </div>
 
     <script>
-        // --- FUNCIÓN DEL MENÚ (AÑADIDA) ---
+        // --- FUNCIÓN DEL MENÚ ---
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
@@ -178,9 +178,16 @@
             })
             .then(data => {
                 if (data.token) {
-                    localStorage.setItem('auth_token', data.token);
-                    localStorage.setItem('user_data', JSON.stringify(data.user));
+                    // 1. Limpiamos localStorage por si había una sesión antigua "pegada"
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+
+                    // 2. Aquí está la magia: Usamos sessionStorage
+                    // Esto hará que al cerrar la pestaña, la sesión se pierda.
+                    sessionStorage.setItem('auth_token', data.token);
+                    sessionStorage.setItem('user_data', JSON.stringify(data.user));
                 }
+                // Redirigir al dashboard
                 window.location.href = "{{ route('dashboard') }}";
             })
             .catch(error => {
