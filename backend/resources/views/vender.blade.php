@@ -191,9 +191,9 @@
         };
 
         try {
-            console.log("Enviando:", payload); // Debug
+            console.log("Enviando:", payload); 
 
-            const res = await fetch('/listings', {
+            const res = await fetch("{{ route('listings.store') }}", {                
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

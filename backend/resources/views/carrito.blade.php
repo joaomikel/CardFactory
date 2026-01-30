@@ -182,9 +182,6 @@
             // 1. Validación básica: Carrito vacío
             if(cart.length === 0) return alert("El carrito está vacío.");
             
-            // --- NUEVA LÓGICA DE LOGIN ---
-            // Intentamos recuperar el token o dato que indica que está logueado.
-            // (Asegúrate de que tu Login guarde esto como 'auth_token' o similar)
             const token = localStorage.getItem('auth_token'); 
 
             // Si NO hay token (es null), es que no está logueado

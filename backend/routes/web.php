@@ -7,7 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CatalogController;
 use App\Models\Listing;
 use App\Models\Card;
-use App\Models\Set; // Importante: Importamos el modelo Set
+use App\Models\Set; 
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ Route::post('/listings', function (Request $request) {
             [
                 'name' => 'General / Desconocido',
                 'code' => 'GEN',
-                'icon_svg' => null // Asumiendo que es nullable, si no, pon ''
+                'icon_svg' => null 
             ]
         );
 
@@ -99,7 +99,6 @@ Route::post('/listings', function (Request $request) {
         return response()->json(['message' => '¡Carta publicada con éxito!']);
 
     } catch (\Exception $e) {
-        // Si falla, devolvemos el error exacto al navegador
         return response()->json([
             'message' => 'Error: ' . $e->getMessage(),
             'file' => $e->getFile(),
@@ -107,6 +106,6 @@ Route::post('/listings', function (Request $request) {
         ], 500);
     }
 
-})->middleware(['auth']); 
+})->middleware(['auth'])->name('listings.store'); 
 
 require __DIR__.'/auth.php';
