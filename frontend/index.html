@@ -668,59 +668,72 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 
         // --- CORRECCIÓN AQUÍ: CAMBIO A SESSION STORAGE ---
         function checkLoginStatus() {
-            // 1. LIMPIEZA: Si hay rastros antiguos en localStorage, los borramos para evitar conflictos
-            if (localStorage.getItem('auth_token')) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_data');
-            }
+        // CORRECCIÓN: No borramos nada. Buscamos en ambos sitios.
+        // Prioridad: 1. SessionStorage, 2. LocalStorage
+        const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+        let storedUser = sessionStorage.getItem('user_data') || localStorage.getItem('user_data');
+        
+        // Elementos del DOM a modificar
+        const authContainer = document.getElementById('auth-container');
+        const footerLoginLink = document.getElementById('footer-login-link');
+        const linkSidebar = document.getElementById('link-perfil-sidebar');
+        
+        // Intentar leer datos del usuario
+        let userData = { name: 'Usuario' };
+        try {
+            if (storedUser) userData = JSON.parse(storedUser);
+        } catch (e) { console.error("Error parseando usuario", e); }
 
-            // 2. LECTURA: Leemos de sessionStorage (Memoria que se borra al cerrar navegador)
-            const token = sessionStorage.getItem('auth_token');
+        if (token) {
+            // --- USUARIO LOGUEADO ---
+            console.log("Usuario detectado:", userData.name);
+            const userName = userData.name ? userData.name.split(' ')[0] : 'Mi Cuenta';
             
-            const authContainer = document.getElementById('auth-container');
-            const footerLoginLink = document.getElementById('footer-login-link');
-            
-            let userData = { name: 'Usuario' };
-            try {
-                const storedUser = sessionStorage.getItem('user_data'); // Cambiado a sessionStorage
-                if (storedUser) userData = JSON.parse(storedUser);
-            } catch (e) {}
-
-            if (token) {
-                // ESTÁ LOGUEADO
-                const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
-                
-                if (authContainer) {
-                    authContainer.innerHTML = `
-                        <a href="/dashboard" class="user-profile-widget" aria-label="Ver perfil de ${userName}">
+            // 1. Actualizar Header (Botones de arriba)
+            if (authContainer) {
+                authContainer.innerHTML = `
+                        <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
                             <div class="profile-avatar"><i class="fas fa-user"></i></div>
                             <span class="profile-name">${userName}</span>
                         </a>`;
-                }
-                
-                const linkSidebar = document.getElementById('link-perfil-sidebar');
-                if(linkSidebar) { 
-                    linkSidebar.innerHTML = `Hola, ${userName}`; 
-                    linkSidebar.href = "/dashboard"; 
-                }
-                
-                if (footerLoginLink) { 
-                    footerLoginLink.textContent = "Mi Perfil"; 
-                    footerLoginLink.href = "/dashboard"; 
-                }
-            } else {
-                // NO ESTÁ LOGUEADO
-                if (authContainer) {
-                    authContainer.innerHTML = `
-                        <a href="/login" class="btn-header btn-login">Login</a>
-                        <a href="/register" class="btn-header btn-register">Registro</a>`;
-                }
-                if (footerLoginLink) { 
-                    footerLoginLink.textContent = "Login"; 
-                    footerLoginLink.href = "/login"; 
-                }
+            }
+            
+            // 2. Actualizar Sidebar (Menú lateral móvil)
+            if(linkSidebar) { 
+                linkSidebar.innerHTML = `Hola, ${userName}`; 
+                linkSidebar.href = "/dashboard"; 
+                linkSidebar.style.color = "var(--primary)";
+                linkSidebar.style.fontWeight = "bold";
+            }
+            
+            // 3. Actualizar Footer
+            if (footerLoginLink) { 
+                footerLoginLink.textContent = "Mi Perfil"; 
+                footerLoginLink.href = "/dashboard"; 
+            }
+
+        } else {
+            // --- USUARIO NO LOGUEADO (Visitante) ---
+            console.log("No hay sesión activa");
+            
+            if (authContainer) {
+                authContainer.innerHTML = `
+                    <a href="/login" class="btn-header btn-login">Login</a>
+                    <a href="/register" class="btn-header btn-register">Registro</a>`;
+            }
+            
+            if(linkSidebar) { 
+                linkSidebar.textContent = "Login"; 
+                linkSidebar.href = "/login"; 
+                linkSidebar.style.color = ""; // Reset color
+            }
+
+            if (footerLoginLink) {
+                footerLoginLink.textContent = "Acceso Login";
+                footerLoginLink.href = "/login";
             }
         }
+    }
 
         function createCardHTML(card) {
             const img = card.image_uris?.normal || (card.card_faces && card.card_faces[0]?.image_uris?.normal) || 'https://via.placeholder.com/488x680?text=No+Image';
