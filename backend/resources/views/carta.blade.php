@@ -2,171 +2,197 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Detalle de Carta - CardFactory</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #816EB2; /* El Morado Principal */
-            --primary-dark: #6a5a9e;
+        /* --- VARIABLES DEL DISEÑO NUEVO --- */
+        :root {
+            --primary: #816EB2;
+            --primary-dark: #5e4c8d; 
             --secondary: #958EA0;
-            --dark: #111827; 
+            --text-dark: #222;
+            --text-light: #f4f4f4;
             --white: #ffffff;
-            --bg: #f3f4f6; /* Fondo gris claro para el cuerpo */
+            --bg: #f8f9fa;
+            --radius: 16px;
+            --focus-ring: #ffbf00;
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        /* Cuerpo claro para mejor lectura */
-        body { background-color: var(--bg); color: var(--dark); padding-bottom: 100px; }
 
-        /* --- HEADER MORADO --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-dark); 
+            min-height: 100vh; 
+            padding-bottom: 100px; /* Espacio para el carrito flotante */
+        }
+
+        /* --- HEADER NUEVO (ADAPTADO A FONDO SÓLIDO) --- */
         header {
-            background: var(--primary); /* AQUÍ ESTÁ EL FONDO MORADO */
-            height: 60px;
+            background: var(--primary); /* Fondo sólido para que se vean los botones */
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
-            position: sticky;
-            top: 0;
+            position: sticky; /* Sticky para que baje contigo */
+            top: 0; left: 0; right: 0;
             z-index: 100;
-            width: 100%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* Sombra suave */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .menu-trigger { font-size: 1.5rem; background: none; border: none; color: var(--white); cursor: pointer; padding: 5px; }
-        
-        .auth-actions { display: flex; gap: 10px; align-items: center; }
-        
-        /* Botones del Header adaptados al fondo morado */
+        .menu-trigger { 
+            font-size: 1.8rem; background: none; border: none; color: var(--white); 
+            cursor: pointer; padding: 10px; margin-right: auto;
+        }
+
+        .auth-actions { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+
+        /* Botones estilo Glassmorphism del nuevo diseño */
         .btn-header {
-            padding: 6px 14px; border-radius: 20px; font-weight: 600;
-            text-decoration: none; font-size: 0.8rem; transition: 0.3s; white-space: nowrap;
+            padding: 8px 16px; border-radius: 20px; font-weight: 600;
+            text-decoration: none; font-size: 0.85rem; transition: 0.3s; white-space: nowrap;
         }
         .btn-login { 
-            background: rgba(255,255,255,0.2); /* Transparente blanco */
-            color: var(--white); 
-            border: 1px solid rgba(255,255,255,0.4); 
+            background: rgba(255,255,255,0.25); color: var(--white); 
+            border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(4px); 
         }
-        .btn-login:hover { background: rgba(255,255,255,0.3); }
-        
+        .btn-login:hover { background: rgba(255,255,255,0.4); }
+
         .btn-register { 
-            background: var(--dark); /* Oscuro para contraste */
-            color: var(--white); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            background: var(--text-dark); color: var(--white); /* Negro para contraste sobre morado */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none;
         }
-        .btn-register:hover { background: #000; }
+        .btn-register:hover { transform: translateY(-2px); background: #000; }
 
-        /* Widget de Perfil (si está logueado) */
+        /* Widget de Perfil Nuevo */
         .user-profile-widget {
-            display: flex; align-items: center; gap: 8px;
-            color: white; text-decoration: none;
-            background: rgba(0,0,0,0.1); padding: 4px 12px 4px 4px; border-radius: 30px;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255, 255, 255, 0.2); padding: 5px 15px 5px 5px;
+            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px); text-decoration: none; transition: all 0.3s ease; cursor: pointer;
         }
+        .user-profile-widget:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        
         .profile-avatar {
-            width: 28px; height: 28px; background: white; color: var(--primary);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+            width: 32px; height: 32px; background: var(--white); color: var(--primary);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; border: 2px solid rgba(255,255,255,0.8);
         }
+        .profile-name {
+            color: white; font-weight: 600; font-size: 0.9rem;
+            max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: none; 
+        }
+        @media (min-width: 480px) { .profile-name { display: block; } }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR NUEVO --- */
         .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s;
+            backdrop-filter: blur(3px);
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: all; }
-        
+
         .sidebar {
-            position: fixed; top: 0; left: -100%; width: 85%; max-width: 300px; height: 100%;
-            background: var(--white); z-index: 102; padding: 2rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; gap: 1rem; box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
+            background: var(--white); z-index: 102; padding: 2rem; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; gap: 1rem;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
         }
         .sidebar.active { left: 0; }
-        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; }
-        .sidebar a { padding: 15px 10px; font-weight: 500; color: var(--secondary); border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; }
+        .close-sidebar { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; background: none; border: none; color: #666; cursor: pointer;}
+        .sidebar a { padding: 15px 0; border-bottom: 1px solid #eee; color: var(--secondary); text-decoration: none; font-size: 1.1rem; font-weight: 500;}
 
-        /* --- LAYOUT CARTA --- */
-        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+
+        /* --- LAYOUT ESPECÍFICO DE CARTA (MANTENIDO) --- */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         
         .detail-grid {
-            display: grid; grid-template-columns: 1fr; gap: 20px;
-            background: white; padding: 20px; border-radius: 12px;
-            margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: grid; grid-template-columns: 1fr; gap: 30px;
+            background: white; padding: 25px; border-radius: var(--radius);
+            margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         .card-image-large {
-            width: 100%; max-width: 350px; border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%; max-width: 350px; border-radius: 18px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
             margin: 0 auto; display: block;
+            transition: transform 0.3s;
         }
+        .card-image-large:hover { transform: scale(1.02); }
 
-        /* --- RESPONSIVE TABLE --- */
+        /* --- TABLA RESPONSIVE (MANTENIDA Y ESTILIZADA) --- */
         .table-container {
-            background: white; border-radius: 12px; overflow: hidden;
+            background: white; border-radius: var(--radius); overflow: hidden;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
         }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        thead { background-color: var(--dark); color: white; }
-        th { padding: 15px 20px; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-        td { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+        thead { background-color: #2b2440; color: white; } /* Color oscuro del footer nuevo */
+        th { padding: 18px 20px; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+        td { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
 
-        .price-tag { font-weight: 800; color: var(--primary); font-size: 1.1rem; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .badge-foil { background: linear-gradient(135deg, #fceabb 0%,#f8b500 100%); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .price-tag { font-weight: 800; color: var(--primary-dark); font-size: 1.1rem; }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+        .badge-foil { background: linear-gradient(135deg, #fceabb 0%,#f8b500 100%); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         .badge-normal { background: #e5e7eb; color: #666; }
         
         .btn-add { 
-            background: var(--dark); color: white; border: none; 
-            width: 40px; height: 40px; border-radius: 8px; cursor: pointer; 
+            background: var(--text-dark); color: white; border: none; 
+            width: 42px; height: 42px; border-radius: 10px; cursor: pointer; 
             display: flex; align-items: center; justify-content: center; 
-            transition: 0.2s; font-size: 1.1rem;
+            transition: 0.2s; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .btn-add:active { transform: scale(0.9); }
 
-        /* ESTILOS MOBILE FIRST PARA LA TABLA */
         @media (max-width: 768px) {
             thead { display: none; }
             tbody tr {
                 display: block; background: white; margin-bottom: 15px;
                 border: 1px solid #e5e7eb; border-radius: 12px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.03); padding: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.03); padding: 15px;
             }
             td {
                 display: flex; justify-content: space-between; align-items: center;
-                padding: 10px 5px; border-bottom: 1px solid #f3f4f6; text-align: right;
+                padding: 10px 0; border-bottom: 1px solid #f8f9fa; text-align: right;
             }
-            td:last-child { border-bottom: none; justify-content: center; padding-top: 15px; }
+            td:last-child { border-bottom: none; justify-content: center; padding-top: 20px; }
             td::before {
-                content: attr(data-label); font-weight: 600; color: #6b7280;
-                text-align: left; margin-right: 15px; font-size: 0.9rem;
+                content: attr(data-label); font-weight: 700; color: #888;
+                text-align: left; margin-right: 15px; font-size: 0.85rem;
             }
-            .btn-add { width: 100%; height: 45px; font-weight: bold; }
-            .btn-add::after { content: " AÑADIR AL CARRITO"; margin-left: 8px; font-size: 0.9rem; }
+            .btn-add { width: 100%; height: 50px; font-weight: 700; border-radius: 12px; }
+            .btn-add::after { content: " AÑADIR AL CARRITO"; margin-left: 10px; font-size: 0.9rem; }
         }
 
         @media (min-width: 769px) {
             .detail-grid { grid-template-columns: 350px 1fr; padding: 40px; }
             tbody tr { cursor: grab; transition: background-color 0.2s, transform 0.2s; }
-            tbody tr:hover { background-color: #f9fafb; transform: scale(1.01); box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 10; position: relative; }
+            tbody tr:hover { background-color: #f8f9fa; transform: scale(1.005); box-shadow: 0 4px 15px rgba(0,0,0,0.08); z-index: 10; position: relative; }
         }
 
-        /* --- CARRITO FLOTANTE --- */
+        /* --- CARRITO FLOTANTE (MANTENIDO) --- */
         .floating-cart-zone {
-            position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px;
+            position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
             background: var(--primary); border-radius: 50%; 
             display: flex; align-items: center; justify-content: center;
-            color: white; box-shadow: 0 10px 25px rgba(129, 110, 178, 0.4); 
+            color: white; box-shadow: 0 10px 30px rgba(129, 110, 178, 0.5); 
             z-index: 1000; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
+            border: 4px solid white;
         }
+        .floating-cart-zone:hover { transform: scale(1.1); }
         .cart-badge {
-            position: absolute; top: -5px; right: -5px; background: #ff4757; color: white;
-            width: 25px; height: 25px; border-radius: 50%; font-size: 0.8rem; font-weight: bold;
+            position: absolute; top: 0; right: 0; background: #ff4757; color: white;
+            width: 26px; height: 26px; border-radius: 50%; font-size: 0.85rem; font-weight: bold;
             display: flex; align-items: center; justify-content: center; border: 2px solid white;
         }
-        .drag-over-active { transform: scale(1.3); background: #00d2d3; }
+        .drag-over-active { transform: scale(1.3); background: #00d2d3; border-color: #00d2d3; }
         @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
         .pop-anim { animation: pop 0.3s ease; }
         
@@ -178,9 +204,10 @@
 <body>
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
     <div class="sidebar" id="sidebar">
         <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
-        <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
+        <h3 style="color: var(--primary); margin-bottom: 1.5rem; font-weight: 800;">Menú</h3>
         <a href="/">Inicio</a>
         <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
         <a href="/colecciones">Colecciones</a>
@@ -190,7 +217,7 @@
 
     <header>
         <button class="menu-trigger" onclick="toggleMenu()" aria-label="Abrir menú">
-            <i class="fas fa-bars" aria-hidden="true"></i>
+            <i class="fas fa-bars"></i>
         </button>
         
         <div class="auth-actions" id="auth-container">
@@ -198,21 +225,21 @@
     </header>
 
     <main class="container">
-        <div style="margin-bottom: 20px;">
-            <a href="javascript:history.back()" style="color: var(--secondary); text-decoration: none; font-weight: 600;">
-                <i class="fas fa-arrow-left"></i> Volver
+        <div style="margin-bottom: 25px; margin-top: 20px;">
+            <a href="javascript:history.back()" style="color: var(--secondary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-arrow-left"></i> Volver al listado
             </a>
         </div>
 
         <div class="detail-grid" id="main-content">
-            <div style="text-align: center; padding: 40px;">Cargando carta...</div>
+            <div style="text-align: center; padding: 40px; color: #888;">Cargando carta...</div>
         </div>
 
         <div class="sellers-section">
             <h3 style="margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <span><i class="fas fa-store"></i> Ofertas de Vendedores</span>
-                <span class="desktop-only-text" style="font-size: 0.9rem; font-weight: normal; color: #666; margin-left: auto;">
-                    Arrastra una fila al carrito 🛒
+                <span><i class="fas fa-store" style="color: var(--primary);"></i> Ofertas de Vendedores</span>
+                <span class="desktop-only-text" style="font-size: 0.9rem; font-weight: normal; color: #888; margin-left: auto;">
+                    <i class="fas fa-hand-pointer"></i> Arrastra una fila al carrito 
                 </span>
             </h3>
 
@@ -228,7 +255,7 @@
                         </tr>
                     </thead>
                     <tbody id="sellers-tbody">
-                        <tr><td colspan="5" style="text-align:center; padding: 20px; color: #999;">Buscando vendedores...</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding: 40px; color: #999;">Buscando mejores ofertas...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -247,33 +274,36 @@
         document.getElementById('overlay').classList.toggle('active');
     }
 
-    // --- LÓGICA DE USUARIO / LOGIN ---
+    // --- LÓGICA DE USUARIO / LOGIN MEJORADA (Versión Definitiva) ---
     function checkLoginStatus() {
-        const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-        const authContainer = document.getElementById('auth-container');
+        const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+        let storedUser = sessionStorage.getItem('user_data') || localStorage.getItem('user_data');
         
-        let userData = { name: 'Usuario' };
-        try {
-            const storedUser = localStorage.getItem('user_data');
-            if (storedUser) userData = JSON.parse(storedUser);
-        } catch (e) { console.log('Error parseando user data'); }
+        const authContainer = document.getElementById('auth-container');
+        const linkSidebar = document.getElementById('link-perfil-sidebar');
 
         if (token && authContainer) {
+            // ESTÁ LOGUEADO
+            let userData = { name: 'Usuario' };
+            try { if (storedUser) userData = JSON.parse(storedUser); } catch (e) {}
+
             const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
             
+            // Render Widget Perfil
             authContainer.innerHTML = `
-                <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <span style="font-weight:600; font-size:0.9rem;">${userName}</span>
-                </a>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                        <div class="profile-avatar"><i class="fas fa-user"></i></div>
+                        <span class="profile-name">${userName}</span>
+                    </a>
+                </div>
             `;
-            // Actualizar Sidebar
-            const linkSidebar = document.getElementById('link-perfil-sidebar');
-            if(linkSidebar) linkSidebar.innerHTML = `Hola, ${userName}`;
-
+            if(linkSidebar) {
+                linkSidebar.innerHTML = `Hola, ${userName}`;
+                linkSidebar.href = "/dashboard";
+            }
         } else if (authContainer) {
+            // NO LOGUEADO
             authContainer.innerHTML = `
                 <a href="/login" class="btn-header btn-login">Login</a>
                 <a href="/register" class="btn-header btn-register">Registro</a>
@@ -281,6 +311,10 @@
         }
     }
 
+
+
+
+    // --- LÓGICA DE CARTA, SCRYFALL Y CARRITO ---
     const API_URL = 'http://localhost:8000/api'; 
     const params = new URLSearchParams(window.location.search);
     const cardId = params.get('id');
@@ -293,7 +327,7 @@
         updateCartCount();
         if(!cardId) return;
 
-        // 1. Cargar Info VISUAL desde Scryfall
+        // 1. Info Scryfall
         try {
             const res = await fetch(`https://api.scryfall.com/cards/${cardId}`);
             const card = await res.json();
@@ -314,35 +348,30 @@
                     <img src="${img}" class="card-image-large" alt="${card.name}">
                 </div>
                 <div>
-                    <h1 style="font-size:1.8rem; margin-bottom:10px; line-height: 1.2;">${card.name}</h1>
-                    <p style="color:var(--secondary); font-weight:600; margin-bottom: 15px;">${card.type_line}</p>
-                    <div style="background:#f9f9f9; padding:20px; border-radius:8px; line-height: 1.6; font-size: 0.95rem;">
+                    <h1 style="font-size:2rem; margin-bottom:10px; line-height: 1.2; font-weight: 800; color: var(--text-dark);">${card.name}</h1>
+                    <p style="color:var(--secondary); font-weight:600; margin-bottom: 20px; font-size: 1.1rem;">${card.type_line}</p>
+                    <div style="background:#f8f9fa; padding:25px; border-radius:12px; line-height: 1.6; font-size: 1rem; border: 1px solid #eee;">
                         ${card.oracle_text ? card.oracle_text.replace(/\n/g, '<br>') : 'Sin descripción disponible.'}
                     </div>
                 </div>
             `;
         } catch(e) { console.error("Error Scryfall:", e); }
 
-        // 2. Cargar Vendedores desde Backend
+        // 2. Info Vendedores (Backend)
         try {
             const res = await fetch(`${API_URL}/listings/card/${cardId}`);
-            
             if(res.ok) {
                 sellersData = await res.json();
                 renderSellersTable(sellersData);
             } else {
                 document.getElementById('sellers-tbody').innerHTML = 
-                    `<tr><td colspan="5" style="text-align:center; padding:20px;">No hay ofertas disponibles.</td></tr>`;
+                    `<tr><td colspan="5" style="text-align:center; padding:30px;">No hay ofertas disponibles actualmente.</td></tr>`;
             }
-        } catch(e) { 
-            console.error("Error Backend:", e);
-        }
+        } catch(e) { console.error("Error Backend:", e); }
     }
 
-    // Renderizar la TABLA (Versión Responsive)
     function renderSellersTable(listings) {
         const tbody = document.getElementById('sellers-tbody');
-        
         if(listings.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px;">No hay vendedores para esta carta aún.</td></tr>`;
             return;
@@ -350,24 +379,18 @@
 
         tbody.innerHTML = listings.map((venta, index) => {
             let editionName = currentCardInfo.set_name; 
-            if (venta.card && venta.card.set && venta.card.set.name) {
-                editionName = venta.card.set.name;
-            } else if (venta.set_name) {
-                editionName = venta.set_name;
-            }
+            if (venta.card && venta.card.set && venta.card.set.name) editionName = venta.card.set.name;
+            else if (venta.set_name) editionName = venta.set_name;
 
             return `
-            <tr 
-                draggable="true" 
-                ondragstart="handleDragStart(event, ${index})"
-            >
+            <tr draggable="true" ondragstart="handleDragStart(event, ${index})">
                 <td data-label="Vendedor">
                     <div style="display:flex; align-items:center; gap:10px; justify-content: flex-end;">
                         <div style="text-align:right;">
-                            <strong>${venta.user ? venta.user.name : 'Vendedor'}</strong>
+                            <strong style="color: var(--primary-dark);">${venta.user ? venta.user.name : 'Vendedor'}</strong>
                             <div style="font-size:0.75rem; color:#888;">ID: ${venta.user_id}</div>
                         </div>
-                        <i class="fas fa-user-circle" style="font-size:1.5rem; color:#ccc;"></i>
+                        <i class="fas fa-user-circle" style="font-size:1.8rem; color:#ccc;"></i>
                     </div>
                 </td>
                 <td data-label="Estado">
@@ -376,9 +399,7 @@
                         ${venta.is_foil ? '<span class="badge badge-foil">Foil</span>' : '<span class="badge badge-normal">Normal</span>'}
                     </div>
                 </td>
-                <td data-label="Edición">
-                    ${editionName}
-                </td>
+                <td data-label="Edición">${editionName}</td>
                 <td data-label="Precio" class="price-tag">${parseFloat(venta.price).toFixed(2)} €</td>
                 <td>
                     <button class="btn-add" onclick="manualAdd(${index})" title="Añadir al carrito">
@@ -389,39 +410,32 @@
         `}).join('');
     }
 
-    // --- LÓGICA DRAG AND DROP ---
+    // --- DRAG AND DROP ---
     function handleDragStart(e, index) {
         if(window.innerWidth < 769) { e.preventDefault(); return; }
-        const row = e.target; 
-        row.classList.add('dragging'); 
+        e.target.classList.add('dragging'); 
         e.dataTransfer.setData("text/plain", index);
         e.dataTransfer.effectAllowed = "copy";
     }
-
     document.addEventListener("dragend", (e) => {
         if (e.target.tagName === 'TR') e.target.classList.remove('dragging');
     });
-
     const dropZone = document.getElementById('drop-zone');
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault(); 
-        dropZone.classList.add('drag-over-active');
-    });
-    dropZone.addEventListener('dragleave', (e) => {
-        dropZone.classList.remove('drag-over-active');
-    });
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over-active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over-active'));
     dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('drag-over-active');
+        e.preventDefault(); dropZone.classList.remove('drag-over-active');
         const index = e.dataTransfer.getData("text/plain");
         if(index !== "") addToCart(index);
     });
 
-    // --- GESTIÓN CARRITO ---
+    // --- CARRITO (CORREGIDO LOCAL/SESSION) ---
     function manualAdd(index) { addToCart(index); }
 
     function addToCart(index) {
-        const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+        // CORRECCIÓN APLICADA: Busca en ambos sitios
+        const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+        
         if (!token) {
             if (confirm("🔒 Para añadir al carrito necesitas iniciar sesión. ¿Ir al login?")) {
                 window.location.href = '/login'; 
@@ -464,7 +478,7 @@
         btn.style.background = '#10b981';
         setTimeout(() => {
             btn.innerHTML = oldContent;
-            btn.style.background = 'var(--dark)';
+            btn.style.background = 'var(--text-dark)';
         }, 1500);
     }
 
@@ -474,20 +488,8 @@
     }
 
     window.onload = init;
-
-    // 1. "El Despertador": Se activa cuando vuelves a la página usando "Atrás"
-    window.addEventListener('pageshow', function(event) {
-        // Obligamos a volver a contar lo que hay en el carrito
-        updateCartCount();
-    });
-
-    // 2. "El Sincronizador": Por si tienes dos pestañas abiertas
-    // Si borras algo en una pestaña, la otra se actualiza sola al instante
-    window.addEventListener('storage', function(event) {
-        if (event.key === 'myCart') {
-            updateCartCount();
-        }
-    });
+    window.addEventListener('pageshow', updateCartCount);
+    window.addEventListener('storage', (e) => { if (e.key === 'myCart') updateCartCount(); });
     </script>
 </body>
 </html>
