@@ -463,7 +463,7 @@
 
                 // --- ACTUALIZAR SIDEBAR ---
                 if(linkSidebar) {
-                    linkSidebar.innerHTML = `Hola, ${userName} <i class="fas fa-check-circle" style="font-size:0.8rem; margin-left:5px; color:#4ade80;"></i>`;
+                    linkSidebar.innerHTML = `Hola, ${userName}`;
                     linkSidebar.href = "/dashboard";
                     linkSidebar.style.color = "var(--primary)";
                 }
