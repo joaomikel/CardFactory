@@ -6,6 +6,7 @@
     <title>Mi Carrito</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         :root {
             --primary: #8C52FF; 
@@ -87,6 +88,9 @@
         /* Animación para cuando borras */
         .fade-out { opacity: 0; transform: translateX(100%); transition: all 0.3s ease; }
     </style>
+    <script>
+        window.isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+    </script>
 </head>
 <body>
 
@@ -115,107 +119,96 @@
     </div>
 
     <script>
-        // --- LÓGICA 100% SIN LOGIN ---
+    // --- Inyectar estado de Login de Laravel ---
+    window.isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+    
+    // 1. Cargamos el carrito
+    let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+    const shippingCost = 5.00;
+
+    function renderCart() {
+        const container = document.getElementById('cart-items');
         
-        // 1. Cargamos lo que guardó el Drag & Drop
-        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-        const shippingCost = 5.00;
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; margin-top: 60px;">
+                    <i class="fas fa-shopping-basket" style="font-size: 4rem; color: #ddd;"></i>
+                    <p style="margin-top: 20px; color: #888;">Tu carrito está vacío.</p>
+                </div>`;
+            updateTotals(0);
+            return;
+        }
 
-        function renderCart() {
-            const container = document.getElementById('cart-items');
-            
-            // Si está vacío
-            if (cart.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; margin-top: 60px;">
-                        <i class="fas fa-shopping-basket" style="font-size: 4rem; color: #ddd;"></i>
-                        <p style="margin-top: 20px; color: #888;">Tu carrito está vacío.</p>
-                        <p style="font-size: 0.9rem; color: #aaa;">Arrastra cartas aquí para comprar.</p>
-                    </div>`;
-                updateTotals(0);
-                return;
-            }
-
-            // Pintar items
-            container.innerHTML = cart.map((item, index) => `
-                <div class="cart-item" id="item-${index}">
-                    <img src="${item.image}" class="item-img" onerror="this.src='https://via.placeholder.com/70'">
-                    <div class="item-info">
-                        <div class="item-title">${item.name}</div>
-                        <div class="item-price">${item.price.toFixed(2)} €</div>
-                        <div class="item-meta">
-                            ${item.rarity || 'Carta'} • ${item.condition || 'NM'}
-                        </div>
-                    </div>
-                    <button class="btn-delete" onclick="removeItem(${index})">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+        container.innerHTML = cart.map((item, index) => `
+            <div class="cart-item" id="item-${index}">
+                <img src="${item.image}" class="item-img" onerror="this.src='https://via.placeholder.com/70'">
+                <div class="item-info">
+                    <div class="item-title">${item.name}</div>
+                    <div class="item-price">${item.price.toFixed(2)} €</div>
+                    <div class="item-meta">${item.condition || 'NM'}</div>
                 </div>
-            `).join('');
+                <button class="btn-delete" onclick="removeItem(${index})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `).join('');
 
-            // Calcular
-            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-            updateTotals(subtotal);
+        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+        updateTotals(subtotal);
+    }
+
+    function updateTotals(subtotal) {
+        const ship = subtotal > 0 ? shippingCost : 0;
+        document.getElementById('subtotal').innerText = subtotal.toFixed(2) + ' €';
+        document.getElementById('shipping').innerText = ship.toFixed(2) + ' €';
+        document.getElementById('total').innerText = (subtotal + ship).toFixed(2) + ' €';
+    }
+
+    function removeItem(index) {
+        const row = document.getElementById(`item-${index}`);
+        row.classList.add('fade-out');
+        setTimeout(() => {
+            cart.splice(index, 1);
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            renderCart();
+        }, 300);
+    }
+
+    // --- AQUÍ ESTÁ EL CAMBIO PARA QUE NO DE ERROR 404 ---
+    function checkout() {
+        if(cart.length === 0) return alert("El carrito está vacío.");
+        
+        // 1. Comprobar si está logueado (sin fetch, solo mirando la variable)
+        if (!window.isLoggedIn) {
+            alert("🔒 Para finalizar la compra necesitas iniciar sesión.");
+            window.location.href = '/login';
+            return;
         }
 
-        function updateTotals(subtotal) {
-            const ship = subtotal > 0 ? shippingCost : 0;
-            const total = subtotal + ship;
-
-            document.getElementById('subtotal').innerText = subtotal.toFixed(2) + ' €';
-            document.getElementById('shipping').innerText = ship.toFixed(2) + ' €';
-            document.getElementById('total').innerText = total.toFixed(2) + ' €';
-        }
-
-        function removeItem(index) {
-            const row = document.getElementById(`item-${index}`);
-            row.classList.add('fade-out');
+        // 2. Simular compra EXITOSA directamente (Sin llamar al servidor)
+        if(confirm(`¿Confirmar compra por ${document.getElementById('total').innerText}?`)) {
+            
+            // Simulamos un pequeño tiempo de carga
+            const btn = document.querySelector('.checkout-btn');
+            btn.innerText = "Procesando...";
+            btn.disabled = true;
 
             setTimeout(() => {
-                cart.splice(index, 1);
-                localStorage.setItem('myCart', JSON.stringify(cart));
-                renderCart();
-            }, 300);
-        }
-
-        function checkout() {
-            // 1. Validación básica: Carrito vacío
-            if(cart.length === 0) return alert("El carrito está vacío.");
-            
-            const token = localStorage.getItem('auth_token'); 
-
-            // Si NO hay token (es null), es que no está logueado
-            if (!token) {
-                // Opcional: Avisar al usuario
-                alert("🔒 Para finalizar la compra necesitas iniciar sesión.");
-                
-                // REDIRECCIÓN: Aquí pones la dirección de tu Login de Laravel
-                // Si tu backend está en el puerto 8000, suele ser esta:
-                window.location.href = 'http://localhost:8000/login'; 
-                
-                return; // ¡Importante! Esto detiene la función para que no siga comprando.
-            }
-            // -----------------------------
-
-            // 2. Si llegamos aquí, es que SÍ está logueado. Procedemos.
-            // Aquí en el futuro harías un fetch() a tu API para guardar el pedido real.
-            
-            if(confirm(`¿Confirmar compra por ${document.getElementById('total').innerText}?`)) {
-                
-                // Aquí podrías enviar los datos al backend si quisieras:
-                // enviarPedidoAlBackend(cart, token);
-
-                alert("¡Compra realizada con éxito! 📦\n(Usuario verificado)");
+                alert("¡Compra realizada con éxito! 📦\n(Pedido simulado correctamente)");
                 
                 // Vaciar carrito
                 cart = [];
                 localStorage.removeItem('myCart');
                 renderCart();
-            }
+                
+                btn.innerText = "Finalizar Compra";
+                btn.disabled = false;
+            }, 1000);
         }
+    }
 
-        // Iniciar
-        renderCart();
-    </script>
+    // Iniciar
+    renderCart();
+</script>
 </body>
 </html>
