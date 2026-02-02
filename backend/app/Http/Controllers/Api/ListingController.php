@@ -29,25 +29,34 @@ class ListingController extends Controller
 
     // 3. ACTUALIZAR (Para el botón EDITAR del Dashboard)
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'price' => 'required|numeric|min:0.01',
-            'condition' => 'required|string',
-        ]);
+{
+    $listing = Listing::findOrFail($id);
 
-        $listing = Listing::where('id', $id)->where('user_id', Auth::id())->first();
-
-        if (!$listing) {
-            return back()->with('error', 'No tienes permiso o no existe.');
-        }
-
-        $listing->price = $request->price;
-        $listing->condition = $request->condition;
-        $listing->save();
-
-        return back()->with('status', 'Actualizado correctamente.');
+    // Validar que el usuario es el dueño
+    if ($listing->user_id !== Auth::id()) {
+        return redirect()->back()->with('error', 'No tienes permiso.');
     }
 
+    $request->validate([
+        'price' => 'required|numeric|min:0',
+        'condition' => 'required|string',
+        'set_id' => 'required|exists:sets,id', // Validamos el set
+    ]);
+
+    // Actualizamos precio y condición del LISTING
+    $listing->update([
+        'price' => $request->price,
+        'condition' => $request->condition,
+    ]);
+
+    // Actualizamos el set de la CARTA (CARD)
+    // OJO: Esto cambiará el set para esta carta. 
+    $listing->card->update([
+        'set_id' => $request->set_id
+    ]);
+
+    return redirect()->back()->with('status', 'Producto actualizado correctamente.');
+}
     // 4. ELIMINAR (Para el botón BORRAR del Dashboard)
     public function destroy($id)
     {

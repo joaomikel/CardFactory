@@ -23,9 +23,9 @@
             display: flex; gap: 10px; margin-bottom: 30px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;
         }
-        input, select { padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 10px; outline: none; font-size: 1rem; }
+        input, select { padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 10px; outline: none; font-size: 1rem; width: 100%; }
         input[type="text"] { flex-grow: 1; }
-        .btn-search { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.2s; }
+        .btn-search { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.2s; width: auto; }
         .btn-search:hover { opacity: 0.9; transform: translateY(-1px); }
 
         /* Resultados */
@@ -48,6 +48,8 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; }
+        .full-width { grid-column: span 2; }
+        
         label { display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; color: #4b5563; }
         
         .checkbox-container { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 10px; }
@@ -84,14 +86,30 @@
             <input type="hidden" id="hidden-card-name">
             <input type="hidden" id="hidden-image-url">
             
+            <div class="full-width">
+                <label><i class="fas fa-layer-group"></i> Edición / Colección</label>
+                <select id="set_id">
+                    <option value="" disabled selected>-- Selecciona la edición --</option>
+                    @if(isset($sets))
+                        @foreach($sets as $set)
+                            <option value="{{ $set->id }}">
+                                {{ $set->name }} ({{ strtoupper($set->code) }})
+                            </option>
+                        @endforeach
+                    @else
+                        <option value="">No se cargaron las ediciones (Revisar Controlador)</option>
+                    @endif
+                </select>
+            </div>
+
             <div>
                 <label><i class="fas fa-euro-sign"></i> Precio de venta</label>
-                <input type="number" id="price" step="0.01" placeholder="0.00" style="width: 100%">
+                <input type="number" id="price" step="0.01" placeholder="0.00">
             </div>
             
             <div>
                 <label><i class="fas fa-star"></i> Estado físico</label>
-                <select id="condition" style="width: 100%">
+                <select id="condition">
                     <option value="Mint">Mint (Perfecta)</option>
                     <option value="Near Mint">Near Mint (Casi Nueva)</option>
                     <option value="Excellent">Excellent</option>
@@ -114,7 +132,6 @@
 </div>
 
 <script>
-    // Obtener token CSRF de la etiqueta meta (Más seguro que cookies)
     function getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     }
@@ -172,9 +189,15 @@
     async function publishListing() {
         const publishBtn = document.getElementById('btnPublish');
         const price = document.getElementById('price').value;
+        const setId = document.getElementById('set_id').value; // Capturamos el ID del set
         
         if(!price || price <= 0) {
             alert("Por favor, introduce un precio válido.");
+            return;
+        }
+
+        if(!setId) {
+            alert("Por favor, selecciona la edición de la carta.");
             return;
         }
 
@@ -185,6 +208,7 @@
             scryfall_id: document.getElementById('scryfall-id').value,
             card_name:   document.getElementById('hidden-card-name').value,
             image_url:   document.getElementById('hidden-image-url').value,
+            set_id:      setId, // Enviamos el ID del set seleccionado
             price:       price,
             condition:   document.getElementById('condition').value,
             is_foil:     document.getElementById('is_foil').checked,
@@ -198,17 +222,16 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken() // Usamos el token del meta
+                    'X-CSRF-TOKEN': getCsrfToken()
                 },
                 body: JSON.stringify(payload)
             });
 
-            // --- BLOQUE DEPURACIÓN DE ERRORES ---
-            const text = await res.text(); // Leemos respuesta cruda
+            const text = await res.text();
             
             if(!res.ok) {
-                console.error("ERROR SERVIDOR:", text); // Muestra el HTML del error en consola
-                alert("Ocurrió un error. Abre la consola (F12) para ver el detalle.");
+                console.error("ERROR SERVIDOR:", text);
+                alert("Ocurrió un error. Abre la consola para ver más detalles.");
                 return;
             }
 
@@ -219,7 +242,6 @@
             } catch(e) {
                 console.error("Respuesta no es JSON:", text);
             }
-            // ------------------------------------
 
         } catch(e) {
             console.error(e);
