@@ -407,6 +407,8 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
 .acc-list li { margin-bottom: 10px; color: #333; }
 .acc-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
 .tag-aa { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.tag-fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.acc-subtitle { font-weight: 700; margin-top: 15px; margin-bottom: 5px; display: block; color: var(--text-dark); }
 
 @media (min-width: 768px) {
     header { padding: 0 40px; height: 90px; }
@@ -434,17 +436,41 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
                 <button class="modal-close" onclick="closeAccModal()" aria-label="Cerrar declaración">&times;</button>
             </div>
             <div style="font-size: 1rem; line-height: 1.6;">
-                <p style="margin-bottom: 15px;">CardFactory se compromete a garantizar la accesibilidad digital para personas con discapacidad, aplicando los estándares WCAG 2.1.</p>
+                <p style="margin-bottom: 15px;">
+                    CardFactory se compromete a facilitar la accesibilidad de su sitio web, aunque actualmente nos encontramos en proceso de auditoría y mejora continua.
+                </p>
                 
-                <h3 style="color: var(--secondary); margin-bottom: 10px;">Cumplimiento Nivel AA</h3>
+                <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 15px; font-size: 0.9rem;">
+                    <strong>Estado de cumplimiento:</strong><br>
+                    Este sitio web es <strong>PARCIALMENTE CONFORME</strong> con el nivel AA de las WCAG 2.1 debido a las excepciones indicadas a continuación.
+                </div>
+
+                <span class="acc-subtitle">✅ Características implementadas:</span>
                 <ul class="acc-list">
-                    <li><span class="acc-tag tag-aa">Contraste</span> Los colores de texto y fondo superan el ratio 4.5:1 para garantizar legibilidad.</li>
-                    <li><span class="acc-tag tag-aa">Teclado</span> Toda la navegación es operable sin ratón, con foco visible en todos los elementos interactivos.</li>
-                    <li><span class="acc-tag tag-aa">Lectores</span> Las imágenes tienen atributos ALT y los iconos decorativos están ocultos (aria-hidden).</li>
-                    <li><span class="acc-tag tag-aa">Zoom</span> Se permite escalar la página hasta un 500% sin pérdida de funcionalidad.</li>
-                    <li><span class="acc-tag tag-aa">Cognitivo</span> Movimiento reducido y actualizaciones pausadas.</li>
+                    <li><span class="acc-tag tag-aa">Zoom</span> Escalado hasta 200% sin pérdida.</li>
+                    <li><span class="acc-tag tag-aa">Semántica</span> Uso de etiquetas HTML5 estructurales (header, main, nav).</li>
                 </ul>
-                <p>Si encuentras alguna barrera de acceso, contáctanos en soporte@cardfactory.com.</p>
+
+                <span class="acc-subtitle">❌ Contenido NO accesible:</span>
+                <ul class="acc-list">
+                    <li>
+                        <span class="acc-tag tag-fail">Contraste</span> 
+                        El texto sobre la imagen del "Hero" no cumple el ratio 4.5:1 en pantallas muy brillantes.
+                    </li>
+                    <li>
+                        <span class="acc-tag tag-fail">Teclado</span> 
+                        Falta implementar el "Focus Trap" dentro de este modal (el tabulador se escapa al fondo).
+                    </li>
+                    <li>
+                        <span class="acc-tag tag-fail">Formularios</span> 
+                        El formulario de reseñas da errores de validación que no son leídos automáticamente por lectores de pantalla (NVDA).
+                    </li>
+                </ul>
+
+                <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                    Estamos trabajando para resolver estas incidencias antes de la próxima actualización del sprint.
+                </p>
+                
                 <button onclick="closeAccModal()" style="margin-top: 15px; width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Entendido</button>
             </div>
         </div>

@@ -246,10 +246,16 @@
             transition: 0.3s;
         }
         .modal-close:hover, .modal-close:focus { background: var(--primary); border-color: var(--primary); color: white; }
+        
+        /* Listas y Etiquetas Accesibilidad */
         .acc-list { margin-left: 20px; margin-bottom: 20px; }
         .acc-list li { margin-bottom: 10px; color: #333; }
         .acc-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
+        
         .tag-aa { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        /* NUEVO: Etiquetas para lo que falla */
+        .tag-fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .acc-subtitle { font-weight: 700; margin-top: 15px; margin-bottom: 5px; display: block; color: var(--text-dark); }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -275,12 +281,36 @@
                 <button class="modal-close" onclick="closeAccModal()" aria-label="Cerrar declaración">&times;</button>
             </div>
             <div style="font-size: 1rem; line-height: 1.6;">
-                <p style="margin-bottom: 15px;">CardFactory se compromete a garantizar la accesibilidad digital...</p>
-                <h3 style="color: var(--secondary); margin-bottom: 10px;">Cumplimiento Nivel AA</h3>
+                <p style="margin-bottom: 15px;">
+                    CardFactory se encuentra en proceso de auditoría para cumplir con los estándares WCAG 2.1.
+                </p>
+                
+                <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 15px; font-size: 0.9rem;">
+                    <strong>Estado:</strong> PARCIALMENTE CONFORME (Nivel AA).
+                </div>
+
+                <span class="acc-subtitle">✅ Puntos cumplidos:</span>
                 <ul class="acc-list">
-                    <li><span class="acc-tag tag-aa">Contraste</span> Colores legibles.</li>
-                    <li><span class="acc-tag tag-aa">Teclado</span> Navegación completa.</li>
+                    <li><span class="acc-tag tag-aa">Navegación</span> Foco visible (outline amarillo) en elementos interactivos.</li>
+                    <li><span class="acc-tag tag-aa">Semántica</span> Estructura correcta de encabezados (h1, h2, h3).</li>
                 </ul>
+
+                <span class="acc-subtitle">❌ Pendiente de corrección:</span>
+                <ul class="acc-list">
+                    <li>
+                        <span class="acc-tag tag-fail">Imágenes</span> 
+                        Algunas cartas cargadas dinámicamente no tienen texto alternativo (alt) descriptivo.
+                    </li>
+                    <li>
+                        <span class="acc-tag tag-fail">Formularios</span> 
+                        El buscador de sets no tiene una etiqueta &lt;label&gt; visible, solo placeholder.
+                    </li>
+                    <li>
+                        <span class="acc-tag tag-fail">Modal</span> 
+                        Al abrir este modal, el foco del teclado no queda atrapado dentro (Focus Trap).
+                    </li>
+                </ul>
+
                 <button onclick="closeAccModal()" style="margin-top: 15px; width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Entendido</button>
             </div>
         </div>
