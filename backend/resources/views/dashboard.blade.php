@@ -208,7 +208,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Apellidos</label>
-                        <input type="text" name="lastname" class="form-input" value="{{ Auth::user()->lastname ?? '' }}" placeholder="Tus apellidos">
+                        <input type="text" name="surname" class="form-input" value="{{ Auth::user()->surname ?? '' }}" placeholder="Tus apellidos">
                     </div>
 
                     <div class="form-group">
@@ -354,7 +354,6 @@
             document.getElementById('modalCondition').value = condition;
 
             // 2. ACTUALIZAMOS LA RUTA AL CONTROLADOR DE LISTINGS
-            // Antes ponía '/cards/', ahora es '/listings/'
             const form = document.getElementById('editForm');
             form.action = '/listings/' + id; 
 
