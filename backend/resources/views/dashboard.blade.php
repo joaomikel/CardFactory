@@ -151,6 +151,10 @@
         }
 
         .card-details { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        
+        .card-edition {
+             font-size: 0.65rem; color: #6b7280; display: block; margin-top: 2px;
+        }
 
         /* --- BARRA DE ACCIONES --- */
         .card-actions-bar { display: flex; border-top: 1px solid #f3f4f6; }
@@ -266,6 +270,9 @@
                                 
                                 <div class="card-info">
                                     <h4 class="card-title">{{ $listing->card->name }}</h4>
+                                    <span class="card-edition">
+                                        {{ $listing->card->set ? $listing->card->set->name : 'N/A' }}
+                                    </span>
                                     <div class="card-details">
                                         <span style="color: #816EB2; font-weight: 800;">{{ $listing->price }} €</span>
                                         <span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">{{ $listing->condition }}</span>
@@ -273,9 +280,8 @@
                                 </div>
 
                                 <div class="card-actions-bar">
-                                    
                                     <button type="button" class="btn-action-mobile btn-edit-mobile" 
-                                            onclick="openEditModal({{ $listing->id }}, '{{ $listing->card->name }}', {{ $listing->price }}, '{{ $listing->condition }}')">
+                                            onclick="openEditModal({{ $listing->id }}, '{{ addslashes($listing->card->name) }}', {{ $listing->price }}, '{{ $listing->condition }}', {{ $listing->card->set_id ?? 'null' }})">
                                         <i class="fas fa-pen"></i>
                                     </button>
                                     
@@ -331,6 +337,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Edición</label>
+                    <select name="set_id" id="modalSet" class="form-input">
+                        @if(isset($sets))
+                            @foreach($sets as $set)
+                                <option value="{{ $set->id }}">{{ $set->name }} ({{ strtoupper($set->code) }})</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Precio (€)</label>
                     <input type="number" step="0.01" name="price" id="modalPrice" class="form-input" required>
                 </div>
@@ -338,12 +355,12 @@
                 <div class="form-group">
                     <label class="form-label">Estado</label>
                     <select name="condition" id="modalCondition" class="form-input">
-                        <option value="NM">Near Mint</option>
-                        <option value="EX">Excellent</option>
-                        <option value="GD">Good</option>
-                        <option value="LP">Light Played</option>
-                        <option value="PL">Played</option>
-                        <option value="PO">Poor</option>
+                        <option value="Mint">Mint (Perfecta)</option>
+                        <option value="Near Mint">Near Mint (Casi Nueva)</option>
+                        <option value="Excellent">Excellent</option>
+                        <option value="Good">Good</option>
+                        <option value="Played">Played (Muy usada)</option>
+                        <option value="Poor">Poor</option>
                     </select>
                 </div>
 
@@ -370,17 +387,18 @@
         } );
 
         // --- LÓGICA DEL MODAL ---
-        let lastFocusedElement;
-
-        function openEditModal(id, name, price, condition) {
-            lastFocusedElement = document.activeElement;
-            
+        function openEditModal(id, name, price, condition, setId) {
             // 1. Rellenar datos
             document.getElementById('modalName').value = name;
             document.getElementById('modalPrice').value = price;
             document.getElementById('modalCondition').value = condition;
+            
+            // Seleccionar el Set correcto
+            if(setId) {
+                document.getElementById('modalSet').value = setId;
+            }
 
-            // 2. ACTUALIZAMOS LA RUTA
+            // 2. ACTUALIZAMOS LA RUTA AL CONTROLADOR DE LISTINGS
             const form = document.getElementById('editForm');
             form.action = '/listings/' + id; 
 

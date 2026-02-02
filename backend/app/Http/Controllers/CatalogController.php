@@ -7,7 +7,6 @@ use App\Models\Listing;
 
 class CatalogController extends Controller
 {
-    // ... (Tu función index existente se queda igual) ...
     public function index(Request $request)
     {
         $query = Listing::with(['card', 'user'])->where('quantity', '>', 0);
