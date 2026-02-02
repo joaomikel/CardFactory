@@ -206,6 +206,16 @@
         }
         .footer-section h3 { font-size: 1.3rem; margin-bottom: 20px; color: var(--white); }
         .footer-section p { font-size: 1rem; line-height: 1.6; opacity: 1; color: #e0e0e0; }
+        
+        /* ESTILO NUEVO PARA EL LOGO DEL FOOTER */
+        .footer-logo {
+            width: 150px; /* Tamaño controlado */
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+            border-radius: 8px;
+        }
+
         .footer-links { list-style: none; }
         .footer-links li { margin-bottom: 12px; }
         .footer-links a {
@@ -353,8 +363,7 @@
     <footer role="contentinfo">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>CardFactory</h3>
-                <p>Tu mercado de confianza para comprar y vender cartas de Magic.</p>
+                <img src="http://localhost:8000/logo.jpg" alt="CardFactory Logo" class="footer-logo">                <p>Tu mercado de confianza para comprar y vender cartas de Magic.</p>
                 <div class="social-icons">
                     <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
@@ -364,9 +373,9 @@
             <div class="footer-section">
                 <h3>Enlaces Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="/catalogo">Catálogo Completo</a></li>
-                    <li><a href="/colecciones">Ver Colecciones</a></li>
-                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li> 
+                    <li><a href="{{ url('/catalogo') }}">Catálogo Completo</a></li>
+                    <li><a href="{{ url('/colecciones') }}">Ver Colecciones</a></li>
+                    <li><a href="{{ url('/login') }}" id="footer-login-link">Acceso Login</a></li> 
                     <li><a href="javascript:void(0)" onclick="openAccModal()" id="acc-trigger" style="color: #ffbf00;">Accesibilidad</a></li>
                 </ul>
             </div>

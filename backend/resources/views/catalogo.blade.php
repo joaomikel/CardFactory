@@ -16,19 +16,17 @@
             --white: #ffffff; 
             --bg: #f9f9f9;
             --radius: 12px;
-            --focus-ring: #ffbf00; /* Amarillo intenso para accesibilidad */
+            --focus-ring: #ffbf00;
             --text-light: #f4f4f4;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* --- MEJORA DE FOCO (ACCESIBILIDAD) --- */
         :focus-visible {
             outline: 3px solid var(--focus-ring) !important;
             outline-offset: 2px;
             z-index: 10;
         }
-        /* Eliminar outline predeterminado en clic de ratón si no es teclado */
         button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
         
         body { 
@@ -41,7 +39,7 @@
             overflow-x: hidden;
         }
 
-        /* --- MODAL ACCESIBILIDAD ACTUALIZADO --- */
+        /* --- MODAL ACCESIBILIDAD --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 2000;
@@ -65,7 +63,6 @@
         }
         .modal-close:hover, .modal-close:focus { background: var(--primary); border-color: var(--primary); color: white; }
         
-        /* Listas y Etiquetas Accesibilidad */
         .acc-list { margin-left: 20px; margin-bottom: 20px; }
         .acc-list li { margin-bottom: 10px; color: #333; }
         .acc-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
@@ -78,7 +75,7 @@
 
         /* --- HEADER --- */
         header {
-            background: linear-gradient(135deg, var(--primary), #9ca3af); /* Ajuste visual leve */
+            background: linear-gradient(135deg, var(--primary), #9ca3af);
             height: 70px;
             display: flex;
             align-items: center;
@@ -120,7 +117,7 @@
         .btn-register { 
             background: var(--white); color: var(--primary); 
             box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-            display: none; /* Oculto en móvil para ganar espacio */
+            display: none; 
         }
         @media (min-width: 480px) { .btn-register { display: inline-block; } }
         .btn-register:hover { transform: translateY(-2px); }
@@ -202,6 +199,15 @@
         /* --- FOOTER --- */
         footer { margin-top: auto; background: #2b2440; color: var(--text-light); padding-top: 60px; width: 100%; }
         .footer-content { display: grid; grid-template-columns: 1fr; gap: 40px; max-width: 1200px; margin: 0 auto; padding: 0 20px 40px; }
+        
+        .footer-logo {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+            display: block;
+            border-radius: 8px;
+        }
+
         .footer-section h3 { font-size: 1.3rem; margin-bottom: 20px; color: var(--white); }
         .footer-section p { font-size: 1rem; line-height: 1.6; opacity: 1; color: #e0e0e0; }
         .footer-links { list-style: none; }
@@ -342,7 +348,7 @@
     <footer role="contentinfo">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>CardFactory</h3>
+                <img src="http://localhost:8000/logo.jpg" alt="CardFactory Logo" class="footer-logo">
                 <p>Tu mercado de confianza para comprar y vender cartas de Magic: The Gathering.</p>
                 <div class="social-icons">
                     <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
