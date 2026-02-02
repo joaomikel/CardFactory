@@ -12,7 +12,7 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
     <style>
-        :root { --primary: #816EB2; --dark: #111827; --bg: #f3f4f6; }
+        :root { --primary: #816EB2; --dark: #111827; --bg: #f3f4f6; --danger: #ef4444; --warning: #f59e0b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { background-color: var(--bg); color: var(--dark); padding-bottom: 40px; }
@@ -91,56 +91,70 @@
             margin-top: 20px; color: #ef4444; border: 1px solid #fee2e2; cursor: pointer; font-weight: 700;
         }
 
-        /* --- NUEVOS ESTILOS PARA LAS CARTAS Y MODAL --- */
+        /* --- NUEVOS ESTILOS PARA LAS CARTAS (MOBILE FRIENDLY) --- */
         
         .grid-cards {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
         }
 
         .user-card-item {
-            background: white; padding: 10px; border-radius: 12px; 
+            background: white; border-radius: 12px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;
-            position: relative; overflow: hidden;
-            transition: transform 0.2s;
+            overflow: hidden; /* Importante para los bordes redondeados */
+            display: flex; flex-direction: column;
         }
-
-        .user-card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
         .card-img-wrapper {
             position: relative;
-            width: 100%; height: 150px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            overflow: hidden;
+            width: 100%; height: 140px;
+            padding: 10px;
+            background: #fff;
         }
 
         .card-img-wrapper img {
             width: 100%; height: 100%; object-fit: contain;
         }
 
-        /* Overlay con botones (oculto por defecto) */
-        .card-actions {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            opacity: 0; transition: opacity 0.3s;
+        .card-info {
+            padding: 0 10px 10px 10px;
+            flex-grow: 1; /* Empuja los botones al fondo */
         }
 
-        /* En móvil siempre visible un poco, en PC al hover */
-        .user-card-item:hover .card-actions { opacity: 1; }
-        @media (max-width: 768px) {
-             /* Opcional: en móvil quizás prefieras botones siempre visibles debajo */
+        .card-title {
+            font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        .action-btn {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: white; font-size: 1.1rem;
-            transition: transform 0.2s;
+        .card-details {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 5px;
         }
-        .action-btn:hover { transform: scale(1.1); }
-        .btn-edit { background: #f59e0b; }
-        .btn-delete { background: #ef4444; }
+
+        /* --- BARRA DE ACCIONES (NUEVO) --- */
+        .card-actions-bar {
+            display: flex;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .btn-action-mobile {
+            flex: 1; /* Ocupan 50% cada uno */
+            padding: 12px 0;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: white;
+            transition: background 0.2s;
+        }
+
+        .btn-edit-mobile {
+            background-color: var(--warning); 
+        }
+        .btn-edit-mobile:hover { background-color: #d97706; }
+
+        .btn-delete-mobile {
+            background-color: var(--danger);
+        }
+        .btn-delete-mobile:hover { background-color: #dc2626; }
+
 
         /* Estilos del Modal */
         .modal-overlay {
@@ -240,29 +254,30 @@
                             <div class="user-card-item">
                                 <div class="card-img-wrapper">
                                     <img src="{{ $listing->card->image_url }}" alt="{{ $listing->card->name }}">
-                                    
-                                    <div class="card-actions">
-                                        <button type="button" class="action-btn btn-edit" 
-                                                onclick="openEditModal({{ $listing->id }}, '{{ $listing->card->name }}', {{ $listing->price }}, '{{ $listing->condition }}')">
-                                            <i class="fas fa-pen"></i>
-                                        </button>
-                                        
-                                        <form action="/listings/{{ $listing->id }}" method="POST" onsubmit="return confirm('¿Eliminar?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="action-btn btn-delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
                                 </div>
                                 
-                                <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $listing->card->name }}
-                                </h4>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                                    <span style="color: #816EB2; font-weight: 800;">{{ $listing->price }} €</span>
-                                    <span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">{{ $listing->condition }}</span>
+                                <div class="card-info">
+                                    <h4 class="card-title">{{ $listing->card->name }}</h4>
+                                    <div class="card-details">
+                                        <span style="color: #816EB2; font-weight: 800;">{{ $listing->price }} €</span>
+                                        <span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">{{ $listing->condition }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="card-actions-bar">
+                                    
+                                    <button type="button" class="btn-action-mobile btn-edit-mobile" 
+                                            onclick="openEditModal({{ $listing->id }}, '{{ $listing->card->name }}', {{ $listing->price }}, '{{ $listing->condition }}')">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    
+                                    <form action="{{ url('/listings/' . $listing->id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta carta de la venta?');" style="margin:0; flex:1; display:flex;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-action-mobile btn-delete-mobile" style="width:100%;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         @endforeach
@@ -354,6 +369,7 @@
             document.getElementById('modalCondition').value = condition;
 
             // 2. ACTUALIZAMOS LA RUTA AL CONTROLADOR DE LISTINGS
+            // Antes ponía '/cards/', ahora es '/listings/'
             const form = document.getElementById('editForm');
             form.action = '/listings/' + id; 
 
