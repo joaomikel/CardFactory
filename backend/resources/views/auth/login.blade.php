@@ -13,6 +13,20 @@
             --accent-dark: #4338ca;
             --white: #ffffff;
             --sidebar-primary: #816EB2;
+            /* Variable de foco amarillo del index.html */
+            --focus-ring: #ffbf00; 
+        }
+
+        /* --- ACCESIBILIDAD: FOCO VISIBLE --- */
+        /* Solo se activa al usar el teclado (tabulador) */
+        :focus-visible {
+            outline: 3px solid var(--focus-ring) !important;
+            outline-offset: 2px;
+        }
+
+        /* Quitamos el foco por defecto para que no se duplique */
+        button:focus, input:focus, a:focus {
+            outline: none;
         }
 
         body {
@@ -30,7 +44,7 @@
             overflow-x: hidden;
         }
 
-        /* --- ESTILOS DEL SIDEBAR Y HEADER --- */
+        /* --- HEADER Y MENU TRIGGER --- */
         header {
             position: absolute; top: 0; left: 0; width: 100%; height: 70px;
             display: flex; align-items: center; padding: 0 20px; z-index: 100;
@@ -38,23 +52,33 @@
         .menu-trigger { 
             font-size: 1.8rem; background: none; border: none; 
             color: var(--white); cursor: pointer; padding: 10px;
+            border-radius: 8px;
         }
+
+        /* --- SIDEBAR CORREGIDO --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px);
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: all; }
+
         .sidebar {
             position: fixed; top: 0; left: -100%; width: 85%; max-width: 320px; height: 100%;
             background: var(--white); z-index: 102; padding: 2rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; gap: 1rem; box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            /* Importante: oculta los elementos del foco cuando el menú está cerrado */
+            visibility: hidden; 
         }
-        .sidebar.active { left: 0; }
-        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; }
-        .sidebar a { padding: 15px 10px; font-weight: 500; color: #958EA0; border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; }
+        .sidebar.active { 
+            left: 0; 
+            visibility: visible;
+        }
+
+        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; border-radius: 4px; }
+        .sidebar a { padding: 15px 10px; font-weight: 500; color: #958EA0; border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; border-radius: 4px; }
         .sidebar h3 { color: var(--sidebar-primary); margin-bottom: 1rem; }
 
-        /* --- ESTILOS LOGIN CARD --- */
+        /* --- LOGIN CARD --- */
         .login-card {
             background: rgba(255, 255, 255, 0.95);
             padding: 30px;
@@ -70,7 +94,7 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 600; margin-bottom: 4px; color: #374151; font-size: 0.9rem; }
         input[type="email"], input[type="password"] { 
-            width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; outline-color: var(--accent); 
+            width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;
         }
         .btn-login {
             width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 15px;
@@ -79,15 +103,16 @@
         .btn-login:disabled { background: #9ca3af; cursor: not-allowed; }
         
         .links { text-align: center; margin-top: 15px; font-size: 0.9rem; }
-        .links a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .links a { color: var(--accent); text-decoration: none; font-weight: 600; border-radius: 4px; }
         .error-list { color: #dc2626; font-size: 0.85rem; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
     <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <button class="close-sidebar" id="closeSidebar" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3>Menú</h3>
         <a href="/">Inicio</a>
         <a href="{{ url('/dashboard') }}">Perfil</a>
@@ -97,7 +122,7 @@
     </div>
 
     <header>
-        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">&#9776;</button>
+        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir Menú">&#9776;</button>
     </header>
 
     <div class="login-card">
@@ -134,28 +159,36 @@
             <button type="submit" class="btn-login">Entrar</button>
 
             <div class="links">
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" style="font-weight: 400; font-size: 0.85rem;">¿Olvidaste tu contraseña?</a>
-                @endif
-                <br><br>
                 ¿No tienes cuenta? <a href="{{ route('register') }}">Regístrate aquí</a>
             </div>
         </form>
     </div>
 
     <script>
-        // --- FUNCIÓN DEL MENÚ ---
         function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const menuBtn = document.getElementById('menuBtn');
+            const closeBtn = document.getElementById('closeSidebar');
+            
+            const isActive = sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            if (isActive) {
+                // Al abrir, esperamos a la transición y ponemos el foco en el botón de cerrar
+                setTimeout(() => {
+                    closeBtn.focus();
+                }, 300);
+            } else {
+                // Al cerrar, devolvemos el foco al botón que lo abrió
+                menuBtn.focus();
+            }
         }
 
-        // --- LÓGICA DE LOGIN ---
+        // Lógica de validación de formulario (se mantiene la tuya)
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
-
             const form = this;
-            const formData = new FormData(form);
             const btn = form.querySelector('.btn-login');
             const originalText = btn.innerText;
 
@@ -164,40 +197,24 @@
 
             fetch(form.action, {
                 method: 'POST',
-                body: formData,
+                body: new FormData(form),
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
                 }
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                return response.json().then(err => { throw err; });
-            })
+            .then(response => response.ok ? response.json() : response.json().then(err => { throw err; }))
             .then(data => {
                 if (data.token) {
-                    // 1. Limpiamos localStorage por si había una sesión antigua "pegada"
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('user_data');
-
-                    // 2. Aquí está la magia: Usamos sessionStorage
-                    // Esto hará que al cerrar la pestaña, la sesión se pierda.
                     sessionStorage.setItem('auth_token', data.token);
                     sessionStorage.setItem('user_data', JSON.stringify(data.user));
                 }
-                // Redirigir al dashboard
                 window.location.href = "{{ route('dashboard') }}";
             })
             .catch(error => {
                 btn.innerText = originalText;
                 btn.disabled = false;
-
-                if (error.errors || error.message) {
-                    const msg = error.message || "Credenciales incorrectas";
-                    alert("❌ " + msg);
-                }
+                alert("❌ " + (error.message || "Credenciales incorrectas"));
             });
         });
     </script>

@@ -22,6 +22,16 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
 
+        /* --- MEJORA DE ACCESIBILIDAD (FOCO) --- */
+        :focus-visible {
+            outline: 3px solid var(--focus-ring) !important;
+            outline-offset: 2px;
+            z-index: 1000;
+        }
+        
+        /* Quitamos el outline por defecto en clic de ratón para botones */
+        button:focus:not(:focus-visible) { outline: none; }
+
         body { 
             background-color: var(--bg); 
             color: var(--text-dark); 
@@ -46,6 +56,7 @@
         .menu-trigger { 
             font-size: 1.8rem; background: none; border: none; color: var(--white); 
             cursor: pointer; padding: 10px; margin-right: auto;
+            border-radius: 8px; /* Para que el foco se vea bien */
         }
 
         .auth-actions { display: flex; gap: 10px; align-items: center; margin-left: auto; }
@@ -88,7 +99,7 @@
         }
         @media (min-width: 480px) { .profile-name { display: block; } }
 
-        /* --- SIDEBAR NUEVO --- */
+        /* --- SIDEBAR NUEVO (CON VISIBILIDAD CONTROLADA) --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s;
@@ -102,10 +113,12 @@
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; gap: 1rem;
             box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            visibility: hidden; /* CLAVE PARA ACCESIBILIDAD: Oculto al tabulador por defecto */
         }
-        .sidebar.active { left: 0; }
-        .close-sidebar { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; background: none; border: none; color: #666; cursor: pointer;}
-        .sidebar a { padding: 15px 0; border-bottom: 1px solid #eee; color: var(--secondary); text-decoration: none; font-size: 1.1rem; font-weight: 500;}
+        .sidebar.active { left: 0; visibility: visible; }
+        
+        .close-sidebar { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; background: none; border: none; color: #666; cursor: pointer; border-radius: 4px;}
+        .sidebar a { padding: 15px 0; border-bottom: 1px solid #eee; color: var(--secondary); text-decoration: none; font-size: 1.1rem; font-weight: 500; border-radius: 4px;}
 
 
         /* --- LAYOUT ESPECÍFICO DE CARTA (MANTENIDO) --- */
@@ -206,7 +219,7 @@
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
     
     <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <button class="close-sidebar" id="closeBtn" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1.5rem; font-weight: 800;">Menú</h3>
         <a href="/">Inicio</a>
         <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
@@ -216,7 +229,7 @@
     </div>
 
     <header>
-        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Abrir menú">
+        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir menú">
             <i class="fas fa-bars"></i>
         </button>
         
@@ -226,7 +239,7 @@
 
     <main class="container">
         <div style="margin-bottom: 25px; margin-top: 20px;">
-            <a href="javascript:history.back()" style="color: var(--secondary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            <a href="javascript:history.back()" style="color: var(--secondary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px;">
                 <i class="fas fa-arrow-left"></i> Volver al listado
             </a>
         </div>
@@ -268,10 +281,25 @@
     </a>
 
     <script>
-    // --- LÓGICA DEL MENÚ ---
+    // --- LÓGICA DEL MENÚ CON FOCO ---
     function toggleMenu() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+
+        const isActive = sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+
+        if (isActive) {
+            // Ponemos el foco en el botón de cerrar cuando se abre
+            setTimeout(() => {
+                closeBtn.focus();
+            }, 300); // 300ms es el tiempo de la transición CSS
+        } else {
+            // Devolvemos el foco al botón de hamburguesa al cerrar
+            menuBtn.focus();
+        }
     }
 
     // --- LÓGICA DE USUARIO / LOGIN MEJORADA (Versión Definitiva) ---
@@ -310,9 +338,6 @@
             `;
         }
     }
-
-
-
 
     // --- LÓGICA DE CARTA, SCRYFALL Y CARRITO ---
     const API_URL = 'http://localhost:8000/api'; 

@@ -15,10 +15,23 @@
             --white: #ffffff; 
             --bg: #f9f9f9;
             --radius: 12px;
-            --focus-ring: #ffbf00;
+            /* CAMBIO: Color amarillo intenso para el foco */
+            --focus-ring: #ffe600;
             --text-light: #f4f4f4;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        /* CAMBIO: Regla global para forzar el foco amarillo en navegación por teclado */
+        *:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+            z-index: 10; /* Asegura que el anillo de foco quede por encima */
+        }
+        /* Fallback para navegadores antiguos */
+        *:focus {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+        }
         
         body { 
             background-color: var(--bg); 
@@ -190,11 +203,19 @@
         }
         .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
         .filter-group label { font-size: 0.75rem; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        
         .filter-control { 
             padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; 
             font-size: 16px; background: #fafafa; width: 100%; outline: none; transition: 0.3s;
         }
-        .filter-control:focus { border-color: var(--primary); background: white; }
+        
+        /* CAMBIO: Borde amarillo en los inputs al hacer foco */
+        .filter-control:focus { 
+            border-color: var(--focus-ring); 
+            background: white; 
+            box-shadow: 0 0 0 1px var(--focus-ring);
+        }
+        
         .btn-apply { 
             background: var(--primary); color: white; padding: 15px; border: none; 
             border-radius: 10px; font-weight: 700; cursor: pointer;
@@ -237,7 +258,8 @@
         }
         .footer-links a:hover, .footer-links a:focus {
             color: var(--white); background-color: rgba(255,255,255,0.1);
-            outline: 2px solid var(--focus-ring);
+            /* El foco amarillo ya está forzado globalmente, pero mantenemos esto por si acaso */
+            outline: 3px solid var(--focus-ring);
         }
         .social-icons { display: flex; gap: 15px; margin-top: 20px; }
         .social-icons a {
@@ -269,7 +291,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 style="color: var(--primary);">Accesibilidad</h2>
-                <button class="modal-close" onclick="closeAccModal()">&times;</button>
+                <button class="modal-close" onclick="closeAccModal()" aria-label="Cerrar modal de accesibilidad">&times;</button>
             </div>
             <div>
                 <p>CardFactory sigue los estándares WCAG 2.1.</p>
@@ -284,7 +306,7 @@
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <button class="close-sidebar" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="/">Inicio</a> 
         <a href="/dashboard" id="link-perfil-sidebar">Perfil</a>
@@ -294,7 +316,7 @@
     </div>
 
     <header>
-        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">☰</button>
+        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Abrir Menú">☰</button>
         <div class="header-title">Catálogo</div>
         <div class="auth-actions" id="auth-container">
             <a href="/login" class="btn-header btn-login">Login</a>
@@ -304,15 +326,15 @@
 
     <section class="filters">
         <div class="filter-group search-group">
-            <label>Nombre de la carta</label>
+            <label for="search-name">Nombre de la carta</label>
             <div style="position: relative;">
                 <input type="text" id="search-name" placeholder="Ej: Black Lotus..." class="filter-control">
-                <i class="fas fa-search" style="position: absolute; right: 15px; top: 15px; color: #9ca3af;"></i>
+                <i class="fas fa-search" style="position: absolute; right: 15px; top: 15px; color: #9ca3af;" aria-hidden="true"></i>
             </div>
         </div>
 
         <div class="filter-group">
-            <label>Color</label>
+            <label for="color">Color</label>
             <select id="color" class="filter-control">
                 <option value="">Todos</option>
                 <option value="w">Blanco</option>
@@ -324,7 +346,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Rareza</label>
+            <label for="rarity">Rareza</label>
             <select id="rarity" class="filter-control">
                 <option value="">Todas</option>
                 <option value="common">Común</option>
@@ -335,7 +357,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Mana (CMC)</label>
+            <label for="cmc">Mana (CMC)</label>
             <select id="cmc" class="filter-control">
                 <option value="">Cualquiera</option>
                 <option value="0">0</option>
@@ -350,7 +372,7 @@
         </div>
 
         <div class="filter-group">
-            <label>Colección</label>
+            <label for="set">Colección</label>
             <select id="set" class="filter-control">
                 <option value="">Todas</option>
                 <option value="dft">Aetherdrift (DFT)</option>
@@ -389,7 +411,8 @@
                 <ul class="footer-links">
                     <li><a href="/catalogo">Catálogo Completo</a></li>
                     <li><a href="/colecciones">Ver Colecciones</a></li>
-                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li> <li><a href="javascript:void(0)" onclick="openAccModal()" style="color: var(--focus-ring);">Declaración de Accesibilidad</a></li>
+                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li> 
+                    <li><a href="javascript:void(0)" onclick="openAccModal()" style="color: var(--focus-ring);">Declaración de Accesibilidad</a></li>
                 </ul>
             </div>
         </div>
@@ -399,37 +422,141 @@
     </footer>
 
     <script>
-        // 1. Alternar Menú Lateral
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            if(sidebar && overlay) {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+        // --- GESTIÓN DE FOCO Y ACCESIBILIDAD ---
+        let lastFocusedElement;
+        
+        // Elementos de fondo que queremos desactivar cuando el menú está abierto
+        const mainContentSelectors = ['header', '.filters', 'main', 'footer'];
+
+        function toggleMainContentInert(isInert) {
+            mainContentSelectors.forEach(selector => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    if (isInert) {
+                        el.setAttribute('inert', ''); // Soporte moderno para bloquear interacción
+                        el.setAttribute('aria-hidden', 'true');
+                    } else {
+                        el.removeAttribute('inert');
+                        el.removeAttribute('aria-hidden');
+                    }
+                }
+            });
+        }
+
+        function trapFocus(e, container) {
+            const focusables = container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (focusables.length === 0) return;
+
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (e.key === 'Tab') {
+                if (e.shiftKey) { // Shift + Tab
+                    if (document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else { // Tab
+                    if (document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
             }
         }
 
-        // 2. MODAL ACCESIBILIDAD
+        // --- MENU LATERAL ---
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const isActive = sidebar.classList.contains('active');
+
+            if (!isActive) {
+                // ABRIR
+                lastFocusedElement = document.activeElement;
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                
+                // Hacerlo visible para la accesibilidad
+                sidebar.style.visibility = 'visible';
+                
+                // Bloquear fondo
+                toggleMainContentInert(true);
+
+                // Mover foco al botón cerrar
+                setTimeout(() => {
+                    const closeBtn = sidebar.querySelector('.close-sidebar');
+                    if (closeBtn) closeBtn.focus();
+                }, 100);
+
+                sidebar.addEventListener('keydown', handleSidebarKeydown);
+            } else {
+                // CERRAR
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                
+                // Desbloquear fondo
+                toggleMainContentInert(false);
+
+                // Ocultar tras animación para que no se pueda tabular
+                setTimeout(() => {
+                    sidebar.style.visibility = 'hidden';
+                }, 300);
+
+                if (lastFocusedElement) lastFocusedElement.focus();
+                
+                sidebar.removeEventListener('keydown', handleSidebarKeydown);
+            }
+        }
+
+        function handleSidebarKeydown(e) {
+            if (e.key === 'Escape') toggleMenu();
+            trapFocus(e, document.getElementById('sidebar'));
+        }
+
+        // --- MODAL ACCESIBILIDAD ---
         function openAccModal() {
-            document.getElementById('acc-modal').classList.add('active');
-        }
-        function closeAccModal() {
-            document.getElementById('acc-modal').classList.remove('active');
-        }
-
-        // 3. LOGICA DE LOGIN (BLINDADA)
-        function checkLoginStatus() {
-            console.log("Comprobando sesión..."); // Para depuración
-
-            // Recuperamos el token
-            const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+            lastFocusedElement = document.activeElement;
+            const modal = document.getElementById('acc-modal');
+            modal.classList.add('active');
             
-            // Referencias al DOM
+            // Hacer modal visible si tenía display:none en CSS, aunque aquí usamos visibility/opacity para transiciones
+            modal.style.display = 'flex'; 
+
+            toggleMainContentInert(true);
+
+            setTimeout(() => {
+                const closeBtn = modal.querySelector('.modal-close');
+                if (closeBtn) closeBtn.focus();
+            }, 100);
+
+            modal.addEventListener('keydown', handleModalKeydown);
+        }
+
+        function closeAccModal() {
+            const modal = document.getElementById('acc-modal');
+            modal.classList.remove('active');
+            
+            // Esperar animación si la hubiera, o cerrar directo
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+
+            toggleMainContentInert(false);
+            if (lastFocusedElement) lastFocusedElement.focus();
+            modal.removeEventListener('keydown', handleModalKeydown);
+        }
+
+        function handleModalKeydown(e) {
+            if (e.key === 'Escape') closeAccModal();
+            trapFocus(e, document.getElementById('acc-modal'));
+        }
+
+        // --- LÓGICA DE DATOS ---
+        function checkLoginStatus() {
+            const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
             const authContainer = document.getElementById('auth-container');
             const linkSidebar = document.getElementById('link-perfil-sidebar');
             const footerLoginLink = document.getElementById('footer-login-link');
             
-            // Intentamos leer los datos del usuario de forma segura
             let userData = {};
             let userName = "Mi Perfil"; 
 
@@ -437,153 +564,72 @@
                 const storedUser = localStorage.getItem('user_data') || sessionStorage.getItem('user_data');
                 if (storedUser) {
                     userData = JSON.parse(storedUser);
-                    // Si existe el nombre, lo usamos, si no, "Usuario"
                     if (userData && userData.name) {
-                        userName = String(userData.name).split(' ')[0]; // Solo el primer nombre
+                        userName = String(userData.name).split(' ')[0];
                     }
                 }
-            } catch (e) { 
-                console.error('Error leyendo datos de usuario:', e); 
-            }
+            } catch (e) { }
 
             if (token) {
-                console.log("Usuario LOGUEADO detectado:", userName);
-
-                // --- ACTUALIZAR HEADER (Icono Usuario) ---
                 if (authContainer) {
                     authContainer.innerHTML = `
                         <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
-                            <div class="profile-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
+                            <div class="profile-avatar"><i class="fas fa-user"></i></div>
                             <span class="profile-name">${userName}</span>
-                        </a>
-                    `;
+                        </a>`;
                 }
-
-                // --- ACTUALIZAR SIDEBAR ---
                 if(linkSidebar) {
                     linkSidebar.innerHTML = `Hola, ${userName}`;
                     linkSidebar.href = "/dashboard";
                     linkSidebar.style.color = "var(--primary)";
                 }
-
-                // --- ACTUALIZAR FOOTER ---
                 if(footerLoginLink) {
                     footerLoginLink.textContent = "Ir a mi Perfil";
                     footerLoginLink.href = "/dashboard";
                 }
-
-            } else {
-                console.log("Usuario NO logueado");
-                // Aseguramos que se vean los botones de Login/Registro si no hay token
-                if (authContainer) {
-                    authContainer.innerHTML = `
-                        <a href="/login" class="btn-header btn-login">Login</a>
-                        <a href="/register" class="btn-header btn-register">Registro</a>
-                    `;
-                }
             }
         }
 
-        // 4. Lógica del Catálogo
-       // --- NUEVA LÓGICA: CRUCE DE DATOS SCRYFALL VS BASE DE DATOS LOCAL ---
-
-        // 1. Función para consultar tu Backend (Simulada)
-        // Esta función toma un array de IDs de Scryfall y pregunta a tu servidor si hay ventas.
         async function checkLocalStock(scryfallIds) {
             try {
-                // NOTA: Aquí debes poner la URL de tu API real que consulta la tabla 'listings'
-                // Tu backend debería esperar un JSON { ids: [...] } y devolver un objeto { "uuid-carta": precio_minimo, ... }
-                // Ejemplo de respuesta esperada del backend: { "b029c...": 19.50, "a1b2...": 5.00 }
-                
-                const response = await fetch('/api/check-stock-batch', { // <--- CAMBIA ESTO POR TU RUTA REAL
+                const response = await fetch('/api/check-stock-batch', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ids: scryfallIds })
                 });
-
-                if (!response.ok) return {}; // Si falla, asumimos que no hay stock
-                return await response.json();
-
-            } catch (error) {
-                console.error("Error consultando stock local:", error);
-                return {}; // En caso de error, devolvemos objeto vacío (todo saldrá Sin Stock)
-            }
+                return response.ok ? await response.json() : {};
+            } catch (error) { return {}; }
         }
 
-        // 2. Función fetchCards Modificada
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
             if(!grid) return;
-            
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--secondary);"><i class="fas fa-circle-notch fa-spin"></i> Buscando cartas y comprobando stock...</p>';
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-circle-notch fa-spin"></i> Buscando cartas...</p>';
 
             try {
-                // PASO A: Buscar en Scryfall (Como hacías antes)
                 const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
-                if (!res.ok) throw new Error('Error API Scryfall');
                 const data = await res.json();
-                
-                if(!data.data || data.data.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados en Scryfall.</p>';
+                if(!data.data) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Sin resultados.</p>';
                     return;
                 }
+                const localStockData = await checkLocalStock(data.data.map(c => c.id));
 
-                // PASO B: Recolectar IDs para comprobar stock local
-                const scryfallIds = data.data.map(card => card.id);
-
-                // PASO C: Consultar a TU base de datos (Listings)
-                // Aquí llamamos a la función que creamos arriba. 
-                // Si aún no tienes el backend listo, esto devolverá {} y todo saldrá "Sin Stock" (lo cual es correcto según tu lógica).
-                const localStockData = await checkLocalStock(scryfallIds);
-
-                // PASO D: Renderizar mezclando datos
                 grid.innerHTML = data.data.map(card => {
-                    // Manejo de imagen
-                    let img = 'https://via.placeholder.com/488x680?text=No+Img';
-                    if (card.image_uris && card.image_uris.normal) {
-                        img = card.image_uris.normal;
-                    } else if (card.card_faces && card.card_faces[0].image_uris) {
-                        img = card.card_faces[0].image_uris.normal;
-                    }
-
-                    // --- LÓGICA DE PRECIO CRÍTICA ---
-                    // Buscamos si el ID de esta carta existe en la respuesta de tu backend
+                    const img = card.image_uris?.normal || card.card_faces?.[0].image_uris?.normal || 'https://via.placeholder.com/488x680';
                     const localPrice = localStockData[card.id]; 
-                    
-                    let priceHtml = '';
-                    let stockClass = '';
-
-                    if (localPrice !== undefined && localPrice !== null) {
-                        // SI hay stock en listings: Mostramos TU precio
-                        priceHtml = `${parseFloat(localPrice).toFixed(2)} €`;
-                        stockClass = 'in-stock'; 
-                    } else {
-                        // NO hay stock en listings: Ignoramos precio Scryfall, ponemos Sin Stock
-                        priceHtml = 'Sin Stock';
-                        stockClass = 'out-of-stock';
-                    }
-                    
-                    // Estilo dinámico para el precio
-                    const priceStyle = stockClass === 'out-of-stock' 
-                        ? 'color: #999; font-size: 0.9rem; font-weight: normal;' 
-                        : 'color: var(--primary); font-weight: 800; font-size: 1.1rem;';
-
+                    const priceHtml = localPrice ? `${parseFloat(localPrice).toFixed(2)} €` : 'Sin Stock';
                     return `
-                    <a href="/carta?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit; cursor: pointer;">
-                        <img src="${img}" loading="lazy" alt="${card.name}">
-                        <div class="card-info">
-                            <h3>${card.name}</h3>
-                            <p class="card-price" style="${priceStyle}">${priceHtml}</p>
-                        </div>
-                    </a>
-                `}).join('');
-
-            } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color:var(--secondary);">Ocurrió un error al cargar el catálogo.</p>';
-            }
+                        <a href="/carta?id=${card.id}" class="card-catalog" style="text-decoration:none; color:inherit;">
+                            <img src="${img}" alt="${card.name}">
+                            <div class="card-info">
+                                <h3>${card.name}</h3>
+                                <p class="card-price">${priceHtml}</p>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+            } catch (e) { grid.innerHTML = '<p>Error de conexión.</p>'; }
         }
 
         function applyFilters() {
@@ -592,53 +638,30 @@
             const rarity = document.getElementById('rarity').value;
             const cmc = document.getElementById('cmc').value;
             const set = document.getElementById('set').value;
-
-            let queryParts = [];
-
-            if (name) queryParts.push(name.trim());
-            
-            if (!set && !name && !color && !rarity && !cmc) {
-                fetchCards('f:standard');
-                return;
-            }
-            
-            if (color) queryParts.push(`c:${color}`);
-            if (rarity) queryParts.push(`r:${rarity}`);
-            if (set) queryParts.push(`s:${set}`);
-            
-            if (cmc) {
-                if (cmc === "7") queryParts.push(`cmc>=7`);
-                else queryParts.push(`cmc:${cmc}`);
-            }
-
-            fetchCards(queryParts.join(' '));
+            let q = [];
+            if (name) q.push(name);
+            if (color) q.push(`c:${color}`);
+            if (rarity) q.push(`r:${rarity}`);
+            if (set) q.push(`s:${set}`);
+            if (cmc) q.push(cmc === "7" ? `cmc>=7` : `cmc:${cmc}`);
+            fetchCards(q.length ? q.join(' ') : 'f:standard');
         }
 
-        const searchInput = document.getElementById('search-name');
-        if(searchInput){
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') applyFilters();
-            });
-        }
-
-        // 5. Inicialización (IMPORTANTE)
         document.addEventListener('DOMContentLoaded', () => {
-            // Ejecutamos la comprobación de sesión inmediatamente
+            // Inicializar visibilidad del sidebar para que no sea focuseable al inicio
+            const sidebar = document.getElementById('sidebar');
+            if(sidebar) sidebar.style.visibility = 'hidden';
+
             checkLoginStatus();
-
             const params = new URLSearchParams(window.location.search);
-            const qParam = params.get('q');
-            const setParam = params.get('set');
-
-            if (qParam) {
-                if(searchInput) searchInput.value = qParam;
-                fetchCards(qParam);
-            } else if (setParam) {
-                const setSelect = document.getElementById('set');
-                if(setSelect) setSelect.value = setParam;
-                fetchCards(`s:${setParam}`);
-            } else {
-                fetchCards('f:standard');
+            if (params.get('q')) fetchCards(params.get('q'));
+            else fetchCards();
+            
+            const searchInput = document.getElementById('search-name');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') applyFilters();
+                });
             }
         });
     </script>

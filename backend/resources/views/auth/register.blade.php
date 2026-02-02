@@ -13,6 +13,20 @@
             --accent-dark: #4338ca;
             --white: #ffffff;
             --sidebar-primary: #816EB2;
+            /* Foco amarillo solicitado */
+            --focus-ring: #ffe600;
+        }
+
+        /* --- MEJORA DE ACCESIBILIDAD (FOCO) --- */
+        *:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+            z-index: 10;
+        }
+        /* Fallback */
+        *:focus {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
         }
 
         body {
@@ -38,20 +52,26 @@
         .menu-trigger { 
             font-size: 1.8rem; background: none; border: none; 
             color: var(--white); cursor: pointer; padding: 10px;
+            border-radius: 8px; /* Para que el foco se vea bien */
         }
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 101; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.6); z-index: 101; 
+            opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px);
         }
         .sidebar-overlay.active { opacity: 1; pointer-events: all; }
+        
         .sidebar {
             position: fixed; top: 0; left: -100%; width: 85%; max-width: 320px; height: 100%;
-            background: var(--white); z-index: 102; padding: 2rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--white); z-index: 102; padding: 2rem; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; gap: 1rem; box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            visibility: hidden; /* Oculto al tabulador por defecto */
         }
-        .sidebar.active { left: 0; }
-        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; }
-        .sidebar a { padding: 15px 10px; font-weight: 500; color: #958EA0; border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; }
+        .sidebar.active { left: 0; visibility: visible; }
+        
+        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 2rem; background: none; border: none; cursor: pointer; color: #666; border-radius: 4px; }
+        .sidebar a { padding: 15px 10px; font-weight: 500; color: #958EA0; border-bottom: 1px solid #eee; text-decoration: none; font-size: 1.1rem; border-radius: 4px; }
         .sidebar h3 { color: var(--sidebar-primary); margin-bottom: 1rem; }
 
         /* --- ESTILOS REGISTER CARD --- */
@@ -69,96 +89,175 @@
         .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-align: center; margin-bottom: 15px; }
         .form-group { margin-bottom: 12px; }
         label { display: block; font-weight: 600; margin-bottom: 4px; color: #374151; font-size: 0.9rem; }
-        input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; outline-color: var(--accent); }
+        
+        input { 
+            width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; 
+            /* Quitamos outline por defecto para usar el global */
+            outline: none; 
+        }
+        
+        /* Borde amarillo al hacer foco en inputs */
+        input:focus {
+            border-color: var(--focus-ring);
+            box-shadow: 0 0 0 1px var(--focus-ring);
+        }
+
         .btn-register {
             width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 15px;
         }
         .btn-register:hover { background: var(--accent-dark); }
         .links { text-align: center; margin-top: 15px; font-size: 0.9rem; }
-        .links a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .links a { color: var(--accent); text-decoration: none; font-weight: 600; border-radius: 4px; }
         .error-list { color: #dc2626; font-size: 0.85rem; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
-    <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+    
+    <div id="main-content">
+        <header>
+            <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Menú">&#9776;</button>
+        </header>
+
+        <div class="register-card">
+            <div class="logo">Únete a CardFactory</div>
+            
+            <div id="js-errors" class="error-list" style="display:none;"></div>
+
+            @if ($errors->any())
+                <div class="error-list">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('register') }}" id="registerForm">
+                @csrf
+
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="given-name">
+                </div>
+
+                <div class="form-group">
+                    <label for="last_name">Apellido</label>
+                    <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required autocomplete="family-name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Teléfono</label>
+                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required autocomplete="tel">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input id="password" type="password" name="password" required autocomplete="new-password">
+                </div>
+
+                <div class="form-group">
+                    <label for="password_confirmation">Confirmar Contraseña</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                </div>
+
+                <button type="submit" class="btn-register">Registrar</button>
+
+                <div class="links">
+                    ¿Ya tienes una cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <button class="close-sidebar" id="closeBtn" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3>Menú</h3>
         <a href="/">Inicio</a>
         <a href="{{ url('/dashboard') }}">Perfil</a>
         <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
         <a href="#">Carrito</a>
-    </div>
+    </nav>
 
-    <header>
-        <button class="menu-trigger" onclick="toggleMenu()" aria-label="Menú">&#9776;</button>
-    </header>
+    <script>
+        // --- GESTIÓN DE FOCO ---
+        let lastFocusedElement;
+        const mainContent = document.getElementById('main-content');
 
-    <div class="register-card">
-        <div class="logo">Únete a CardFactory</div>
-        
-        <div id="js-errors" class="error-list" style="display:none;"></div>
+        function trapFocus(e, container) {
+            const focusables = container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
 
-        @if ($errors->any())
-            <div class="error-list">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('register') }}" id="registerForm">
-            @csrf
-
-            <div class="form-group">
-                <label for="name">Nombre</label>
-                <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="given-name">
-            </div>
-
-            <div class="form-group">
-                <label for="last_name">Apellido</label>
-                <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required autocomplete="family-name">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username">
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Teléfono</label>
-                <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required autocomplete="tel">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input id="password" type="password" name="password" required autocomplete="new-password">
-            </div>
-
-            <div class="form-group">
-                <label for="password_confirmation">Confirmar Contraseña</label>
-                <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
-            </div>
-
-            <button type="submit" class="btn-register">Registrar</button>
-
-            <div class="links">
-                ¿Ya tienes una cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
-            </div>
-        </form>
-    </div>
-
-<script>
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
+            if (e.key === 'Tab') {
+                if (e.shiftKey) { // Shift + Tab
+                    if (document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else { // Tab
+                    if (document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            }
         }
 
-        // --- SCRIPT DE REGISTRO BLINDADO ---
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const isActive = sidebar.classList.contains('active');
+
+            if (!isActive) {
+                // ABRIR
+                lastFocusedElement = document.activeElement;
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                
+                // Hacer visible y bloquear fondo
+                sidebar.style.visibility = 'visible';
+                mainContent.setAttribute('aria-hidden', 'true');
+                mainContent.setAttribute('inert', '');
+
+                // Mover foco
+                setTimeout(() => {
+                    const closeBtn = document.getElementById('closeBtn');
+                    if (closeBtn) closeBtn.focus();
+                }, 100);
+
+                sidebar.addEventListener('keydown', handleSidebarKeydown);
+            } else {
+                // CERRAR
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                
+                // Restaurar fondo
+                mainContent.removeAttribute('aria-hidden');
+                mainContent.removeAttribute('inert');
+
+                setTimeout(() => { sidebar.style.visibility = 'hidden'; }, 300);
+
+                if (lastFocusedElement) lastFocusedElement.focus();
+                sidebar.removeEventListener('keydown', handleSidebarKeydown);
+            }
+        }
+
+        function handleSidebarKeydown(e) {
+            if (e.key === 'Escape') toggleMenu();
+            trapFocus(e, document.getElementById('sidebar'));
+        }
+
+        // --- SCRIPT DE REGISTRO ---
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
 
@@ -167,7 +266,6 @@
             const btn = form.querySelector('.btn-register');
             const errorDiv = document.getElementById('js-errors');
             
-            // Estado visual "Cargando"
             const originalText = btn.innerText;
             btn.innerText = 'Creando cuenta...';
             btn.disabled = true;
@@ -175,7 +273,6 @@
             errorDiv.style.display = 'none';
             errorDiv.innerHTML = '';
 
-            // Guardamos el nombre ingresado para usarlo inmediatamente
             const fallbackName = formData.get('name');
 
             fetch(form.action, {
@@ -183,63 +280,34 @@
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json', // Pedimos JSON explícitamente
+                    'Accept': 'application/json',
                 }
             })
             .then(async response => {
-                // 1. Verificar si es una respuesta exitosa (200 o 201)
                 const isSuccess = response.ok; 
-                
-                // Intentamos leer la respuesta JSON (si la hay)
                 let data = {};
-                try {
-                    data = await response.json();
-                } catch (e) {
-                    // Si no hay JSON, no pasa nada, seguimos
-                }
+                try { data = await response.json(); } catch (e) {}
 
-                if (!isSuccess) {
-                    // Si el servidor dice que hubo error (ej: email duplicado)
-                    throw data;
-                }
+                if (!isSuccess) throw data;
 
-                // --- ¡AQUÍ ESTÁ LA CLAVE! ---
-                // Si llegamos aquí, el registro fue exitoso.
-                // No nos importa si el servidor mandó token o no, nosotros CREAMOS uno.
-                
-                console.log("Registro exitoso. Guardando sesión local...");
-
-                // 1. Guardar "Token" (puede ser el real o uno inventado, ambos sirven para activar el menú)
+                // Lógica de éxito: Guardar sesión manual
                 const tokenToSave = data.token || 'session_login_manual_override';
                 localStorage.setItem('auth_token', tokenToSave);
 
-                // 2. Guardar Datos del Usuario (Usamos el que viene del server O el que escribió en el input)
                 const userToSave = data.user || { name: fallbackName, email: formData.get('email') };
                 localStorage.setItem('user_data', JSON.stringify(userToSave));
 
-                // 3. Redirigir
-                // Si el servidor mandó una URL de redirección, la usamos. Si no, al dashboard.
-                if (data.redirect_url) {
-                    window.location.href = data.redirect_url;
-                } else if (response.redirected) {
-                    window.location.href = response.url;
-                } else {
-                    window.location.href = "{{ route('dashboard') }}"; // O a '/'
-                }
+                if (data.redirect_url) window.location.href = data.redirect_url;
+                else if (response.redirected) window.location.href = response.url;
+                else window.location.href = "{{ route('dashboard') }}";
             })
             .catch(error => {
-                console.error("Error en registro:", error);
-                
-                // Restauramos botón
                 btn.innerText = originalText;
                 btn.disabled = false;
                 btn.style.opacity = "1";
 
-                // Mostramos errores
                 let errorMsg = "Ocurrió un error al registrarse.";
-                
                 if (error.errors) {
-                    // Errores de validación de Laravel (ej: email ya existe)
                     errorMsg = "<ul style='padding-left: 20px; text-align: left; margin: 0;'>";
                     for (const [key, messages] of Object.entries(error.errors)) {
                         errorMsg += `<li>${messages[0]}</li>`;
@@ -251,7 +319,16 @@
 
                 errorDiv.innerHTML = errorMsg;
                 errorDiv.style.display = 'block';
+                // Poner foco en el mensaje de error para que el usuario sepa qué pasó
+                errorDiv.setAttribute('tabindex', '-1');
+                errorDiv.focus();
             });
+        });
+        
+        // Inicialización para ocultar sidebar de la tabulación
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            if(sidebar) sidebar.style.visibility = 'hidden';
         });
     </script>
 </body>

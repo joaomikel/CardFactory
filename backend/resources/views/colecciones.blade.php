@@ -26,6 +26,13 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* --- MEJORA DE FOCO (ÚNICO CAMBIO DE ESTILO) --- */
+        :focus-visible {
+            outline: 3px solid var(--focus-ring) !important;
+            outline-offset: 2px;
+        }
+        button:focus, input:focus, a:focus { outline: none; }
+
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -138,8 +145,9 @@
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; gap: 1rem;
             box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            visibility: hidden; /* Evita foco cuando está cerrado */
         }
-        .sidebar.active { left: 0; }
+        .sidebar.active { left: 0; visibility: visible; }
         .close-sidebar { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; background: none; border: none; color: #666; cursor: pointer;}
         .sidebar a { padding: 15px 0; border-bottom: 1px solid #eee; color: var(--secondary); text-decoration: none; font-size: 1.1rem; font-weight: 500;}
 
@@ -206,7 +214,6 @@
         }
         .footer-links a:hover, .footer-links a:focus {
             color: var(--white); background-color: rgba(255,255,255,0.1);
-            outline: 2px solid var(--focus-ring);
         }
         .social-icons { display: flex; gap: 15px; margin-top: 20px; }
         .social-icons a {
@@ -281,16 +288,17 @@
 
     <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
-        <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        <button class="close-sidebar" id="closeSidebarBtn" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Menú</h3>
         <a href="/">Inicio</a>
-        <a href="/dashboard" id="link-perfil-sidebar">Login</a> <a href="/colecciones" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px;">Colecciones</a>
+        <a href="/dashboard" id="link-perfil-sidebar">Login</a> 
+        <a href="/colecciones" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 10px;">Colecciones</a>
         <a href="/catalogo">Catálogo</a>
         <a href="/carrito">Carrito</a>
     </div>
 
     <header>
-        <button class="menu-trigger" onclick="toggleMenu()">☰</button>
+        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
         <div class="auth-actions" id="auth-container">
             <a href="/login" class="btn-header btn-login">Login</a>
             <a href="/register" class="btn-header btn-register">Registro</a>
@@ -318,9 +326,9 @@
                 <h3>CardFactory</h3>
                 <p>Tu mercado de confianza para comprar y vender cartas de Magic.</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
             <div class="footer-section">
@@ -328,7 +336,8 @@
                 <ul class="footer-links">
                     <li><a href="/catalogo">Catálogo Completo</a></li>
                     <li><a href="/colecciones">Ver Colecciones</a></li>
-                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li> <li><a href="javascript:void(0)" onclick="openAccModal()" id="acc-trigger" style="color: #ffbf00;">Accesibilidad</a></li>
+                    <li><a href="/login" id="footer-login-link">Acceso Login</a></li> 
+                    <li><a href="javascript:void(0)" onclick="openAccModal()" id="acc-trigger" style="color: #ffbf00;">Accesibilidad</a></li>
                 </ul>
             </div>
         </div>
@@ -339,13 +348,22 @@
 
     <script>
         function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const menuBtn = document.getElementById('menuBtn');
+            const closeBtn = document.getElementById('closeSidebarBtn');
+
+            const isActive = sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            if (isActive) {
+                setTimeout(() => closeBtn.focus(), 300);
+            } else {
+                menuBtn.focus();
+            }
         }
 
-        // --- LÓGICA DE USUARIO / LOGIN MEJORADA ---
         function checkLoginStatus() {
-            // 1. Buscamos token en ambas memorias
             const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
             const authContainer = document.getElementById('auth-container');
             const footerLoginLink = document.getElementById('footer-login-link');
@@ -355,13 +373,10 @@
             try {
                 const storedUser = localStorage.getItem('user_data') || sessionStorage.getItem('user_data');
                 if (storedUser) userData = JSON.parse(storedUser);
-            } catch (e) { console.log('Error parseando user data'); }
+            } catch (e) { }
 
             if (token) {
-                // --- ESTÁ LOGUEADO ---
                 const userName = userData.name ? userData.name.split(' ')[0] : 'Perfil';
-                
-                // HEADER
                 if (authContainer) {
                     authContainer.innerHTML = `
                         <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
@@ -369,30 +384,17 @@
                             <span class="profile-name">${userName}</span>
                         </a>`;
                 }
-
-                // SIDEBAR
                 if (linkSidebar) {
                     linkSidebar.innerHTML = `Hola, ${userName}`;
                     linkSidebar.href = "/dashboard";
                 }
-
-                // FOOTER
                 if (footerLoginLink) {
                     footerLoginLink.textContent = "Mi Perfil";
                     footerLoginLink.href = "/dashboard";
                 }
-
-            } else {
-                // --- NO ESTÁ LOGUEADO ---
-                if (authContainer) {
-                    authContainer.innerHTML = `
-                        <a href="/login" class="btn-header btn-login">Login</a>
-                        <a href="/register" class="btn-header btn-register">Registro</a>`;
-                }
             }
         }
 
-        // --- LÓGICA DE CARGA DE SETS ---
         let allSets = [];
         let currentCount = 20;
 
@@ -401,14 +403,12 @@
             try {
                 const res = await fetch('https://api.scryfall.com/sets');
                 const data = await res.json();
-                
                 const validTypes = ['expansion', 'core', 'masters', 'draft_innovation', 'commander', 'modern'];
                 allSets = data.data.filter(set => validTypes.includes(set.set_type));
                 allSets.sort((a, b) => new Date(b.released_at) - new Date(a.released_at));
-
                 renderSets(allSets.slice(0, currentCount));
             } catch (error) {
-                container.innerHTML = '<p>Error de conexión con la API.</p>';
+                container.innerHTML = '<p>Error de conexión.</p>';
             }
         }
 
@@ -418,48 +418,31 @@
                 container.innerHTML = '<p style="text-align:center; padding:20px;">No hay resultados.</p>';
                 return;
             }
-
-            container.innerHTML = setsList.map(set => {
-                const dateYear = new Date(set.released_at).getFullYear();
-                // OJO: Cambiado 'catalogo.html' por '/catalogo'
-                return `
-                <div class="set-item" onclick="window.location.href='/catalogo?set=${set.code}'">
+            container.innerHTML = setsList.map(set => `
+                <div class="set-item" tabindex="0" onclick="window.location.href='/catalogo?set=${set.code}'" onkeypress="if(event.key==='Enter')window.location.href='/catalogo?set=${set.code}'">
                     <img src="${set.icon_svg_uri}" class="set-icon" alt="" loading="lazy">
                     <div class="set-info">
                         <h3>${set.name}</h3>
-                        <p>${set.card_count} Cartas • ${dateYear}</p>
+                        <p>${set.card_count} Cartas • ${new Date(set.released_at).getFullYear()}</p>
                     </div>
                     <div class="arrow-indicator">›</div>
                 </div>
-            `}).join('');
+            `).join('');
         }
 
-        // Buscador y Paginación
-        const searchInput = document.getElementById('setSearchInput');
-        if (searchInput) {
-            searchInput.addEventListener('keyup', (e) => {
-                const term = e.target.value.toLowerCase();
-                const filtered = allSets.filter(set => set.name.toLowerCase().includes(term));
-                currentCount = 20;
-                renderSets(filtered.slice(0, currentCount));
-                document.getElementById('loadMoreBtn').style.display = (term !== '' || filtered.length <= currentCount) ? 'none' : 'block';
-            });
-        }
+        document.getElementById('setSearchInput').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allSets.filter(set => set.name.toLowerCase().includes(term));
+            renderSets(filtered.slice(0, 20));
+            document.getElementById('loadMoreBtn').style.display = (term !== '' || filtered.length <= 20) ? 'none' : 'block';
+        });
 
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', () => {
-                currentCount += 20;
-                const term = searchInput ? searchInput.value.toLowerCase() : '';
-                let listToRender = allSets;
-                if(term !== '') listToRender = allSets.filter(set => set.name.toLowerCase().includes(term));
-                
-                renderSets(listToRender.slice(0, currentCount));
-                if (currentCount >= listToRender.length) loadMoreBtn.style.display = 'none';
-            });
-        }
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            currentCount += 20;
+            renderSets(allSets.slice(0, currentCount));
+            if (currentCount >= allSets.length) document.getElementById('loadMoreBtn').style.display = 'none';
+        });
 
-        // Accesibilidad
         let lastFocusedElement;
         function openAccModal() {
             lastFocusedElement = document.activeElement;
@@ -470,19 +453,11 @@
         }
 
         function closeAccModal() {
-            const modal = document.getElementById('acc-modal');
-            modal.classList.remove('active');
+            document.getElementById('acc-modal').classList.remove('active');
             document.body.style.overflow = '';
             if (lastFocusedElement) lastFocusedElement.focus();
         }
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (document.getElementById('acc-modal').classList.contains('active')) closeAccModal();
-            }
-        });
-
-        // INICIALIZACIÓN
         document.addEventListener("DOMContentLoaded", () => {
             checkLoginStatus(); 
             loadSets(); 

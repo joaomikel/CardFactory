@@ -12,13 +12,34 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
     <style>
-        :root { --primary: #816EB2; --dark: #111827; --bg: #f3f4f6; --danger: #ef4444; --warning: #f59e0b; }
+        :root { 
+            --primary: #816EB2; 
+            --dark: #111827; 
+            --bg: #f3f4f6; 
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            /* Foco amarillo solicitado */
+            --focus-ring: #ffbf00; 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
+        /* --- MEJORA DE ACCESIBILIDAD (FOCO) --- */
+        *:focus-visible {
+            outline: 3px solid var(--focus-ring) !important;
+            outline-offset: 2px;
+            z-index: 10;
+        }
+        /* Eliminar outline por defecto en clic de ratón si no es teclado */
+        button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
+
         body { background-color: var(--bg); color: var(--dark); padding-bottom: 40px; }
 
         .top-nav { padding: 20px 5%; display: flex; justify-content: flex-start; }
-        .btn-back { text-decoration: none; color: var(--primary); font-weight: 700; }
+        .btn-back { 
+            text-decoration: none; color: var(--primary); font-weight: 700; 
+            border-radius: 4px; /* Para que el foco se vea bien */
+            padding: 5px;
+        }
 
         .profile-container { max-width: 450px; margin: 0 auto; padding: 20px; }
         
@@ -45,7 +66,16 @@
         .ui-tabs .ui-tabs-nav li a {
             display: block; width: 100%; padding: 10px; text-decoration: none;
             font-weight: 600; color: #6b7280; font-size: 0.95rem; outline: none;
+            border-radius: 8px; /* Foco redondeado en tabs */
         }
+        
+        /* Foco específico para las pestañas */
+        .ui-tabs .ui-tabs-nav li a:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: -2px; /* Interior */
+            z-index: 5;
+        }
+
         .ui-tabs .ui-tabs-nav li.ui-tabs-active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .ui-tabs .ui-tabs-nav li.ui-tabs-active a { color: var(--primary); }
         .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: none; background: transparent; }
@@ -53,11 +83,18 @@
         /* --- FORMS & CARDS --- */
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; margin-bottom: 6px; font-size: 0.9rem; font-weight: 600; color: #374151; }
+        
         .form-input { 
             width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid #d1d5db; 
             font-size: 1rem; outline: none; transition: 0.2s;
         }
-        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(129, 110, 178, 0.1); }
+        
+        /* CAMBIO: Foco amarillo en inputs */
+        .form-input:focus { 
+            border-color: var(--focus-ring); 
+            box-shadow: 0 0 0 3px rgba(255, 191, 0, 0.2); /* Sombra amarilla suave */
+        }
+        
         .btn-save {
             width: 100%; padding: 14px; background: var(--primary); color: white; border: none;
             border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 10px;
@@ -92,69 +129,40 @@
         }
 
         /* --- NUEVOS ESTILOS PARA LAS CARTAS (MOBILE FRIENDLY) --- */
-        
-        .grid-cards {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
-        }
+        .grid-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
 
         .user-card-item {
             background: white; border-radius: 12px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;
-            overflow: hidden; /* Importante para los bordes redondeados */
-            display: flex; flex-direction: column;
+            overflow: hidden; display: flex; flex-direction: column;
         }
 
         .card-img-wrapper {
-            position: relative;
-            width: 100%; height: 140px;
-            padding: 10px;
-            background: #fff;
+            position: relative; width: 100%; height: 140px;
+            padding: 10px; background: #fff;
         }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: contain; }
 
-        .card-img-wrapper img {
-            width: 100%; height: 100%; object-fit: contain;
-        }
-
-        .card-info {
-            padding: 0 10px 10px 10px;
-            flex-grow: 1; /* Empuja los botones al fondo */
-        }
+        .card-info { padding: 0 10px 10px 10px; flex-grow: 1; }
 
         .card-title {
             font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        .card-details {
-            display: flex; justify-content: space-between; align-items: center; margin-top: 5px;
-        }
+        .card-details { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
 
-        /* --- BARRA DE ACCIONES (NUEVO) --- */
-        .card-actions-bar {
-            display: flex;
-            border-top: 1px solid #f3f4f6;
-        }
+        /* --- BARRA DE ACCIONES --- */
+        .card-actions-bar { display: flex; border-top: 1px solid #f3f4f6; }
 
         .btn-action-mobile {
-            flex: 1; /* Ocupan 50% cada uno */
-            padding: 12px 0;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            color: white;
-            transition: background 0.2s;
+            flex: 1; padding: 12px 0; border: none; font-size: 1rem;
+            cursor: pointer; color: white; transition: background 0.2s;
         }
-
-        .btn-edit-mobile {
-            background-color: var(--warning); 
-        }
+        .btn-edit-mobile { background-color: var(--warning); }
         .btn-edit-mobile:hover { background-color: #d97706; }
-
-        .btn-delete-mobile {
-            background-color: var(--danger);
-        }
+        .btn-delete-mobile { background-color: var(--danger); }
         .btn-delete-mobile:hover { background-color: #dc2626; }
-
 
         /* Estilos del Modal */
         .modal-overlay {
@@ -251,7 +259,7 @@
                 @else
                     <div class="grid-cards">
                         @foreach($listings as $listing)
-                            <div class="user-card-item">
+                            <div class="user-card-item" tabindex="0">
                                 <div class="card-img-wrapper">
                                     <img src="{{ $listing->card->image_url }}" alt="{{ $listing->card->name }}">
                                 </div>
@@ -311,7 +319,7 @@
         <div class="modal-content">
             <div class="modal-header-edit">
                 <h3>Editar Producto</h3>
-                <button onclick="closeEditModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                <button onclick="closeEditModal()" class="close-modal-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
             </div>
             
             <form id="editForm" method="POST" action="">
@@ -362,28 +370,46 @@
         } );
 
         // --- LÓGICA DEL MODAL ---
+        let lastFocusedElement;
+
         function openEditModal(id, name, price, condition) {
+            lastFocusedElement = document.activeElement;
+            
             // 1. Rellenar datos
             document.getElementById('modalName').value = name;
             document.getElementById('modalPrice').value = price;
             document.getElementById('modalCondition').value = condition;
 
-            // 2. ACTUALIZAMOS LA RUTA AL CONTROLADOR DE LISTINGS
-            // Antes ponía '/cards/', ahora es '/listings/'
+            // 2. ACTUALIZAMOS LA RUTA
             const form = document.getElementById('editForm');
             form.action = '/listings/' + id; 
 
             // 3. Mostrar modal
-            document.getElementById('editModal').classList.add('active');
+            const modal = document.getElementById('editModal');
+            modal.classList.add('active');
+            
+            // 4. Gestión de foco
+            setTimeout(() => {
+                const closeBtn = modal.querySelector('.close-modal-btn');
+                if(closeBtn) closeBtn.focus();
+            }, 100);
         }
 
         function closeEditModal() {
             document.getElementById('editModal').classList.remove('active');
+            if (lastFocusedElement) lastFocusedElement.focus();
         }
 
         // Cerrar al hacer clic fuera
         document.getElementById('editModal').addEventListener('click', function(e) {
             if(e.target === this) closeEditModal();
+        });
+        
+        // Cerrar con Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('editModal').classList.contains('active')) {
+                closeEditModal();
+            }
         });
     </script>
 
