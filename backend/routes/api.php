@@ -9,6 +9,10 @@ use App\Http\Controllers\CatalogController;
 use App\Models\Card;
 use App\Models\Listing;
 
+
+// Ruta pública para el Catálogo 
+Route::get('/api/listings', [ListingController::class, 'index']);
+
 // 0. Tendencias (Tu código original)
 Route::get('/tendencias', function () {
     return Listing::with('card')
