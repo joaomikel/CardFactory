@@ -36,7 +36,6 @@ class CatalogController extends Controller
         return view('catalogo', compact('listings'));
     }
 
-    // --- AÑADE ESTA FUNCIÓN NUEVA AQUI ---
     public function checkStockBatch(Request $request)
     {
         // 1. Validamos que nos envíen un array de IDs
@@ -48,9 +47,9 @@ class CatalogController extends Controller
         $ids = $request->input('ids');
 
         // 2. Buscamos en la tabla Listings
-        // - Que coincida con los scryfall_id
-        // - Que tenga stock (quantity > 0)
-        // - Agrupamos por scryfall_id y sacamos el precio MÍNIMO
+        // Que coincida con los scryfall_id
+        // Que tenga stock (quantity > 0)
+        // Agrupamos por scryfall_id y sacamos el precio MÍNIMO
         $stock = Listing::whereIn('scryfall_id', $ids)
             ->where('quantity', '>', 0)
             ->selectRaw('scryfall_id, MIN(price) as min_price')
@@ -60,5 +59,19 @@ class CatalogController extends Controller
         // 3. Formateamos la respuesta para JS: { "uuid-1": 10.50, "uuid-2": 5.00 }
         // 'pluck' crea un array asociativo clave(scryfall_id) => valor(min_price)
         return response()->json($stock->pluck('min_price', 'scryfall_id'));
+    }
+    public function showCard(Request $request)
+    {
+        // Obtenemos el ID de la URL (?id=...)
+        $cardId = $request->query('id');
+
+        // Buscamos las ventas locales para esa carta
+        // Usamos 'with' para cargar el usuario y el set y que sea eficiente
+        $listings = \App\Models\Listing::where('scryfall_id', $cardId)
+                        ->with(['user', 'card.set'])
+                        ->get();
+
+        // Devolvemos la vista pasando las ofertas ($listings)
+        return view('carta', compact('listings', 'cardId'));
     }
 }

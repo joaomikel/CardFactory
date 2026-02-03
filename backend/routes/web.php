@@ -46,9 +46,7 @@ Route::get('/carrito', function () {
     return view('carrito');
 });
 
-Route::get('/carta', function () {
-    return view('carta');
-});
+Route::get('/carta', [App\Http\Controllers\CatalogController::class, 'showCard'])->name('carta.show');
 
 
 
