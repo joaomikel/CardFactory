@@ -43,7 +43,7 @@
         .tag-fail { background: #fee2e2; color: #991b1b; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- SIDEBAR (MENU LATERAL) --- */
+        /* --- SIDEBAR (MENU LATERAL - IGUAL AL EJEMPLO) --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); z-index: 1001; opacity: 0; pointer-events: none; transition: 0.3s;
@@ -60,16 +60,28 @@
         }
         .sidebar.active { left: 0; }
         .close-sidebar { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; background: none; border: none; color: #666; cursor: pointer; }
+        
         .sidebar a { padding: 12px 0; border-bottom: 1px solid #eee; color: var(--text-dark); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; }
         .sidebar a:hover { color: var(--primary); padding-left: 5px; transition: 0.2s; }
 
-        /* --- HEADER --- */
+        /* --- HEADER (IGUAL AL EJEMPLO) --- */
         header {
             background: var(--primary); height: 70px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; position: sticky; top: 0; left: 0; right: 0; z-index: 100;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .menu-trigger { font-size: 1.5rem; background: none; border: none; color: var(--white); cursor: pointer; padding: 5px; }
+        
+        /* El botón hamburguesa "☰" */
+        .menu-trigger { 
+            font-size: 1.8rem; /* Ajustado para el caracter */
+            background: none; 
+            border: none; 
+            color: var(--white); 
+            cursor: pointer; 
+            padding: 0 5px;
+            line-height: 1;
+        }
+        
         .header-title { font-weight: 800; font-size: 1.5rem; color: white; position: absolute; left: 50%; transform: translateX(-50%); letter-spacing: -1px; }
         
         .auth-actions { display: flex; gap: 10px; align-items: center; }
@@ -77,7 +89,7 @@
         .btn-login { background: rgba(255,255,255,0.25); color: var(--white); border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(4px); }
         .btn-register { background: var(--text-dark); color: var(--white); }
         
-        /* Widget Perfil en Header */
+        /* Widget Perfil (Mantenido para cuando está logueado) */
         .user-profile-widget { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; background: rgba(255,255,255,0.2); padding: 4px 12px 4px 4px; border-radius: 30px; }
         .profile-avatar { width: 28px; height: 28px; background: white; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
@@ -104,7 +116,7 @@
         .listing-row[draggable="true"] { cursor: grab; }
         .listing-row[draggable="true"]:active { cursor: grabbing; }
 
-        /* --- FOOTER --- */
+        /* --- FOOTER (IGUAL AL EJEMPLO) --- */
         footer { background: #2b2440; color: white; padding: 40px 20px 20px; margin-top: auto; }
         .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; }
         .footer-logo { max-width: 150px; margin-bottom: 15px; border-radius: 8px; }
@@ -168,24 +180,17 @@
         <button class="close-sidebar" id="closeSidebarBtn" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
         <h3 style="color: var(--primary); margin-bottom: 1rem;">Menú</h3>
         <a href="{{ url('/') }}">Inicio</a> 
-        
-        @auth
-            <a href="{{ url('/dashboard') }}" style="color: var(--primary);">Mi Perfil</a>
-        @else
-            <a href="{{ route('login') }}">Login</a>
-        @endauth
-        
+        <a href="{{ url('/dashboard') }}" id="link-perfil-sidebar">
+            @auth Mi Perfil @else Login @endauth
+        </a>
         <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
         <a href="{{ url('/carrito') }}">Carrito</a>
     </div>
 
     <header>
-        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir Menú">
-            <i class="fas fa-bars"></i>
-        </button>
+        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir Menú">☰</button>
         
-        <div class="header-title">Card<span style="color: #ffbf00;">Factory</span></div>
         
         <div class="auth-actions" id="auth-container">
             @auth
@@ -280,8 +285,8 @@
     <footer role="contentinfo">
         <div class="footer-content">
             <div class="footer-section">
-                <h4 style="margin-bottom:10px; font-weight:800; font-size:1.2rem;">CardFactory</h4>
-                <p style="font-size:0.9rem; color:#ccc; line-height:1.5;">Tu mercado de confianza para comprar y vender cartas.</p>
+                <img src="{{ asset('logo.jpg') }}" alt="CardFactory Logo" class="footer-logo">
+                <p>Tu mercado de confianza para comprar y vender cartas de Magic: The Gathering.</p>
                 <div class="social-icons" style="margin-top:15px;">
                     <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
@@ -293,6 +298,7 @@
                 <ul class="footer-links">
                     <li><a href="{{ url('/catalogo') }}">Catálogo Completo</a></li>
                     <li><a href="{{ url('/colecciones') }}">Ver Colecciones</a></li>
+                    <li><a href="{{ route('login') }}" id="footer-login-link">Acceso Login</a></li> 
                     <li><a href="javascript:void(0)" onclick="openAccModal()" id="acc-trigger" style="color: #ffbf00;">Accesibilidad</a></li>
                 </ul>
             </div>
@@ -309,7 +315,6 @@
 
     <script>
         // --- VARIABLES DE AUTENTICACION ---
-        // Aquí detectamos si está logueado o no para usarlos abajo
         const isUserLoggedIn = @json(Auth::check());
         const loginUrl = "{{ route('login') }}";
 
@@ -375,7 +380,6 @@
             return true;
         }
 
-        // AGREGAR CLICK: Verificación de Login
         function addToCartClick(btn) {
             if(!isUserLoggedIn) {
                 alert("Debes iniciar sesión para añadir productos al carrito.");
@@ -392,10 +396,9 @@
             }
         }
 
-        // DRAG START: Verificación de Login
         function handleDragStart(e) {
             if(!isUserLoggedIn) {
-                e.preventDefault(); // Evita que empiece a arrastrar
+                e.preventDefault();
                 window.location.href = loginUrl;
                 return;
             }
@@ -412,7 +415,6 @@
             zone.addEventListener('drop', (e) => {
                 e.preventDefault(); zone.classList.remove('drag-over-active');
                 
-                // Si por alguna razón el drag start no lo bloqueó (navegadores viejos), bloqueamos aquí también
                 if(!isUserLoggedIn) {
                     window.location.href = loginUrl;
                     return;
