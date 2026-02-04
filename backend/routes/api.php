@@ -21,7 +21,23 @@ Route::get('/tendencias', function () {
         ->take(4)
         ->get();
 });
+Route::post('/check-stock', function (Request $request) {
+    
+    $ids = $request->input('ids', []);
 
+    if (empty($ids)) {
+        return response()->json([]);
+    }
+
+    $stock = DB::table('listings')
+        ->whereIn('scryfall_id', $ids)
+        ->where('quantity', '>', 0)
+        ->select('scryfall_id', DB::raw('MIN(price) as min_price'))
+        ->groupBy('scryfall_id')
+        ->pluck('min_price', 'scryfall_id');
+
+    return response()->json($stock);
+});
 // 1. Ver cartas por ID de Scryfall 
 Route::get('/listings/card/{scryfall_id}', [ListingController::class, 'getByCard']);
 // 1.1 Ver cartas de Listings

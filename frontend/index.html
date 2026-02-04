@@ -889,12 +889,13 @@ footer { margin-top: auto; background: #2b2440; color: var(--text-light); paddin
         function performSearch() {
             const input = document.getElementById('searchInput');
             const query = input.value.trim();
-            if (query) window.location.href = `/catalogo?q=${encodeURIComponent(query)}`;
-            else window.location.href = '/catalogo';
+            if (query) {
+                window.location.href = `/catalogo?name=${encodeURIComponent(query)}`;
+            } else {
+                window.location.href = '/catalogo';
+            }
         }
-
         function handleEnter(e) { if (e.key === 'Enter') performSearch(); }
-
         window.onload = () => {
             checkLoginStatus(); // Verificar sesión al cargar
             loadCards('/api/trending', 'trending-container', 18);
