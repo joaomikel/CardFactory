@@ -167,7 +167,18 @@
             
             <article class="help-card">
                 <div class="video-wrapper">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=placeholder" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <video controls width="100%" height="auto">
+                        <source src="http://localhost:8000/videos/compra.mp4" type="video/mp4" crossorigin="anonymous">
+
+                        <track
+                            src="http://localhost:8000/videos/compra.vtt"
+                            kind="subtitles"
+                            srclang="es"
+                            label="Español" 
+                            default>
+                            
+                        Tu navegador no soporta videos.
+                    </video>
                 </div>
                 <div class="help-content">
                     <h2><div class="icon-step"><i class="fas fa-shopping-cart"></i></div> Cómo Comprar</h2>
