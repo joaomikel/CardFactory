@@ -38,6 +38,7 @@
         <a href="/colecciones">Colecciones</a>
         <a href="/catalogo" style="color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); padding-left: 6px;">Catálogo</a>
         <a href="/carrito">Carrito</a>
+        <a href="/ayuda">Ayuda</a>
     </div>
 
     <header>
@@ -122,6 +123,7 @@
                     <li><a href="/catalogo">Catálogo Completo</a></li>
                     <li><a href="/colecciones">Ver Colecciones</a></li>
                     <li><a href="/login" id="footer-login-link">Acceso Login</a></li> 
+                    <li><a href="/ayuda">Ayuda</a></li>                    
                     <li><a href="javascript:void(0)" onclick="openAccModal()" style="color: #ffbf00;">Accesibilidad</a></li>
                 </ul>
             </div>

@@ -65,5 +65,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/listings', [ListingController::class, 'store'])->name('listings.store');
 
 });
+Route::view('/ayuda', 'ayuda');
 
 require __DIR__.'/auth.php';
