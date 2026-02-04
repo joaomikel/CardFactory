@@ -78,6 +78,17 @@ body {
     text-overflow: ellipsis;
     display: none;
 }
+a.card-catalog {
+            text-decoration: none !important;
+            color: inherit !important;
+            display: block; 
+}
+
+a.card-catalog:hover {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
 @media (min-width: 480px) {
     .profile-name {
         display: block;

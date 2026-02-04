@@ -52,4 +52,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Listing::class);
     }
+    public function cards()
+    {
+        return $this->belongsToMany(Card::class, 'listings', 'user_id', 'card_id')
+                    ->withPivot('id', 'price', 'quantity', 'condition', 'language', 'is_foil') // Campos extra de la tabla listings
+                    ->withTimestamps();
+    }
 }

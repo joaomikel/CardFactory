@@ -10,7 +10,7 @@ class ReviewController extends Controller
     // Tu función index ya existente...
     public function index()
     {
-        return Review::latest()->take(3)->get();
+        return Review::latest()->take(20)->get();
     }
 
     // --- AÑADE ESTA FUNCIÓN NUEVA ---

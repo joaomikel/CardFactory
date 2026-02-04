@@ -28,4 +28,11 @@ class Card extends Model
     {
         return $this->hasMany(Listing::class);
     }
+
+    public function sellers()
+    {
+        return $this->belongsToMany(User::class, 'listings', 'card_id', 'user_id')
+                    ->withPivot('id', 'price', 'quantity', 'condition', 'language', 'is_foil')
+                    ->withTimestamps();
+    }
 }
