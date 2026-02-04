@@ -223,7 +223,113 @@
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
         }
+        // Sustituye tu función checkLoginStatus antigua por esta:
+            function checkLoginStatus() {
+                // 1. Buscamos el token
+                const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+                
+                // 2. Buscamos los datos "viejos" (caché) para mostrar algo rápido
+                let storedUser = sessionStorage.getItem('user_data') || localStorage.getItem('user_data');
+                let userData = { name: 'Usuario' };
 
+                try {
+                    if (storedUser) userData = JSON.parse(storedUser);
+                } catch (e) {
+                    console.error("Error parseando usuario", e);
+                }
+
+                if (token) {
+                    // --- A. MOSTRAR DATOS DE LA CACHÉ (Inmediato) ---
+                    updateUserUI(userData);
+
+                    // --- B. PEDIR DATOS FRESCOS AL SERVIDOR (Segundo plano) ---
+                    // Esto arregla tu problema: actualiza el nombre si cambió en la DB
+                    fetch('/api/user', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) return response.json();
+                        throw new Error('Sesión expirada o inválida');
+                    })
+                    .then(freshUser => {
+                        // Si el nombre ha cambiado, actualizamos todo
+                        if (JSON.stringify(freshUser) !== storedUser) {
+                            console.log("Datos actualizados desde el servidor");
+                            
+                            // 1. Guardar en memoria nueva
+                            localStorage.setItem('user_data', JSON.stringify(freshUser));
+                            sessionStorage.setItem('user_data', JSON.stringify(freshUser));
+                            
+                            // 2. Actualizar el Header otra vez con el nombre nuevo
+                            updateUserUI(freshUser);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error verificando sesión:", error);
+                        // Opcional: Si el token no vale, cerrar sesión
+                        // logout(); 
+                    });
+
+                } else {
+                    // --- USUARIO NO LOGUEADO ---
+                    showGuestUI();
+                }
+            }
+
+            // --- FUNCIONES AUXILIARES PARA LIMPIAR EL CÓDIGO ---
+
+            function updateUserUI(user) {
+                const userName = user.name ? user.name.split(' ')[0] : 'Mi Cuenta';
+                const authContainer = document.getElementById('auth-container');
+                const linkSidebar = document.getElementById('link-perfil-sidebar');
+                const footerLoginLink = document.getElementById('footer-login-link');
+
+                // 1. Header
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/dashboard" class="user-profile-widget" title="Ir a mi perfil">
+                            <div class="profile-avatar"><i class="fas fa-user"></i></div>
+                            <span class="profile-name">${userName}</span>
+                        </a>`;
+                }
+                // 2. Sidebar
+                if (linkSidebar) {
+                    linkSidebar.innerHTML = `Hola, ${userName}`;
+                    linkSidebar.href = "/dashboard";
+                    linkSidebar.style.color = "var(--primary)";
+                    linkSidebar.style.fontWeight = "bold";
+                }
+                // 3. Footer
+                if (footerLoginLink) {
+                    footerLoginLink.textContent = "Mi Perfil";
+                    footerLoginLink.href = "/dashboard";
+                }
+            }
+
+            function showGuestUI() {
+                const authContainer = document.getElementById('auth-container');
+                const linkSidebar = document.getElementById('link-perfil-sidebar');
+                const footerLoginLink = document.getElementById('footer-login-link');
+
+                if (authContainer) {
+                    authContainer.innerHTML = `
+                        <a href="/login" class="btn-header btn-login">Login</a>
+                        <a href="/register" class="btn-header btn-register">Registro</a>`;
+                }
+                if (linkSidebar) {
+                    linkSidebar.textContent = "Login";
+                    linkSidebar.href = "/login";
+                    linkSidebar.style.color = "";
+                }
+                if (footerLoginLink) {
+                    footerLoginLink.textContent = "Acceso Login";
+                    footerLoginLink.href = "/login";
+                }
+            }
         function openAccModal() {
             document.getElementById('acc-modal').classList.add('active');
         }
