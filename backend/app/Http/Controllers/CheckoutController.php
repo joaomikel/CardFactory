@@ -13,11 +13,20 @@ class CheckoutController extends Controller
             'amount' => 'required|numeric',
         ]);
 
+        $minimo = 10.00;
+        
+        $subtotalCalculado = collect($request->items)->sum('price');
+
+        if ($subtotalCalculado < $minimo) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'El pedido mínimo es de ' . $minimo . ' euros.'
+            ], 400); 
+        }
+        
         return response()->json([
             'status' => 'success',
-            'message' => 'Compra procesada y registrada en el sistema.',
-            // Devolvemos lo que nos llegó para confirmar (opcional)
-            'data_received' => $request->all() 
+            'message' => 'Compra procesada correctamente.'
         ]);
     }
 }

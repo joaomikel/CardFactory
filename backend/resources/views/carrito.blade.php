@@ -178,19 +178,24 @@
     function checkout() {
         if(cart.length === 0) return alert("El carrito está vacío.");
         
-        // 1. Comprobar si está logueado
+        // 1. Validar Usuario
         if (!window.isLoggedIn) {
             alert("🔒 Para finalizar la compra necesitas iniciar sesión.");
             window.location.href = '/login';
             return;
         }
 
-        // 2. Calcular totales para enviarlos
         const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+        const MINIMO_COMPRA = 10.00;
+
+        if (subtotal < MINIMO_COMPRA) {
+            alert(`⚠️ El pedido mínimo es de ${MINIMO_COMPRA}€ (sin contar envío).\nActualmente tienes: ${subtotal.toFixed(2)}€`);
+            return; 
+        }
+
         const total = subtotal + shippingCost;
 
         if(confirm(`¿Confirmar compra por ${total.toFixed(2)} €?`)) {
-            
             // Interfaz visual: "Procesando..."
             const btn = document.querySelector('.checkout-btn');
             const originalText = btn.innerText;
