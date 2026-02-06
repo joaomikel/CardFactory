@@ -118,7 +118,7 @@
         <button class="checkout-btn" onclick="checkout()">Finalizar Compra</button>
     </div>
 
-    <script>
+<script>
     // --- Inyectar estado de Login de Laravel ---
     window.isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
     
@@ -174,36 +174,66 @@
         }, 300);
     }
 
-    // --- AQUÍ ESTÁ EL CAMBIO PARA QUE NO DE ERROR 404 ---
+    // --- FUNCIÓN DE PAGO CONECTADA AL SERVIDOR ---
     function checkout() {
         if(cart.length === 0) return alert("El carrito está vacío.");
         
-        // 1. Comprobar si está logueado (sin fetch, solo mirando la variable)
+        // 1. Comprobar si está logueado
         if (!window.isLoggedIn) {
             alert("🔒 Para finalizar la compra necesitas iniciar sesión.");
             window.location.href = '/login';
             return;
         }
 
-        // 2. Simular compra EXITOSA directamente (Sin llamar al servidor)
-        if(confirm(`¿Confirmar compra por ${document.getElementById('total').innerText}?`)) {
+        // 2. Calcular totales para enviarlos
+        const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+        const total = subtotal + shippingCost;
+
+        if(confirm(`¿Confirmar compra por ${total.toFixed(2)} €?`)) {
             
-            // Simulamos un pequeño tiempo de carga
+            // Interfaz visual: "Procesando..."
             const btn = document.querySelector('.checkout-btn');
-            btn.innerText = "Procesando...";
+            const originalText = btn.innerText;
+            btn.innerText = "Conectando con el servidor...";
             btn.disabled = true;
 
-            setTimeout(() => {
-                alert("¡Compra realizada con éxito! 📦\n(Pedido simulado correctamente)");
-                
-                // Vaciar carrito
-                cart = [];
-                localStorage.removeItem('myCart');
-                renderCart();
-                
-                btn.innerText = "Finalizar Compra";
+            // 3. ENVIAR DATOS REALES AL BACKEND (Aquí actúa el Middleware LogActivity)
+            fetch('/pagar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Importante: El token CSRF para que Laravel acepte la petición
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ 
+                    items: cart,     // Enviamos las cartas
+                    amount: total,   // Enviamos el total
+                    date: new Date().toISOString()
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // ÉXITO
+                    alert("¡Compra registrada correctamente! 📦\nRevisa el log del servidor.");
+                    
+                    // Vaciar carrito
+                    cart = [];
+                    localStorage.removeItem('myCart');
+                    renderCart();
+                } else {
+                    // ERROR
+                    alert("Hubo un error al procesar el pedido.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Error de conexión con el servidor.");
+            })
+            .finally(() => {
+                // Restaurar botón
+                btn.innerText = originalText;
                 btn.disabled = false;
-            }, 1000);
+            });
         }
     }
 
