@@ -167,17 +167,8 @@
             
             <article class="help-card">
                 <div class="video-wrapper">
-                    <video controls width="100%" height="auto">
-                        <source src="http://localhost:8000/videos/compra.mp4" type="video/mp4" crossorigin="anonymous">
-
-                        <track
-                            src="http://localhost:8000/videos/compra.vtt"
-                            kind="subtitles"
-                            srclang="es"
-                            label="Español" 
-                            default>
-                            
-                        Tu navegador no soporta videos.
+                    <video controls crossorigin="anonymous"> <source src="/videos/compra.mp4" type="video/mp4">
+                        <track src="/videos/compra.vtt" kind="subtitles" srclang="es" label="Español" default>
                     </video>
                 </div>
                 <div class="help-content">
