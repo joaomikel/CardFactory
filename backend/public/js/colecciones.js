@@ -142,19 +142,19 @@ async function loadSets() {
 
 function renderSets(setsList) {
     const container = document.getElementById('sets-container');
+    
     if(setsList.length === 0) {
         container.innerHTML = '<p style="text-align:center; padding:20px;">No hay resultados.</p>';
         return;
     }
     container.innerHTML = setsList.map(set => `
-        <div class="set-item" tabindex="0" onclick="window.location.href='/catalogo?set=${set.code}'" onkeypress="if(event.key==='Enter')window.location.href='/catalogo?set=${set.code}'">
+        <a href="/catalogo?set=${set.code}" class="set-item" style="text-decoration: none; color: inherit; display: block;">
             <img src="${set.icon_svg_uri}" class="set-icon" alt="" loading="lazy">
             <div class="set-info">
                 <h3>${set.name}</h3>
                 <p>${set.card_count} Cartas • ${new Date(set.released_at).getFullYear()}</p>
             </div>
-            <div class="arrow-indicator">›</div>
-        </div>
+        </a>
     `).join('');
 }
 

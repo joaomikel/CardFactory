@@ -64,7 +64,7 @@
     <section class="hero-mini">
         <h1>Explorar Sets</h1>
         <div class="search-wrapper-mini">
-            <input type="text" placeholder="Buscar edición..." id="setSearchInput">
+            <input type="text" placeholder="Buscar edición..." id="setSearchInput" alt="Buscador">
             <i class="fas fa-search search-icon-mini"></i>
         </div>
     </section>
@@ -79,7 +79,7 @@
     <footer role="contentinfo">
         <div class="footer-content">
             <div class="footer-section">
-                <img src="/logo.jpg" alt="CardFactory Logo" class="footer-logo">
+                <img src="http://localhost:8000/logo.jpg" alt="CardFactory Logo" class="footer-logo">
                 <p>Tu mercado de confianza para comprar y vender cartas de Magic.</p>
                 <div class="social-icons">
                     <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
