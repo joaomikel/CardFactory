@@ -42,8 +42,8 @@
     </div>
 
     <header>
-        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir Menú">
-            <i class="fas fa-bars"></i>
+        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir menú principal">
+            <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
         <div class="header-title">Catálogo</div>
         
@@ -57,8 +57,8 @@
         <div class="filter-group search-group" style="flex: 2;">
             <label for="search-name">Nombre de la carta</label>
             <div style="position: relative;">
-                <input type="text" id="search-name" placeholder="Ej: Black Lotus..." class="filter-control">
-                <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #9ca3af; pointer-events: none;"></i>
+                <input type="text" id="search-name" placeholder="Ej: Black Lotus..." class="filter-control" aria-label="Buscar carta por nombre">
+                <i class="fas fa-search" aria-hidden="true" style="..."></i>
             </div>
         </div>
 
@@ -112,9 +112,9 @@
                 <img src="/img/logo.jpg" alt="CardFactory Logo" class="footer-logo">
                 <p>Tu mercado de confianza para comprar y vender cartas de Magic.</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                 </div>
             </div>
             <div class="footer-section">

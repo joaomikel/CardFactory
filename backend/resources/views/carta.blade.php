@@ -24,6 +24,12 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
 
+        /* Mejora del foco para navegación por teclado */
+        *:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+        }
+
         body { background-color: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
 
         /* --- ACCESIBILIDAD (MODAL) --- */
@@ -43,7 +49,7 @@
         .tag-fail { background: #fee2e2; color: #991b1b; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- SIDEBAR (MENU LATERAL - IGUAL AL EJEMPLO) --- */
+        /* --- SIDEBAR --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); z-index: 1001; opacity: 0; pointer-events: none; transition: 0.3s;
@@ -64,16 +70,15 @@
         .sidebar a { padding: 12px 0; border-bottom: 1px solid #eee; color: var(--text-dark); text-decoration: none; font-size: 1.1rem; font-weight: 500; display: block; }
         .sidebar a:hover { color: var(--primary); padding-left: 5px; transition: 0.2s; }
 
-        /* --- HEADER (IGUAL AL EJEMPLO) --- */
+        /* --- HEADER --- */
         header {
             background: var(--primary); height: 70px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; position: sticky; top: 0; left: 0; right: 0; z-index: 100;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        /* El botón hamburguesa "☰" */
         .menu-trigger { 
-            font-size: 1.8rem; /* Ajustado para el caracter */
+            font-size: 1.8rem; 
             background: none; 
             border: none; 
             color: var(--white); 
@@ -86,10 +91,14 @@
         
         .auth-actions { display: flex; gap: 10px; align-items: center; }
         .btn-header { padding: 8px 16px; border-radius: 20px; font-weight: 600; text-decoration: none; font-size: 0.85rem; transition: 0.3s; white-space: nowrap; }
-        .btn-login { background: rgba(255,255,255,0.25); color: var(--white); border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(4px); }
+        
+        /* ACCESIBILIDAD: Mejora de contraste en botón Login */
+        /* Antes era rgba(255,255,255,0.25), demasiado transparente para texto blanco */
+        .btn-login { background: rgba(0, 0, 0, 0.2); color: var(--white); border: 1px solid rgba(255,255,255,0.6); backdrop-filter: blur(4px); }
+        .btn-login:hover { background: rgba(0,0,0,0.3); }
+
         .btn-register { background: var(--text-dark); color: var(--white); }
         
-        /* Widget Perfil (Mantenido para cuando está logueado) */
         .user-profile-widget { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; background: rgba(255,255,255,0.2); padding: 4px 12px 4px 4px; border-radius: 30px; }
         .profile-avatar { width: 28px; height: 28px; background: white; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
@@ -112,11 +121,10 @@
 
         .btn-add { background: var(--text-dark); color: white; border: none; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 1.1rem; }
         
-        /* Drag & Drop Styles */
         .listing-row[draggable="true"] { cursor: grab; }
         .listing-row[draggable="true"]:active { cursor: grabbing; }
 
-        /* --- FOOTER (IGUAL AL EJEMPLO) --- */
+        /* --- FOOTER --- */
         footer { background: #2b2440; color: white; padding: 40px 20px 20px; margin-top: auto; }
         .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; }
         .footer-logo { max-width: 150px; margin-bottom: 15px; border-radius: 8px; }
@@ -128,16 +136,41 @@
         .footer-bottom { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; color: #888; }
 
         /* --- CARRITO FLOTANTE --- */
+        @keyframes palpito {
+            0% { transform: scale(1); box-shadow: 0 10px 30px rgba(129, 110, 178, 0.5); }
+            14% { transform: scale(1.15); box-shadow: 0 10px 30px rgba(129, 110, 178, 0.8); }
+            28% { transform: scale(1); box-shadow: 0 10px 30px rgba(129, 110, 178, 0.5); }
+            42% { transform: scale(1.15); box-shadow: 0 10px 30px rgba(129, 110, 178, 0.8); }
+            70% { transform: scale(1); box-shadow: 0 10px 30px rgba(129, 110, 178, 0.5); }
+        }
+
         .floating-cart-zone {
             position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
             background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; box-shadow: 0 10px 30px rgba(129, 110, 178, 0.5); z-index: 1000; cursor: pointer; border: 4px solid white;
-            transition: transform 0.2s;
+            color: white; 
+            z-index: 1000; cursor: pointer; border: 4px solid white;
+            transition: transform 0.2s, background 0.2s;
+            animation: palpito 3s infinite;
+            text-decoration: none; /* Importante para el tag <a> */
         }
-        .floating-cart-zone:hover { transform: scale(1.1); }
-        .drag-over-active { transform: scale(1.3); background: #10b981; border-color: #10b981; }
-        .pop { animation: popAnim 0.4s ease-out; }
+
+        .floating-cart-zone:hover { 
+            animation: none;
+            transform: scale(1.1); 
+            box-shadow: 0 10px 30px rgba(129, 110, 178, 0.8);
+        }
+        
+        .drag-over-active { 
+            animation: none !important;
+            transform: scale(1.3) !important; 
+            background: #10b981; 
+            border-color: #10b981; 
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+        
+        .pop { animation: popAnim 0.4s ease-out !important; }
         @keyframes popAnim { 0% { transform: scale(1.3); } 50% { transform: scale(1.6); } 100% { transform: scale(1); } }
+        
         .cart-badge { position: absolute; top: 0; right: 0; background: #ff4757; color: white; width: 26px; height: 26px; border-radius: 50%; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
 
         @media (max-width: 768px) {
@@ -189,13 +222,12 @@
     </div>
 
     <header>
-        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir Menú">☰</button>
-        
+        <button class="menu-trigger" id="menuBtn" onclick="toggleMenu()" aria-label="Abrir Menú Principal">☰</button>
         
         <div class="auth-actions" id="auth-container">
             @auth
-                <a href="{{ url('/dashboard') }}" class="user-profile-widget">
-                    <div class="profile-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
+                <a href="{{ url('/dashboard') }}" class="user-profile-widget" aria-label="Ver perfil de {{ Auth::user()->name }}">
+                    <div class="profile-avatar" aria-hidden="true">{{ substr(Auth::user()->name, 0, 1) }}</div>
                     <span style="font-size: 0.85rem; padding-right: 5px;">{{ Auth::user()->name }}</span>
                 </a>
             @else
@@ -208,7 +240,7 @@
     <main class="container">
         <div style="margin-bottom: 25px; margin-top: 20px;">
             <a href="javascript:history.back()" style="color: var(--secondary); text-decoration: none; font-weight: 600;">
-                <i class="fas fa-arrow-left"></i> Volver
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver
             </a>
         </div>
 
@@ -218,8 +250,8 @@
 
         <div class="sellers-section">
             <h3 style="margin-bottom: 20px; color: var(--text-dark);">
-                <span><i class="fas fa-store" style="color: var(--primary);"></i> Ofertas</span>
-                <span style="font-size: 0.8rem; color: #888; font-weight: normal; margin-left: 10px;">(Arrastra al carrito)</span>
+                <span><i class="fas fa-store" style="color: var(--primary);" aria-hidden="true"></i> Ofertas</span>
+                <span style="font-size: 0.8rem; color: #666; font-weight: normal; margin-left: 10px;">(Arrastra al carrito)</span>
             </h3>
 
             <div class="table-container">
@@ -251,7 +283,7 @@
                             >
                                 <td data-label="Vendedor">
                                     <div style="display:flex; align-items:center; gap:10px; justify-content: flex-end; @media(min-width:769px){justify-content:flex-start;}">
-                                        <i class="fas fa-user-circle" style="font-size:1.8rem; color:#ccc;"></i>
+                                        <i class="fas fa-user-circle" style="font-size:1.8rem; color:#ccc;" aria-hidden="true"></i>
                                         <strong>{{ $sellerName }}</strong>
                                     </div>
                                 </td>
@@ -263,13 +295,14 @@
                                 <td data-label="Precio" class="price-tag">{{ number_format($listing->price, 2) }} €</td>
                                 <td>
                                     <button class="btn-add" onclick="addToCartClick(this)"
+                                        aria-label="Añadir al carrito oferta de {{ $sellerName }} por {{ number_format($listing->price, 2) }} euros"
                                         data-id="{{ $listing->id }}"
                                         data-price="{{ $listing->price }}"
                                         data-seller="{{ $sellerName }}"
                                         data-condition="{{ $listing->condition }}"
                                         data-foil="{{ $listing->is_foil }}"
                                         data-set="{{ $setName }}">
-                                        <i class="fas fa-plus"></i>
+                                        <i class="fas fa-plus" aria-hidden="true"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -288,9 +321,9 @@
                 <img src="{{ asset('logo.jpg') }}" alt="CardFactory Logo" class="footer-logo">
                 <p>Tu mercado de confianza para comprar y vender cartas de Magic: The Gathering.</p>
                 <div class="social-icons" style="margin-top:15px;">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                 </div>
             </div>
             <div class="footer-section">
@@ -308,9 +341,13 @@
         </div>
     </footer>
 
-    <a id="cart-drop-zone" class="floating-cart-zone" onclick="window.location.href='/carrito'">        
+    <a id="cart-drop-zone" class="floating-cart-zone" 
+       href="#" 
+       role="button"
+       aria-label="Ver carrito de compras"
+       onclick="event.preventDefault(); window.location.href='/carrito'">        
         <span class="cart-badge" id="cart-count">0</span>
-        <i class="fas fa-shopping-cart" style="font-size: 1.5rem;"></i>
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem;" aria-hidden="true"></i>
     </a>
 
     <script>
@@ -391,7 +428,8 @@
             const item = { id: ds.id, price: parseFloat(ds.price), seller: ds.seller, condition: ds.condition, is_foil: ds.foil == "1", set_name: ds.set };
             if(processAddToCart(item)) {
                 const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i>'; btn.style.background = '#10b981';
+                // ACCESIBILIDAD: Mantener aria-hidden en el icono de check
+                btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>'; btn.style.background = '#10b981';
                 setTimeout(() => { btn.innerHTML = original; btn.style.background = ''; }, 1500);
             }
         }
@@ -430,7 +468,12 @@
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('myCart')) || [];
             const el = document.getElementById('cart-count');
-            if(el) el.innerText = cart.length;
+            if(el) {
+                el.innerText = cart.length;
+                // ACCESIBILIDAD: Actualizar label del carrito dinámicamente
+                const dropZone = document.getElementById('cart-drop-zone');
+                if(dropZone) dropZone.setAttribute('aria-label', `Ver carrito, ${cart.length} artículos`);
+            }
         }
 
         window.onload = init;
