@@ -82,6 +82,7 @@
         <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
         <a href="#">Carrito</a>
+        <a href="/ayuda">Ayuda</a>
     </nav>
 
     <script src="http://localhost:8000/js/register.js"></script>

@@ -20,7 +20,9 @@
         <a href="{{ url('/dashboard') }}">Perfil</a>
         <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
-        <a href="carrito.html">Carrito</a> 
+        <a href="carrito.html">Carrito</a>
+        <a href="/ayuda">Ayuda</a>
+
     </div>
 
     <header>

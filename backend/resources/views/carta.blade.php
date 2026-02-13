@@ -186,6 +186,7 @@
         <a href="{{ url('/colecciones') }}">Colecciones</a>
         <a href="{{ url('/catalogo') }}">Catálogo</a>
         <a href="{{ url('/carrito') }}">Carrito</a>
+        <a href="/ayuda">Ayuda</a>
     </div>
 
     <header>

@@ -179,7 +179,9 @@
 
             <article class="help-card">
                 <div class="video-wrapper">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=placeholder" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <video controls crossorigin="anonymous"> <source src="/videos/venta.mp4" type="video/mp4">
+                        <track src="/videos/venta.vtt" kind="subtitles" srclang="es" label="Español" default>
+                    </video>
                 </div>
                 <div class="help-content">
                     <h2><div class="icon-step"><i class="fas fa-tag"></i></div> Cómo Vender</h2>
