@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,8 +28,6 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-// Asegúrate de importar Validator arriba del todo:
-    // use Illuminate\Support\Facades\Validator; 
 
     public function store(Request $request)
     {
@@ -41,23 +40,28 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // 2. Crear Usuario
+        // 2. Crear el Usuario (Solo datos de acceso y nombre principal)
         $user = User::create([
             'name' => $request->name,
-            'surname' => $request->last_name, 
-            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        // 3. Crear el Perfil asociado a ese usuario
+        Profile::create([
+            'user_id' => $user->id,
+            'surname' => $request->last_name,
+            'phone' => $request->phone,
         ]);
 
         event(new Registered($user));
         Auth::login($user);
 
-        // 3. RESPUESTA JSON (La clave para tu idea)
+        // 4. RESPUESTA JSON
         return response()->json([
             'status' => 'success',
             'user_name' => $user->name,
-            'visual_token' => 'sesion_activa_' . time(), // Token inventado
+            'visual_token' => 'sesion_activa_' . time(), 
             'redirect_url' => route('dashboard', absolute: false)
         ]);
     }

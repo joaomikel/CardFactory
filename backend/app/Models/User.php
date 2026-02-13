@@ -58,4 +58,8 @@ class User extends Authenticatable
                     ->withPivot('id', 'price', 'quantity', 'condition', 'language', 'is_foil') // Campos extra de la tabla listings
                     ->withTimestamps();
     }
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
 }
