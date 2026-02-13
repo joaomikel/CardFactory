@@ -1,8 +1,8 @@
 /* Ubicación: public/css/catalogo.css */
 :root {
-    --primary: #816EB2;
+    --primary: #6c5a96;
     --primary-dark: #5e4c8d;
-    --secondary: #958EA0;
+    --secondary: #6e667a;
     --dark: #222;
     --white: #ffffff;
     --bg: #f9f9f9;
@@ -262,9 +262,9 @@ header {
     white-space: nowrap;
 }
 .btn-login {
-    background: rgba(255,255,255,0.25);
+    background: rgba(0, 0, 0, 0.2); 
     color: var(--white);
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(4px);
 }
 .btn-login:hover {
@@ -499,6 +499,11 @@ header {
     font-weight: 800;
     font-size: 1rem;
 }
+.text-no-stock {
+    color: #595959; 
+    font-weight: 700;
+    font-size: 0.9rem;
+}
 
 /* --- FOOTER --- */
 footer {
@@ -625,4 +630,20 @@ footer {
     .footer-content {
         grid-template-columns: repeat(4, 1fr);
     }
+}
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); 
+    }
+}
+
+.card-anim {
+    opacity: 0; 
+    animation: fadeInUp 0.5s ease-out forwards; 
+    will-change: opacity, transform;
 }

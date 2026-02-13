@@ -141,7 +141,7 @@
 
         async function fetchCards(q = 'f:standard') {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; font-size:1.2rem;"><i class="fas fa-circle-notch fa-spin"></i> Buscando cartas...</p>';
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 50px; font-size:1.2rem;"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Buscando cartas...</p>';
 
             try {
                 const res = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(q)}`);
@@ -155,7 +155,7 @@
                 const scryfallIds = data.data.map(card => card.id);
                 const stockMap = await checkLocalStock(scryfallIds);
 
-                grid.innerHTML = data.data.map(card => {
+                grid.innerHTML = data.data.map((card, index) => {
                     let imgUrl = 'https://via.placeholder.com/488x680';
                     if (card.image_uris && card.image_uris.normal) {
                         imgUrl = card.image_uris.normal;
@@ -167,13 +167,18 @@
                     let priceHtml;
                     
                     if (dbPrice !== undefined && dbPrice !== null) {
-                        priceHtml = `<span style="color: var(--primary); font-weight: 800;">${parseFloat(dbPrice).toFixed(2)}€</span>`;
+                        priceHtml = `<span class="card-price">${parseFloat(dbPrice).toFixed(2)}€</span>`;
                     } else {
-                        priceHtml = `<span style="color: #999; font-weight: 600; font-size: 0.9rem;">No Stock</span>`;
+                        priceHtml = `<span class="text-no-stock">No Stock</span>`;
                     }
 
+                    const delay = index * 0.05;
+
                     return `
-                        <a href="/carta?id=${card.id}" class="card-catalog" tabindex="0">
+                        <a href="/carta?id=${card.id}" 
+                        class="card-catalog card-anim" 
+                        style="animation-delay: ${delay}s"
+                        tabindex="0">
                             <img src="${imgUrl}" alt="Carta: ${card.name}" loading="lazy">
                             <div class="card-info">
                                 <h3>${card.name}</h3>

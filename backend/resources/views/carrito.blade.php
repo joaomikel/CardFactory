@@ -87,6 +87,7 @@
 
         /* Animación para cuando borras */
         .fade-out { opacity: 0; transform: translateX(100%); transition: all 0.3s ease; }
+        
     </style>
     <script>
         window.isLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
